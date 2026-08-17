@@ -3,6 +3,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthProvider } from "@/components/AuthProvider";
+import { SupportAssistant } from "@/components/SupportAssistant";
 
 export const metadata: Metadata = {
   title: "AutoFace — Real people. Real compatibility.",
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><AuthProvider><Header />{children}<Footer /></AuthProvider></body></html>;
+  return <html lang="en"><body><AuthProvider><Header />{children}<Footer /><SupportAssistant /></AuthProvider></body></html>;
 }

@@ -149,3 +149,17 @@ Introduces a guided controlled-beta setup experience at `/get-started`.
 - Updated homepage copy so it no longer describes matching and messaging as future capabilities.
 - Adds `Getting Started` to desktop, account and mobile navigation.
 - No recommendation, compatibility, safety or verification scoring logic is changed.
+
+
+## v0.16 — Atlas Support Assistant
+
+Adds an authenticated floating product-support assistant throughout AutoFace.
+
+- Floating `Need help? / Ask Atlas Support` launcher on signed-in pages.
+- Curated support knowledge for Getting Started, authenticity, Atlas compatibility, Discovery, introductions, messaging, privacy, reporting, blocking, export and deletion.
+- Direct action links route users to the relevant AutoFace feature.
+- Quick-start support questions make common help topics one tap away.
+- Discovery/setup questions can inspect the authenticated member's setup metadata and identify which readiness checks remain.
+- The support session is stateless: v0.16 does not create or persist a support-chat history collection.
+- The assistant does not inspect private messages, calculate compatibility, recommend partners, or make moderation decisions.
+- Gemini is not required for v0.16 support answers; approved AutoFace guidance is the source of truth.

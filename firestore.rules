@@ -167,6 +167,9 @@ service cloud.firestore {
     }
 
 
+    // v0.16 support assistant is stateless and does not create a chat-history collection.
+    // Support requests use authenticated server APIs and curated product guidance.
+
     // v0.15 beta feedback is accepted only through authenticated server APIs.
     match /betaFeedback/{feedbackId} {
       allow read, write: if false;
