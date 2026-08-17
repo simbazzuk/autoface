@@ -133,6 +133,7 @@ export function Header() {
         </div>
 
         <div className="account-dropdown-links">
+          <Link href="/get-started" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Getting Started</Link>
           <Link href="/profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>My Profile</Link>
           <Link href="/relationship-profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Atlas Profile</Link>
           <Link href="/dashboard" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Security & Verification</Link>
@@ -161,6 +162,7 @@ export function Header() {
             <details className="nav-group">
               <summary>My AutoFace <span aria-hidden="true">⌄</span></summary>
               <div className="nav-group-menu">
+                <Link href="/get-started"><b>Getting Started</b><small>Setup checklist & beta feedback</small></Link>
                 <Link href="/profile"><b>My Profile</b><small>Personal details and visibility</small></Link>
                 <Link href="/relationship-profile"><b>Atlas Profile</b><small>Relationship preferences</small></Link>
                 <Link href="/compatibility"><b>Compatibility</b><small>Explainable compatibility model</small></Link>
@@ -220,6 +222,7 @@ export function Header() {
 
               <div className="mobile-nav-section">
                 <span className="mobile-nav-label">MY AUTOFACE</span>
+                <Link href="/get-started" onClick={closeMobile}>Getting Started</Link>
                 <Link href="/profile" onClick={closeMobile}>My Profile</Link>
                 <Link href="/relationship-profile" onClick={closeMobile}>Atlas Profile</Link>
                 <Link href="/compatibility" onClick={closeMobile}>Compatibility</Link>

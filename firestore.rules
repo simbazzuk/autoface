@@ -166,6 +166,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+
+    // v0.15 beta feedback is accepted only through authenticated server APIs.
+    match /betaFeedback/{feedbackId} {
+      allow read, write: if false;
+    }
+
     // v0.14 moderation and operator audit records are server-owned.
     match /accountModeration/{uid} {
       allow read, write: if false;

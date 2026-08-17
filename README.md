@@ -136,3 +136,16 @@ Completes the member-to-operator safety workflow.
 - Reports flow into the v0.14 Safety Operations queue.
 - Report submission does not automatically include private message history.
 - Human moderation remains responsible for report resolution and account suspension decisions.
+
+
+## v0.15 — Beta Readiness & Onboarding Polish
+
+Introduces a guided controlled-beta setup experience at `/get-started`.
+
+- Dynamic readiness checklist based on the authenticated member's real profile, Atlas, authenticity, preferences and Discovery state.
+- Clear next-step CTA and overall setup progress.
+- Trust snapshot and active introduction count.
+- In-product beta feedback capture to the server-owned `betaFeedback` collection.
+- Updated homepage copy so it no longer describes matching and messaging as future capabilities.
+- Adds `Getting Started` to desktop, account and mobile navigation.
+- No recommendation, compatibility, safety or verification scoring logic is changed.
