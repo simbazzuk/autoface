@@ -94,3 +94,15 @@ Replaces the untyped recommendation candidate with a typed `RelationshipIntent` 
 
 ## v0.12.3 — Recommendation UI Polish
 Improves the recommendation-details hierarchy with friendlier Atlas copy, a clearer compatibility label, user-facing compatibility breakdown language, dimension alignment badges, larger explanatory text, and a clearer discovery-preference eligibility audit. No recommendation algorithm or Firestore changes.
+
+
+## v0.13 — Account, Privacy & Data Controls
+
+Adds an authenticated Account & Privacy area.
+
+- Pause/resume Discovery without deleting the account.
+- Privacy and verification status snapshot.
+- Download a JSON export of AutoFace-held account data, including profiles, preferences, verification outcome metadata, notifications, interests, matches, conversations and security events.
+- Provider-held identity documents or biometric payloads remain outside AutoFace and are therefore not included in the export.
+- Permanent account deletion requires typing `DELETE MY AUTOFACE ACCOUNT`.
+- Deletion is performed server-side and removes known AutoFace account, profile, Atlas, recommendation, conversation, notification and verification-session data before removing the Firebase Authentication user.

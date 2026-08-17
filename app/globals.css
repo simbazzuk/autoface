@@ -839,3 +839,30 @@ body{
     justify-content:space-between;
   }
 }
+
+
+/* AutoFace v0.13 — Account, Privacy & Data Controls */
+.account-privacy-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.72fr);gap:22px;align-items:start}
+.account-privacy-main,.account-privacy-side{display:grid;gap:18px}
+.account-control-card h2{margin:6px 0 10px}
+.account-control-card>p{max-width:760px;line-height:1.6}
+.account-control-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.account-data-row{display:flex;justify-content:space-between;gap:20px;padding:12px 0;border-top:1px solid rgba(255,255,255,.07);font-size:12px}
+.account-data-row span{color:#8493a8}.account-data-row code{font-size:10px;color:#aebbd0;overflow-wrap:anywhere;text-align:right}
+.privacy-live{color:#8ce4c0!important;border-color:rgba(53,211,154,.22)!important;background:rgba(53,211,154,.06)!important}
+.privacy-action-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px;padding:15px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.018)}
+.privacy-action-row>div{display:grid;gap:4px}.privacy-action-row b{font-size:12px}.privacy-action-row small{font-size:10px;color:#8090a7}
+.data-export-note{display:grid;gap:5px;margin:16px 0;padding:14px;border-radius:13px;border:1px solid rgba(53,211,154,.17);background:rgba(53,211,154,.035)}
+.data-export-note b{font-size:12px;color:#9be5c8}.data-export-note span{font-size:10px;line-height:1.55;color:#8c9bb0}
+.privacy-status-list{display:grid;margin:14px 0}
+.privacy-status-list span{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:11px;color:#9cabbe}
+.privacy-status-list b{color:#e1e8f1}
+.privacy-principle-card{background:linear-gradient(145deg,rgba(124,92,255,.07),rgba(85,175,255,.035))}
+.danger-zone{border-color:rgba(255,105,102,.23);background:linear-gradient(145deg,rgba(255,105,102,.045),rgba(255,255,255,.018))}
+.danger-kicker{color:#ff9d9a!important}
+.delete-confirmation{display:grid;gap:12px;margin-top:18px;padding:16px;border-radius:14px;border:1px solid rgba(255,105,102,.22);background:rgba(255,105,102,.035)}
+.delete-confirmation label{font-size:11px;color:#c6d0dd}.delete-confirmation input{width:100%;box-sizing:border-box}
+.delete-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.destructive-fill{background:rgba(255,105,102,.13)!important}
+@media(max-width:900px){.account-privacy-layout{grid-template-columns:1fr}.account-privacy-side{grid-template-columns:repeat(2,minmax(0,1fr))}.privacy-principle-card{grid-column:1/-1}}
+@media(max-width:620px){.account-privacy-side{grid-template-columns:1fr}.privacy-principle-card{grid-column:auto}.account-control-head,.privacy-action-row{display:grid}.account-data-row{display:grid;gap:5px}.account-data-row code{text-align:left}.delete-actions{display:grid}.delete-actions .btn{width:100%}}

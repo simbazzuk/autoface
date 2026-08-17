@@ -135,6 +135,7 @@ export function Header() {
           <Link href="/profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>My Profile</Link>
           <Link href="/relationship-profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Atlas Profile</Link>
           <Link href="/dashboard" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Security & Verification</Link>
+          <Link href="/account" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Account & Privacy</Link>
           <Link href="/introductions" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Introductions</Link>
         </div>
 
@@ -165,6 +166,7 @@ export function Header() {
                 <Link href="/discovery-preferences"><b>Discovery Preferences</b><small>Control who Atlas can recommend</small></Link>
                 <Link href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
                 <Link href="/verify-photo"><b>Photo Verification</b><small>Profile-photo authenticity</small></Link>
+                <Link href="/account"><b>Account & Privacy</b><small>Discovery, data export and deletion</small></Link>
               </div>
             </details>
           )}
@@ -222,6 +224,7 @@ export function Header() {
                 <Link href="/discovery-preferences" onClick={closeMobile}>Discovery Preferences</Link>
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
                 <Link href="/verify-photo" onClick={closeMobile}>Photo Verification</Link>
+                <Link href="/account" onClick={closeMobile}>Account & Privacy</Link>
               </div>
             </>
           ) : (

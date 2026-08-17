@@ -166,5 +166,8 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // v0.13 account privacy, export and deletion are handled by trusted server APIs.
+    // No additional client-writeable collections are introduced.
+
   }
 }
