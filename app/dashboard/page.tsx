@@ -56,7 +56,7 @@ const checks: VerificationCheck[] = [
     label: "Identity verification",
     weight: "+30",
     available: true,
-    summary: "Confirms a real-world identity check through the v0.3 verification boundary.",
+    summary: "Confirms a real-world identity check through the identity-verification boundary.",
     detail: "In development, AutoFace uses a clearly labelled simulator. In production this signal must come from a specialist identity provider; AutoFace stores the outcome and provider reference rather than identity-document images.",
   },
   {
@@ -174,7 +174,7 @@ export default function Dashboard() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Authenticity Centre · v0.3</span>
+          <span className="eyebrow">Authenticity Centre · v0.5</span>
           <h1>Build your authenticity.</h1>
           <p className="lead">Your score comes from explicit verification evidence—not AI judgement, popularity or profile attractiveness.</p>
         </div>
@@ -283,7 +283,7 @@ export default function Dashboard() {
             <div className="security-action identity-action">
               <div className="action-copy">
                 <strong>Identity + liveness verification</strong>
-                <p>Continue to the v0.3 verification boundary. In development this uses a clearly labelled simulator; production will use a specialist provider.</p>
+                <p>Continue to the identity-verification boundary. In development this uses a clearly labelled simulator; production will use a specialist provider.</p>
               </div>
               {signals.identityVerified && signals.livenessVerified ? (
                 <p className="notice">✓ Identity and liveness evidence recorded.</p>
@@ -295,7 +295,7 @@ export default function Dashboard() {
             <div className="privacy-box">
               <span className="privacy-kicker">PRIVACY BY DESIGN</span>
               <b>Zero-ID Storage</b>
-              <p>AutoFace v0.3 has no passport, driving licence, selfie or biometric upload fields.</p>
+              <p>AutoFace v0.5 has no passport, driving licence, selfie or biometric upload fields.</p>
               <p className="privacy-note">Identity and liveness results are written server-side after a provider session; users cannot self-award these verification signals.</p>
             </div>
 

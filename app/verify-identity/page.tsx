@@ -31,7 +31,7 @@ export default function VerifyIdentityPage() {
     } catch (error) {
       const raw = error instanceof Error ? error.message : "Unable to start verification.";
       setMessage(raw === "SERVER_NOT_CONFIGURED"
-        ? "Server-side Firebase Admin is not configured yet. Add the v0.3 server environment variables and restart AutoFace."
+        ? "Server-side Firebase Admin is not configured yet. Add the server-side Firebase Admin environment variables and restart AutoFace."
         : raw === "PROVIDER_NOT_CONFIGURED"
           ? "A production identity provider has not been connected yet. Use demo mode for development or configure a provider adapter."
           : raw);
@@ -46,7 +46,7 @@ export default function VerifyIdentityPage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Identity Verification · v0.3</span>
+          <span className="eyebrow">Identity Verification · v0.5</span>
           <h1>Prove you’re really you.</h1>
           <p className="lead">AutoFace is designed to receive verification evidence from a specialist provider—not your passport, driving licence or biometric files.</p>
         </div>
@@ -65,7 +65,7 @@ export default function VerifyIdentityPage() {
               <div><b>AutoFace stores</b><span>Verified / not verified</span><span>Checks completed</span><span>Provider reference</span><span>Verification timestamp</span></div>
             </div>
 
-            <div className="notice verification-warning"><b>Development mode:</b> v0.3 includes a simulator so you can test the integration boundary before selecting a production verification provider. It does not perform a real identity check.</div>
+            <div className="notice verification-warning"><b>Development mode:</b> v0.5 continues to use the v0.3 verification simulator so you can test the integration boundary before selecting a production verification provider. It does not perform a real identity check.</div>
 
             <button className="btn btn-primary" disabled={busy} onClick={startVerification}>{busy ? "Starting…" : "Start identity verification"}</button>
             {message && <p className="notice status-message">{message}</p>}

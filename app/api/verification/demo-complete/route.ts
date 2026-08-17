@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     const providerReference = snap.data()?.providerReference ?? `demo_${body.sessionId}`;
-    await adminDb.runTransaction(async (tx) => {
+    await db.runTransaction(async (tx) => {
       tx.set(db.collection("identity").doc(user.uid), {
         identityVerified: true,
         livenessVerified: true,
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       });
     });
 
-    await adminDb.collection("securityEvents").add({
+    await db.collection("securityEvents").add({
       uid: user.uid,
       eventType: "identity_verification_completed",
       riskLevel: "info",

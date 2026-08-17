@@ -10,6 +10,9 @@ export function Header() {
           <Link href="/how-it-works">How it works</Link>
           <Link href="/trust">Trust & Privacy</Link>
           <Link href="/dashboard">Authenticity Centre</Link>
+          <Link href="/profile">My Profile</Link>
+          <Link href="/relationship-profile">Atlas Profile</Link>
+          <Link href="/compatibility">Compatibility</Link>
           <Link href="/sign-in">Sign in</Link>
           <Link className="btn btn-primary" href="/register">Create account</Link>
         </nav>

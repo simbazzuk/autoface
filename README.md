@@ -1,66 +1,39 @@
-# AutoFace v0.1
+# AutoFace v0.6 — Explainable Compatibility Engine
 
-Security-first foundation for AutoFace.
+v0.6 builds on the security-first AutoFace foundation and adds the first deterministic compatibility comparison experience.
 
-## Included
+## What is new
+- Compatibility Lab at `/compatibility`
+- Weighted, explainable comparison across 9 structured relationship dimensions
+- Strongest-alignment and conversation-point explanations
+- Synthetic demonstration profiles only — no real member discovery
+- Compatibility consent is required before the lab will run
+- Results are calculated in memory and are not persisted
 
-- Public landing page
-- How It Works page
-- Trust & Privacy page
-- Early-access form and development-only local capture endpoint
-- Security Centre preview
-- Firebase-ready configuration scaffold
-- Security/privacy baseline documentation
-- Zero-ID Storage design principle
+## Existing foundations retained
+- Firebase email and phone authentication
+- Authenticity Centre and server-controlled identity/liveness verification evidence
+- Zero-ID Storage principle
+- Private base profile
+- Private Atlas Relationship Profile
 
-## Deliberately not included in v0.1
-
-- Matrimonial/relationship profiles
-- Matching
-- Atlas compatibility
-- Messaging
-- Passport/driving-licence upload
-- Biometric storage
-- Production identity verification
-
-## Run locally
+## Setup
+Copy the working `.env.local` from your previous AutoFace version, then:
 
 ```powershell
 npm install
-Copy-Item .env.example .env.local
+npm run build
+firebase deploy --only firestore:rules
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+The Firestore rules are unchanged functionally from v0.5 because v0.6 does not expose any other user's profile data and does not add a compatibility-results collection.
 
-The landing page works without Firebase environment variables. Firebase configuration is scaffolded for the next phase.
-
-## Production build
-
-```powershell
-npm run build
-npm start
-```
-
-## Important early-access note
-
-The v0.1 early-access API writes to `.data/early-access.ndjson` only in development. It deliberately does not pretend to be a production datastore. Before public deployment, replace this endpoint with an approved persistent service and document its retention/deletion policy.
-
-## Suggested next release — v0.2
-
-- Firebase sign-up/sign-in
-- Email verification
-- Mobile verification
-- MFA/passkey design
-- Protected Security Centre
-- Deterministic authenticity score service
-- Security event model
-
-
-## v0.3 identity-verification setup
-
-Carry forward your existing client-side Firebase values into `.env.local`, then add the three `FIREBASE_ADMIN_*` values shown in `.env.example`. Keep `AUTOFACE_VERIFICATION_MODE=demo` for development.
-
-The v0.3 simulator is not real identity verification. It exists to test the provider boundary, server-only verification writes, audit trail and Authenticity Centre scoring before a production identity provider is selected.
-
-After changing Firestore rules, deploy `firestore.rules` to the AutoFace Firebase project so browsers cannot self-award identity or liveness verification.
+## Test
+1. Sign in with an existing account.
+2. Confirm your Atlas Relationship Profile is saved with compatibility consent enabled.
+3. Open `/compatibility`.
+4. Switch between the three clearly labelled synthetic profiles.
+5. Confirm the overall score, dimension scores, strongest alignments and conversation points change deterministically.
+6. Refresh and confirm your underlying relationship profile is unchanged.
+7. Confirm no compatibility result document is created in Firestore.

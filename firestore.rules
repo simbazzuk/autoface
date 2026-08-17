@@ -1,19 +1,101 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+    function signedInAs(uid) {
+      return request.auth != null && request.auth.uid == uid;
     }
 
-    // Verification evidence is readable by the account owner but can only be
+    match /users/{uid} {
+      allow read, write: if signedInAs(uid);
+    }
+
+    // v0.4 profile foundation. Profiles remain owner-readable only until the
+    // explicit matching/discovery permissions model is introduced.
+    match /profiles/{uid} {
+      allow read: if signedInAs(uid);
+      allow create, update: if signedInAs(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.keys().hasOnly([
+          'uid','firstName','age','generalLocation','heightCm','occupation',
+          'education','relationshipIntent','aboutMe','visibility','showAge',
+          'showLocation','showOccupation','createdAt','updatedAt'
+        ])
+        && request.resource.data.firstName is string
+        && request.resource.data.firstName.size() > 0
+        && request.resource.data.firstName.size() <= 50
+        && request.resource.data.age is int
+        && request.resource.data.age >= 18
+        && request.resource.data.age <= 100
+        && request.resource.data.generalLocation is string
+        && request.resource.data.generalLocation.size() > 0
+        && request.resource.data.generalLocation.size() <= 80
+        && (request.resource.data.heightCm == null || (request.resource.data.heightCm is int && request.resource.data.heightCm >= 120 && request.resource.data.heightCm <= 230))
+        && request.resource.data.occupation is string
+        && request.resource.data.occupation.size() <= 100
+        && request.resource.data.education is string
+        && request.resource.data.education.size() <= 120
+        && request.resource.data.relationshipIntent in ['marriage','long_term_relationship','serious_relationship']
+        && request.resource.data.aboutMe is string
+        && request.resource.data.aboutMe.size() > 0
+        && request.resource.data.aboutMe.size() <= 600
+        && request.resource.data.visibility in ['private','future_matches']
+        && request.resource.data.showAge is bool
+        && request.resource.data.showLocation is bool
+        && request.resource.data.showOccupation is bool;
+      allow delete: if signedInAs(uid);
+    }
+
+
+
+    // v0.5 Atlas Relationship Profile. These answers are private and owner-only.
+    // Matching/discovery is intentionally not enabled in this release.
+    match /relationshipProfiles/{uid} {
+      allow read: if signedInAs(uid);
+      allow create, update: if signedInAs(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.keys().hasOnly([
+          'uid','familyOrientation','communicationDirectness','socialEnergy',
+          'careerPriority','routineVsAdventure','relocationFlexibility',
+          'sharedInterestsImportance','independencePreference','relationshipPace',
+          'idealWeekend','whatMattersMost','nonNegotiables','consentForCompatibility',
+          'createdAt','updatedAt'
+        ])
+        && request.resource.data.familyOrientation is int
+        && request.resource.data.familyOrientation >= 1 && request.resource.data.familyOrientation <= 5
+        && request.resource.data.communicationDirectness is int
+        && request.resource.data.communicationDirectness >= 1 && request.resource.data.communicationDirectness <= 5
+        && request.resource.data.socialEnergy is int
+        && request.resource.data.socialEnergy >= 1 && request.resource.data.socialEnergy <= 5
+        && request.resource.data.careerPriority is int
+        && request.resource.data.careerPriority >= 1 && request.resource.data.careerPriority <= 5
+        && request.resource.data.routineVsAdventure is int
+        && request.resource.data.routineVsAdventure >= 1 && request.resource.data.routineVsAdventure <= 5
+        && request.resource.data.relocationFlexibility is int
+        && request.resource.data.relocationFlexibility >= 1 && request.resource.data.relocationFlexibility <= 5
+        && request.resource.data.sharedInterestsImportance is int
+        && request.resource.data.sharedInterestsImportance >= 1 && request.resource.data.sharedInterestsImportance <= 5
+        && request.resource.data.independencePreference is int
+        && request.resource.data.independencePreference >= 1 && request.resource.data.independencePreference <= 5
+        && request.resource.data.relationshipPace in ['slow','balanced','intentional']
+        && request.resource.data.idealWeekend is string
+        && request.resource.data.idealWeekend.size() > 0 && request.resource.data.idealWeekend.size() <= 400
+        && request.resource.data.whatMattersMost is string
+        && request.resource.data.whatMattersMost.size() > 0 && request.resource.data.whatMattersMost.size() <= 500
+        && request.resource.data.nonNegotiables is string
+        && request.resource.data.nonNegotiables.size() > 0 && request.resource.data.nonNegotiables.size() <= 400
+        && request.resource.data.consentForCompatibility is bool;
+      allow delete: if signedInAs(uid);
+    }
+
+        // Verification evidence is readable by the account owner but can only be
     // written by trusted server-side code (Firebase Admin bypasses rules).
     match /identity/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
+      allow read: if signedInAs(uid);
       allow write: if false;
     }
 
     match /authenticity/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
+      allow read: if signedInAs(uid);
       allow write: if false;
     }
 
