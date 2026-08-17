@@ -194,3 +194,16 @@ Focuses on controlled-beta launch rather than adding matching features.
 - Refreshes old prototype/early-access wording.
 - Carries forward the tested SupportAssistant TypeScript null-narrowing fix from v0.17.
 - No change to compatibility scoring, authenticity scoring, recommendations, messaging or safety decisions.
+
+
+## v0.19 — Production & Beta Polish
+- Password reset using Firebase Authentication.
+- Dedicated email-verification status/resend journey.
+- Sign-in routes unverified accounts to verification before setup.
+- Friendlier authentication errors without exposing Firebase internals.
+- Branded 404 and recoverable application error states.
+- Persistent BETA product indicator.
+- Privacy Notice and Beta Terms surfaced in Trust navigation/footer.
+- Registration continues directly into email verification.
+- Responsive polish for authentication and error states.
+- Carries forward v0.18 controlled-beta invitation access and v0.17 SupportAssistant null-safety fix.

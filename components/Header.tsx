@@ -151,7 +151,7 @@ export function Header() {
       <div className="container nav-inner">
         <Link href="/" className="brand" onClick={closeMobile}>
           <Image src="/autoface-logo.png" alt="AutoFace" width={42} height={42} className="brand-logo" />
-          <span>AutoFace</span>
+          <span>AutoFace</span><span className="brand-beta">BETA</span>
         </Link>
 
         <nav className="nav-links desktop-nav" aria-label="Primary navigation">
@@ -180,6 +180,8 @@ export function Header() {
             <div className="nav-group-menu trust-menu">
               <Link href="/how-it-works"><b>How it works</b><small>Understand the AutoFace journey</small></Link>
               <Link href="/trust"><b>Trust & Privacy</b><small>Security and data minimisation</small></Link>
+              <Link href="/privacy"><b>Privacy Notice</b><small>How AutoFace handles beta data</small></Link>
+              <Link href="/terms"><b>Beta Terms</b><small>Terms for controlled beta access</small></Link>
             </div>
           </details>
 

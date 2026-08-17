@@ -53,7 +53,7 @@ export default function RegisterPage(){
       }
 
       await sendEmailVerification(credential.user);
-      setMessage("Account created. Check your email for the verification link, then continue with Getting Started.");
+      window.location.href="/verify-email";
     }catch(err){
       setMessage(err instanceof Error?err.message:"Could not create account");
     }finally{setBusy(false);}
