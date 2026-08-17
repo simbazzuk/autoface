@@ -1,0 +1,7 @@
+"use client";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+export default function SignInPage(){const [email,setEmail]=useState("");const [password,setPassword]=useState("");const [message,setMessage]=useState("");const router=useRouter();async function submit(e:FormEvent){e.preventDefault();if(!auth){setMessage("Firebase is not configured.");return;}try{await signInWithEmailAndPassword(auth,email,password);router.push("/dashboard")}catch(err){setMessage(err instanceof Error?err.message:"Unable to sign in")}}return <main><section className="page-hero"><div className="container"><span className="eyebrow">Welcome back</span><h1>Sign in securely.</h1><p className="lead">Access your AutoFace Authenticity Centre and verification status.</p></div></section><section className="section"><div className="container"><form className="form" onSubmit={submit}><div className="field"><label>Email</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></div><div className="field"><label>Password</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} required/></div><button className="btn btn-primary">Sign in</button>{message&&<p className="notice">{message}</p>}<p className="muted">New to AutoFace? <Link href="/register"><b>Create account</b></Link></p></form></div></section></main>}
