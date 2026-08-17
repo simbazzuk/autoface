@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { relationshipIntentLabels } from "@/lib/profile";
 import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
 
-type DiscoveryResponse = { eligible: boolean; candidates: SafeDiscoveryProfile[]; error?: string };
+type DiscoveryResponse = { eligible: boolean; candidates: SafeDiscoveryProfile[]; preferences?: unknown; error?: string };
 
 export default function DiscoverPage() {
   const { user, loading } = useAuth();
@@ -60,11 +60,11 @@ export default function DiscoverPage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">Discovery · v0.10.1</span>
+      <span className="eyebrow">Discovery · v0.12.1</span>
       <h1>Introductions, not endless swiping.</h1>
-      <p className="lead">AutoFace only recommends eligible members who have opted into future matches. Private Atlas answers stay server-side; you see a safe profile projection and an explainable compatibility result.</p>
+      <p className="lead">Your hard preferences define the eligible pool. Atlas then ranks those eligible members using the deterministic compatibility model and explains why each recommendation appears.</p>
     </div></section>
-    <section className="section discovery-section"><div className="container">
+    <section className="section discovery-section"><div className="container"><div className="discovery-toolbar"><div><span className="privacy-kicker">ATLAS RECOMMENDATIONS</span><p>Eligibility → preferences → deterministic ranking</p></div><a className="btn" href="/discovery-preferences">Discovery preferences</a></div>
       {!data.eligible ? <div className="card discovery-empty"><span className="privacy-kicker">DISCOVERY LOCKED</span><h2>Finish the trust foundation first</h2><p>To enter Discovery, set your profile visibility to <b>Future matches</b>, keep compatibility consent enabled, and have at least 50% authenticity.</p><div className="hero-actions left-actions"><a className="btn btn-primary" href="/profile">Update profile visibility</a><a className="btn" href="/dashboard">Check authenticity</a></div></div>
       : data.candidates.length === 0 ? <div className="card discovery-empty"><span className="privacy-kicker">YOU’RE READY</span><h2>No new introductions yet</h2><p>Your profile is eligible for Discovery. AutoFace found no other eligible members that you have not already reviewed.</p><a className="btn" href="/compatibility">Open Compatibility Lab</a></div>
       : <div className="discovery-grid">{data.candidates.map((c) => <article className="card discovery-card" key={c.uid}>
@@ -73,7 +73,7 @@ export default function DiscoverPage() {
           <div className="candidate-badges"><span>{c.authenticityLevel}</span><span>{c.compatibilityLevel} alignment</span><span>{relationshipIntentLabels[c.relationshipIntent]}</span></div>
           <p className="candidate-about">{c.aboutMe}</p>
           <div className="discovery-insights"><div><small>STRONG ALIGNMENTS</small><p>{c.strongestAlignments.length ? c.strongestAlignments.join(" · ") : "No dominant alignment"}</p></div><div><small>WORTH DISCUSSING</small><p>{c.conversationPoints.length ? c.conversationPoints.join(" · ") : "No major structured differences"}</p></div></div>
-          <div className="discovery-actions"><button className="btn" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"pass")}>Not for me</button><button className="btn btn-relationship" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"interested")}>Interested</button></div>
+          <a className="recommendation-detail-link" href={`/recommendations/${c.uid}`}>View recommendation details →</a><div className="discovery-actions"><button className="btn" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"pass")}>Not for me</button><button className="btn btn-relationship" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"interested")}>Interested</button></div>
         </article>)}</div>}
       {message && <p className="notice discovery-message">{message}</p>}
       <div className="card discovery-privacy"><span className="privacy-kicker">MUTUAL BY DESIGN</span><h3>No unsolicited messaging</h3><p>Expressing interest does not expose your email, mobile number or private Atlas answers. Communication remains locked until both people independently choose Interested.</p><a className="btn" href="/introductions">View mutual introductions</a></div>

@@ -78,3 +78,19 @@ Adds server-owned in-app notifications for mutual introductions, new messages, c
 
 ## v0.11.1 — Notification Query Patch
 Removes Firestore composite-index requirements from notification listing and mark-all-read. Queries now filter only by recipientUid, then sort/filter server-side for the small in-app notification set.
+
+
+## v0.12 — Smarter Discovery & Recommendation Engine
+Adds server-owned discovery preferences, preference-first eligibility filtering, deterministic Atlas ranking, structured recommendation reason codes and a recommendation-details page. Preferences currently support age range, broad same-area/UK location choice, relationship intentions and relocation openness. Precise location is not collected and Gemini does not determine eligibility or ranking. Also carries forward the v0.11.1 NotificationBell TypeScript null-narrowing fix.
+
+
+## v0.12.1 — Build Patch
+Fixes the missing closing brace in `lib/server/discovery.ts` at the end of `recommendationFor()`. No recommendation logic, data model, or Firestore rule changes.
+
+
+## v0.12.2 — TypeScript Recommendation Patch
+Replaces the untyped recommendation candidate with a typed `RelationshipIntent` so `relationshipIntentLabels[c.relationshipIntent]` passes strict TypeScript checks. No recommendation or Firestore logic changes.
+
+
+## v0.12.3 — Recommendation UI Polish
+Improves the recommendation-details hierarchy with friendlier Atlas copy, a clearer compatibility label, user-facing compatibility breakdown language, dimension alignment badges, larger explanatory text, and a clearer discovery-preference eligibility audit. No recommendation algorithm or Firestore changes.

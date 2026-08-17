@@ -161,5 +161,10 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // v0.12 discovery preferences are server-owned through authenticated API routes.
+    match /discoveryPreferences/{uid} {
+      allow read, write: if false;
+    }
+
   }
 }
