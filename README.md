@@ -62,3 +62,7 @@ Adds an optional Gemini explanation layer without changing AutoFace's determinis
 
 ## v0.9.2.1 — Atlas AI UI Patch
 Polishes the optional AI consent layout, checkbox alignment, spacing, button sizing, and shortens consent copy for narrow side panels.
+
+
+## v0.10 — Connection Journey & Safety
+Adds a private connection overview for every mutual introduction: explainable Atlas alignment, neutral conversation points, deterministic conversation starters, user-controlled relationship stages, and direct access to existing server-enforced block/report/unmatch controls. Connection stages are stored server-side per participant and are not compatibility or authenticity scoring inputs.

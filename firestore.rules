@@ -150,5 +150,11 @@ service cloud.firestore {
     match /reports/{reportId} {
       allow read, write: if false;
     }
+
+    // v0.10 connection journey is server-owned. Clients use authenticated API
+    // routes so only mutual-match participants can read or update their own stage.
+    match /connections/{matchId} {
+      allow read, write: if false;
+    }
   }
 }

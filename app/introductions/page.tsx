@@ -49,9 +49,9 @@ export default function IntroductionsPage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">Introductions · v0.8</span>
+      <span className="eyebrow">Introductions · v0.10</span>
       <h1>Mutual interest, clearly established.</h1>
-      <p className="lead">These are people where interest has been expressed independently in both directions. Safe messaging is now available only inside a mutual introduction.</p>
+      <p className="lead">These are people where interest has been expressed independently in both directions. Each mutual introduction now has a private Connection space with explainable compatibility, conversation starters and safety controls.</p>
     </div></section>
     <section className="section discovery-section"><div className="container">
       {error && <p className="notice">{error}</p>}
@@ -66,7 +66,7 @@ export default function IntroductionsPage() {
           <p>{i.generalLocation ?? "Location hidden"}</p>
           <div className="trust-pair"><span><b>{i.authenticityScore}%</b><small>Authenticity</small></span><span><b>{i.compatibilityScore}%</b><small>Compatibility</small></span></div>
           <p className="candidate-about">{i.aboutMe}</p>
-          <a className="btn btn-primary" href={`/messages/${i.matchId}`}>Open safe conversation</a>
+          <a className="btn btn-primary" href={`/connections/${i.matchId}`}>Open connection</a>
         </article>)}
       </div>}
     </div></section>
