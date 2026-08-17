@@ -60,7 +60,7 @@ export default function DiscoverPage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">Discovery · v0.7.2</span>
+      <span className="eyebrow">Discovery · v0.10.1</span>
       <h1>Introductions, not endless swiping.</h1>
       <p className="lead">AutoFace only recommends eligible members who have opted into future matches. Private Atlas answers stay server-side; you see a safe profile projection and an explainable compatibility result.</p>
     </div></section>
@@ -73,7 +73,7 @@ export default function DiscoverPage() {
           <div className="candidate-badges"><span>{c.authenticityLevel}</span><span>{c.compatibilityLevel} alignment</span><span>{relationshipIntentLabels[c.relationshipIntent]}</span></div>
           <p className="candidate-about">{c.aboutMe}</p>
           <div className="discovery-insights"><div><small>STRONG ALIGNMENTS</small><p>{c.strongestAlignments.length ? c.strongestAlignments.join(" · ") : "No dominant alignment"}</p></div><div><small>WORTH DISCUSSING</small><p>{c.conversationPoints.length ? c.conversationPoints.join(" · ") : "No major structured differences"}</p></div></div>
-          <div className="discovery-actions"><button className="btn" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"pass")}>Not for me</button><button className="btn btn-primary" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"interested")}>Interested</button></div>
+          <div className="discovery-actions"><button className="btn" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"pass")}>Not for me</button><button className="btn btn-relationship" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"interested")}>Interested</button></div>
         </article>)}</div>}
       {message && <p className="notice discovery-message">{message}</p>}
       <div className="card discovery-privacy"><span className="privacy-kicker">MUTUAL BY DESIGN</span><h3>No unsolicited messaging</h3><p>Expressing interest does not expose your email, mobile number or private Atlas answers. Communication remains locked until both people independently choose Interested.</p><a className="btn" href="/introductions">View mutual introductions</a></div>

@@ -66,3 +66,7 @@ Polishes the optional AI consent layout, checkbox alignment, spacing, button siz
 
 ## v0.10 — Connection Journey & Safety
 Adds a private connection overview for every mutual introduction: explainable Atlas alignment, neutral conversation points, deterministic conversation starters, user-controlled relationship stages, and direct access to existing server-enforced block/report/unmatch controls. Connection stages are stored server-side per participant and are not compatibility or authenticity scoring inputs.
+
+
+## v0.10.1 — Visual Refresh
+Adds a warmer relationship-focused palette while retaining AutoFace's dark premium base. Introduces coral relationship actions, emerald trust states, warmer introduction avatars, a stronger Connection hero, clearer authenticity/compatibility colour separation, and refined message bubble treatments. No backend or data-model changes.

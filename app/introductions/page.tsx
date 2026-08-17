@@ -49,7 +49,7 @@ export default function IntroductionsPage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">Introductions · v0.10</span>
+      <span className="eyebrow">Introductions · v0.10.1</span>
       <h1>Mutual interest, clearly established.</h1>
       <p className="lead">These are people where interest has been expressed independently in both directions. Each mutual introduction now has a private Connection space with explainable compatibility, conversation starters and safety controls.</p>
     </div></section>
@@ -62,11 +62,13 @@ export default function IntroductionsPage() {
       </div> : <div className="discovery-grid">
         {items.map((i) => <article className="card discovery-card" key={i.matchId}>
           <div className="intro-pills"><span className="status-pill">MUTUAL INTRODUCTION</span>{i.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}</div>
-          <h2>{i.firstName}{i.age ? `, ${i.age}` : ""}</h2>
-          <p>{i.generalLocation ?? "Location hidden"}</p>
+          <div className="candidate-identity introduction-identity">
+            <div className="profile-placeholder warm-avatar">{i.firstName.slice(0,1).toUpperCase()}</div>
+            <div><h2>{i.firstName}{i.age ? `, ${i.age}` : ""}</h2><p>{i.generalLocation ?? "Location hidden"}</p></div>
+          </div>
           <div className="trust-pair"><span><b>{i.authenticityScore}%</b><small>Authenticity</small></span><span><b>{i.compatibilityScore}%</b><small>Compatibility</small></span></div>
           <p className="candidate-about">{i.aboutMe}</p>
-          <a className="btn btn-primary" href={`/connections/${i.matchId}`}>Open connection</a>
+          <a className="btn btn-relationship" href={`/connections/${i.matchId}`}>Open connection</a>
         </article>)}
       </div>}
     </div></section>

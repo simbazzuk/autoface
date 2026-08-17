@@ -94,7 +94,7 @@ export default function MessagePage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container message-hero-row">
-      <div><a className="message-back-link" href={`/connections/${matchId}`}>← Connection overview</a><span className="eyebrow">Safe Messaging · v0.10</span><h1>Conversation with {other.firstName}</h1><p className="lead">Messaging is available because interest was mutual. Keep contact details private until you are comfortable sharing them.</p></div>
+      <div><a className="message-back-link" href={`/connections/${matchId}`}>← Connection overview</a><span className="eyebrow">Safe Messaging · v0.10.1</span><h1>Conversation with {other.firstName}</h1><p className="lead">Messaging is available because interest was mutual. Keep contact details private until you are comfortable sharing them.</p></div>
       <div className="message-trust"><span><b>{other.authenticityScore}%</b><small>Authenticity</small></span><span><b>{other.compatibilityScore}%</b><small>Compatibility</small></span>{other.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}</div>
     </div></section>
     <section className="section message-section"><div className="container message-layout">
