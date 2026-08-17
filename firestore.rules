@@ -156,5 +156,10 @@ service cloud.firestore {
     match /connections/{matchId} {
       allow read, write: if false;
     }
+    // v0.11 notifications are server-owned; authenticated clients use API routes.
+    match /notifications/{notificationId} {
+      allow read, write: if false;
+    }
+
   }
 }

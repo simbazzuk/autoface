@@ -70,3 +70,11 @@ Adds a private connection overview for every mutual introduction: explainable At
 
 ## v0.10.1 — Visual Refresh
 Adds a warmer relationship-focused palette while retaining AutoFace's dark premium base. Introduces coral relationship actions, emerald trust states, warmer introduction avatars, a stronger Connection hero, clearer authenticity/compatibility colour separation, and refined message bubble treatments. No backend or data-model changes.
+
+
+## v0.11 — Notifications & Activity Centre
+Adds server-owned in-app notifications for mutual introductions, new messages, connection-stage activity and photo verification. Includes unread counts in the header, an Activity Centre, mark-read/mark-all-read actions, and direct action links. Message bodies are deliberately not copied into notification records.
+
+
+## v0.11.1 — Notification Query Patch
+Removes Firestore composite-index requirements from notification listing and mark-all-read. Queries now filter only by recipientUid, then sort/filter server-side for the small in-app notification set.

@@ -663,3 +663,18 @@ body{
   .connection-avatar{width:56px;height:56px;flex-basis:56px;border-radius:18px;font-size:21px}
   .connection-person{align-items:flex-start}
 }
+
+/* AutoFace v0.11 — notifications & activity centre */
+.notification-bell{position:relative;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);display:grid;place-items:center;color:#dce5f1;font-size:22px}
+.notification-bell:hover{border-color:rgba(255,113,99,.35);background:rgba(255,113,99,.06)}
+.notification-bell>b{position:absolute;right:-5px;top:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--relationship);color:white;font-size:9px;display:grid;place-items:center;border:2px solid var(--bg)}
+.notification-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.notification-head .lead{margin-left:0}
+.notification-section{padding-top:32px}.notification-list{display:grid;gap:12px;max-width:920px}
+.notification-card{display:grid;grid-template-columns:48px 1fr auto;gap:15px;align-items:center;padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.022)}
+.notification-card.unread{border-color:rgba(255,113,99,.22);background:linear-gradient(135deg,rgba(255,113,99,.055),rgba(124,92,255,.025))}
+.notification-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:17px;font-weight:900;background:rgba(124,92,255,.10);color:#d7d0ff}
+.notification-icon.introduction{background:rgba(255,113,99,.10);color:#ffb6ae}.notification-icon.message{background:rgba(85,175,255,.10);color:#9bd0ff}.notification-icon.verification{background:rgba(53,211,154,.10);color:#8ce4c0}.notification-icon.safety{background:rgba(255,105,102,.10);color:#ffaaa8}
+.notification-copy>span{font-size:8px;letter-spacing:.12em;color:#71839e;font-weight:900}.notification-copy h3{margin:4px 0;font-size:16px}.notification-copy p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}.notification-copy small{display:block;margin-top:6px;color:#697991;font-size:9px}
+.notification-actions{display:grid;justify-items:end;gap:7px}.notification-actions .btn{padding:9px 12px;font-size:11px}.notification-read{border:0;background:transparent;color:#8999ae;font-size:9px;cursor:pointer}
+@media(max-width:760px){.notification-head{display:block}.notification-head>.btn{margin-top:18px;width:auto}.notification-card{grid-template-columns:40px 1fr}.notification-icon{width:38px;height:38px}.notification-actions{grid-column:2;justify-items:start;display:flex;align-items:center}.notification-actions .btn{width:auto}}

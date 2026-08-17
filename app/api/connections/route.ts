@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { requireActiveMatch, messagingStatusCode } from "@/lib/server/messaging";
 import { safeProjectionFor } from "@/lib/server/discovery";
+import { createNotification } from "@/lib/server/notifications";
 
 const allowedStages = ["introduced","chatting","getting_to_know","met","connected"] as const;
 type Stage = typeof allowedStages[number];
@@ -62,6 +63,16 @@ export async function POST(request: Request) {
     await adminDb.collection("securityEvents").add({
       uid: user.uid, eventType: "connection_stage_changed", matchId, stage,
       createdAt: FieldValue.serverTimestamp(),
+    });
+    const actor = await safeProjectionFor(match.otherUid, user.uid);
+    await createNotification({
+      recipientUid: match.otherUid,
+      type: "connection",
+      title: `Connection activity with ${actor?.firstName ?? "your introduction"}`,
+      body: "There has been an update in your shared connection journey.",
+      actionUrl: `/connections/${matchId}`,
+      actorUid: user.uid,
+      matchId,
     });
     return NextResponse.json({ ok: true, stage });
   } catch (error) {

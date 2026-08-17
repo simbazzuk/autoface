@@ -2,6 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { verificationMode } from "@/lib/server/verification-provider";
+import { createNotification } from "@/lib/server/notifications";
 
 export const runtime = "nodejs";
 
@@ -72,6 +73,13 @@ export async function POST(request: Request) {
       provider: "autoface-demo-photo",
       assurance: "development-simulation",
       createdAt: FieldValue.serverTimestamp(),
+    });
+    await createNotification({
+      recipientUid: user.uid,
+      type: "verification",
+      title: "Profile photo verified",
+      body: "Your photo-verification signal is complete and your authenticity score can now reflect it.",
+      actionUrl: "/dashboard",
     });
 
     return NextResponse.json({ status: "verified", checks: ["profile_photo_match"] });

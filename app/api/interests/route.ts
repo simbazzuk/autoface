@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { getEligibleMember } from "@/lib/server/discovery";
+import { createNotification } from "@/lib/server/notifications";
 
 type Body = { toUid?: string; action?: "interested" | "pass" };
 
@@ -48,6 +49,10 @@ export async function POST(request: Request) {
           createdAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true });
+        await Promise.all([
+          createNotification({ recipientUid: user.uid, type: "introduction", title: `New introduction with ${toMember.profile.firstName}`, body: "You both independently expressed interest. Your private Connection space is ready.", actionUrl: `/connections/${matchId}`, actorUid: body.toUid, matchId }),
+          createNotification({ recipientUid: body.toUid, type: "introduction", title: `New introduction with ${fromMember.profile.firstName}`, body: "You both independently expressed interest. Your private Connection space is ready.", actionUrl: `/connections/${matchId}`, actorUid: user.uid, matchId }),
+        ]);
         matched = true;
       }
     }

@@ -9,6 +9,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/components/AuthProvider";
 import { auth, db } from "@/lib/firebase";
 import { calculateAuthenticity } from "@/lib/authenticity";
+import { NotificationBell } from "@/components/NotificationBell";
 
 type HeaderIdentity = {
   firstName: string;
@@ -182,10 +183,12 @@ export function Header() {
             </>
           )}
 
+          <NotificationBell />
           {accountControl}
         </nav>
 
         <div className="mobile-nav-controls">
+          <NotificationBell />
           {accountControl}
           <button
             type="button"
@@ -207,6 +210,7 @@ export function Header() {
                 <span className="mobile-nav-label">MATCH</span>
                 <Link href="/discover" onClick={closeMobile}>Discover <span>Recommended introductions</span></Link>
                 <Link href="/introductions" onClick={closeMobile}>Introductions <span>Mutual interest & conversations</span></Link>
+                <Link href="/notifications" onClick={closeMobile}>Activity <span>Notifications & updates</span></Link>
               </div>
 
               <div className="mobile-nav-section">

@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { requireActiveMatch, messagingStatusCode } from "@/lib/server/messaging";
 import { safeProjectionFor } from "@/lib/server/discovery";
+import { createNotification } from "@/lib/server/notifications";
 
 type SendBody = { matchId?: string; text?: string };
 
@@ -76,6 +77,16 @@ export async function POST(request: Request) {
       createdAt: now,
     });
     await batch.commit();
+    const senderProfile = await safeProjectionFor(match.otherUid, user.uid);
+    await createNotification({
+      recipientUid: match.otherUid,
+      type: "message",
+      title: `${senderProfile?.firstName ?? "Your introduction"} sent you a message`,
+      body: "You have a new message in your AutoFace conversation.",
+      actionUrl: `/messages/${matchId}`,
+      actorUid: user.uid,
+      matchId,
+    });
     return NextResponse.json({ ok: true, id: messageRef.id });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
