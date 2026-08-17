@@ -21,6 +21,8 @@ export default function MessagePage() {
   const [showReport, setShowReport] = useState(false);
   const [reportReason, setReportReason] = useState("fake_identity");
   const [reportDetails, setReportDetails] = useState("");
+  const [blockAfterReport, setBlockAfterReport] = useState(true);
+  const [statusMessage, setStatusMessage] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { if (!loading && !user) router.replace("/sign-in"); }, [loading, user, router]);
@@ -72,16 +74,23 @@ export default function MessagePage() {
     if (action === "unmatch" && !window.confirm("End this introduction? Messaging will stop for both people.")) return;
     if (action === "block" && !window.confirm("Block this member? They will no longer be able to message you.")) return;
     setActionBusy(true);
+    setStatusMessage("");
     try {
       const token = await user.getIdToken();
       const response = await fetch("/api/match-actions", {
         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ matchId, action, reason: reportReason, details: reportDetails }),
+        body: JSON.stringify({ matchId, action, reason: reportReason, details: reportDetails, blockAfterReport }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error ?? "Unable to complete action.");
       if (action === "report") {
-        setShowReport(false); setReportDetails(""); setError("Report submitted for review. You can also block or unmatch this member.");
+        setShowReport(false);
+        setReportDetails("");
+        if (body.blocked) {
+          router.replace("/introductions");
+        } else {
+          setStatusMessage("Report submitted to AutoFace Safety Operations for human review.");
+        }
       } else {
         router.replace("/introductions");
       }
@@ -94,12 +103,13 @@ export default function MessagePage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container message-hero-row">
-      <div><a className="message-back-link" href={`/connections/${matchId}`}>← Connection overview</a><span className="eyebrow">Safe Messaging · v0.10.1</span><h1>Conversation with {other.firstName}</h1><p className="lead">Messaging is available because interest was mutual. Keep contact details private until you are comfortable sharing them.</p></div>
+      <div><a className="message-back-link" href={`/connections/${matchId}`}>← Connection overview</a><span className="eyebrow">Safe Messaging · v0.14.1</span><h1>Conversation with {other.firstName}</h1><p className="lead">Messaging is available because interest was mutual. Keep contact details private until you are comfortable sharing them.</p></div>
       <div className="message-trust"><span><b>{other.authenticityScore}%</b><small>Authenticity</small></span><span><b>{other.compatibilityScore}%</b><small>Compatibility</small></span>{other.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}</div>
     </div></section>
     <section className="section message-section"><div className="container message-layout">
       <div className="card chat-card">
         {error && <p className="notice messaging-error">{error}</p>}
+        {statusMessage && <p className="notice safety-success">{statusMessage}</p>}
         <div className="chat-safety-note">AutoFace never reveals your email or mobile number through messaging. Block, report and unmatch remain available at any time.</div>
         <div className="message-list">
           {data.messages.length === 0 && <div className="message-empty"><h2>Start the conversation</h2><p>You both chose to be introduced. A simple hello is enough.</p></div>}
@@ -138,9 +148,73 @@ export default function MessagePage() {
         </form>
       </div>
       <aside className="message-side">
-        <div className="card"><span className="privacy-kicker">YOUR CONTROLS</span><h2>Stay in control.</h2><p>These actions are enforced server-side and immediately affect messaging access.</p>
-          <div className="safety-actions"><button className="btn btn-secondary" onClick={() => void matchAction("unmatch")} disabled={actionBusy}>Unmatch</button><button className="btn btn-secondary danger-button" onClick={() => void matchAction("block")} disabled={actionBusy}>Block member</button><button className="btn btn-secondary" onClick={() => setShowReport((v) => !v)} disabled={actionBusy}>Report</button></div>
-          {showReport && <div className="report-panel"><label>Reason<select value={reportReason} onChange={(e) => setReportReason(e.target.value)}><option value="fake_identity">Fake identity / impersonation</option><option value="harassment">Harassment</option><option value="financial_request">Asked for money</option><option value="inappropriate_content">Inappropriate content</option><option value="spam">Spam</option><option value="other">Other</option></select></label><label>Optional details<textarea rows={4} maxLength={1000} value={reportDetails} onChange={(e) => setReportDetails(e.target.value)} /></label><button className="btn btn-primary" onClick={() => void matchAction("report")} disabled={actionBusy}>Submit report</button></div>}
+        <div className="card safety-control-card">
+          <span className="privacy-kicker">YOUR SAFETY CONTROLS</span>
+          <h2>Stay in control.</h2>
+          <p>Blocking and reporting are enforced server-side. The other member is not told who submitted a report.</p>
+
+          <div className="safety-actions">
+            <button className="btn btn-secondary" onClick={() => void matchAction("unmatch")} disabled={actionBusy}>End introduction</button>
+            <button className="btn btn-secondary danger-button" onClick={() => void matchAction("block")} disabled={actionBusy}>Block member</button>
+            <button className={`btn btn-secondary ${showReport ? "report-open" : ""}`} onClick={() => setShowReport((v) => !v)} disabled={actionBusy}>
+              {showReport ? "Cancel report" : "Report member"}
+            </button>
+          </div>
+
+          {showReport && (
+            <div className="report-panel member-report-panel">
+              <div className="report-panel-head">
+                <span className="privacy-kicker">REPORT {other.firstName.toUpperCase()}</span>
+                <h3>Tell AutoFace what happened.</h3>
+                <p>Reports go to the human Safety Operations queue. AutoFace does not automatically suspend someone because a report was submitted.</p>
+              </div>
+
+              <label>
+                <span>Reason</span>
+                <select value={reportReason} onChange={(e) => setReportReason(e.target.value)}>
+                  <option value="fake_identity">Fake identity / impersonation</option>
+                  <option value="harassment">Harassment</option>
+                  <option value="financial_request">Asked for money</option>
+                  <option value="inappropriate_content">Inappropriate content</option>
+                  <option value="spam">Spam</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+
+              <label>
+                <span>What would help the safety team understand? · optional</span>
+                <textarea
+                  rows={5}
+                  maxLength={1000}
+                  placeholder="Describe the behaviour you are reporting. Do not include unnecessary sensitive information."
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                />
+                <small>{reportDetails.length}/1000</small>
+              </label>
+
+              <label className="report-block-choice">
+                <input
+                  type="checkbox"
+                  checked={blockAfterReport}
+                  onChange={(e) => setBlockAfterReport(e.target.checked)}
+                />
+                <span>
+                  <b>Also block {other.firstName}</b>
+                  <small>Recommended if you do not want any further contact. Blocking closes this conversation immediately.</small>
+                </span>
+              </label>
+
+              <div className="report-privacy-note">
+                <b>Privacy boundary</b>
+                <span>Your report reason and the details you enter above are sent to Safety Operations. v0.14.1 does not automatically copy your private conversation history into the report.</span>
+              </div>
+
+              <button className="btn btn-relationship" onClick={() => void matchAction("report")} disabled={actionBusy}>
+                {actionBusy ? "Submitting…" : blockAfterReport ? "Submit report & block" : "Submit report"}
+              </button>
+            </div>
+          )}
         </div>
         <div className="card"><span className="privacy-kicker">SAFETY REMINDER</span><h3>Keep early conversations here.</h3><p>Never send money or financial information to someone you have met through AutoFace. Identity verification confirms identity evidence, not somebody’s intentions.</p></div>
       </aside>

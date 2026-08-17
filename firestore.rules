@@ -166,6 +166,15 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // v0.14 moderation and operator audit records are server-owned.
+    match /accountModeration/{uid} {
+      allow read, write: if false;
+    }
+
+    match /adminAuditEvents/{eventId} {
+      allow read, write: if false;
+    }
+
     // v0.13 account privacy, export and deletion are handled by trusted server APIs.
     // No additional client-writeable collections are introduced.
 

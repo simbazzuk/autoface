@@ -106,3 +106,33 @@ Adds an authenticated Account & Privacy area.
 - Provider-held identity documents or biometric payloads remain outside AutoFace and are therefore not included in the export.
 - Permanent account deletion requires typing `DELETE MY AUTOFACE ACCOUNT`.
 - Deletion is performed server-side and removes known AutoFace account, profile, Atlas, recommendation, conversation, notification and verification-session data before removing the Firebase Authentication user.
+
+
+## v0.14 — Admin, Moderation & Safety Operations
+
+Adds a restricted operator safety console at `/admin`.
+
+- Server-side access is controlled by the comma-separated `AUTOFACE_ADMIN_EMAILS` environment variable.
+- Review user-submitted reports and supplied report details.
+- See report, block and safety-event summary counts.
+- Resolve reports with a mandatory human resolution note.
+- Suspend reported Firebase Authentication accounts; suspension also sets the profile to private.
+- Reinstate accounts through the operator console.
+- Every resolve/suspend/reinstate action creates a server-owned `adminAuditEvents` record.
+- Account moderation state is written to the server-owned `accountModeration` collection.
+- Routine admin APIs deliberately do **not** return private conversation message bodies.
+- No Gemini/LLM automated moderation decisions are introduced in v0.14.
+
+
+## v0.14.1 — Member Reporting & Blocking
+
+Completes the member-to-operator safety workflow.
+
+- Clear `Report member`, `Block member`, and `End introduction` controls in conversations.
+- Reporting captures a structured reason plus optional member-supplied details.
+- Users can choose `Submit report & block` in one action.
+- Report-and-block immediately closes the conversation and writes the block server-side.
+- Standalone blocking now also records a server-owned security event.
+- Reports flow into the v0.14 Safety Operations queue.
+- Report submission does not automatically include private message history.
+- Human moderation remains responsible for report resolution and account suspension decisions.
