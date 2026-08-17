@@ -16,10 +16,24 @@ export default function CompatibilityPage() {
   const [selectedId, setSelectedId] = useState(demoCompatibilityProfiles[0].id);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [message, setMessage] = useState("");
+  const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiConsent, setAiConsent] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiInsight, setAiInsight] = useState("");
+  const [aiError, setAiError] = useState("");
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
   }, [loading, user, router]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/atlas-ai", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((body) => { if (active) setAiEnabled(body.enabled === true); })
+      .catch(() => { if (active) setAiEnabled(false); });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     if (!db || !user) return;
@@ -50,6 +64,33 @@ export default function CompatibilityPage() {
   const selected = demoCompatibilityProfiles.find((candidate) => candidate.id === selectedId) ?? demoCompatibilityProfiles[0];
   const result = useMemo(() => relationshipProfile ? calculateCompatibility(relationshipProfile, selected) : null, [relationshipProfile, selected]);
 
+  useEffect(() => {
+    setAiInsight("");
+    setAiError("");
+  }, [selectedId]);
+
+  async function generateAiExplanation() {
+    if (!user || !result || !aiConsent || aiBusy) return;
+    try {
+      setAiBusy(true);
+      setAiError("");
+      const token = await user.getIdToken();
+      const response = await fetch("/api/atlas-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ mode: "compatibility", consent: true, candidateId: selected.id }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error ?? "Unable to generate Atlas AI explanation.");
+      if (body.deterministicScore !== result.score) throw new Error("AI explanation score check failed.");
+      setAiInsight(body.insight ?? "");
+    } catch (error) {
+      setAiError(error instanceof Error ? error.message : "Unable to generate Atlas AI explanation.");
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
   if (loading || !user || loadingProfile) {
     return <main><section className="section"><div className="container"><p className="muted">Loading the private Compatibility Lab…</p></div></section></main>;
   }
@@ -58,9 +99,9 @@ export default function CompatibilityPage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Compatibility Lab · v0.6</span>
+          <span className="eyebrow">Compatibility Lab · v0.9.2.1</span>
           <h1>Understand why two people may fit.</h1>
-          <p className="lead">AutoFace compares structured relationship signals and shows the reasoning. This is not a prediction of relationship success and no LLM decides the score.</p>
+          <p className="lead">AutoFace calculates compatibility deterministically. Optional Gemini explanations can make that published reasoning easier to read, but cannot alter the score.</p>
         </div>
       </section>
 
@@ -149,6 +190,27 @@ export default function CompatibilityPage() {
                   <h3>Deterministic, not mysterious</h3>
                   <p>Each dimension has a published weight. Similar answers score more highly; differences are surfaced rather than hidden.</p>
                   <p>No free-text answer is scored in v0.6, and this comparison is not saved to Firestore.</p>
+                </div>
+
+                <div className="card atlas-ai-compat-card">
+                  <div className="atlas-ai-title">
+                    <div><span className="privacy-kicker">OPTIONAL GEMINI EXPLANATION</span><h3>Explain this result naturally</h3></div>
+                    <span className={`status-pill ${aiEnabled ? "" : "ai-off-pill"}`}>{aiEnabled ? "AVAILABLE" : "OFF"}</span>
+                  </div>
+                  <p>The score above has already been calculated. Gemini may explain it, but it cannot recalculate or override it.</p>
+                  {aiEnabled ? (
+                    <>
+                      <label className="consent-row ai-consent-row">
+                        <input type="checkbox" checked={aiConsent} onChange={(e) => setAiConsent(e.target.checked)} />
+                        <span><b>Use Gemini for this explanation</b><small>Your structured Atlas answers and this comparison will be sent to the configured AI provider for this request. The generated text is not saved.</small></span>
+                      </label>
+                      <button className="btn btn-primary" type="button" disabled={!aiConsent || aiBusy} onClick={() => void generateAiExplanation()}>
+                        {aiBusy ? "Generating…" : aiInsight ? "Regenerate explanation" : "Generate AI explanation"}
+                      </button>
+                      {aiInsight && <div className="atlas-ai-output"><span className="privacy-kicker">ATLAS AI</span><p>{aiInsight}</p></div>}
+                      {aiError && <p className="notice">{aiError}</p>}
+                    </>
+                  ) : <div className="ai-disabled-note"><b>Gemini is optional and currently disabled.</b><span>The deterministic Compatibility Lab remains fully available.</span></div>}
                 </div>
               </aside>
             </div>

@@ -50,10 +50,24 @@ export default function RelationshipProfilePage() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiConsent, setAiConsent] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiInsight, setAiInsight] = useState("");
+  const [aiError, setAiError] = useState("");
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
   }, [loading, user, router]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/atlas-ai", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((body) => { if (active) setAiEnabled(body.enabled === true); })
+      .catch(() => { if (active) setAiEnabled(false); });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     if (!db || !user) return;
@@ -95,6 +109,27 @@ export default function RelationshipProfilePage() {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  async function generateAiReflection() {
+    if (!user || aiBusy || !aiConsent) return;
+    try {
+      setAiBusy(true);
+      setAiError("");
+      const token = await user.getIdToken();
+      const response = await fetch("/api/atlas-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ mode: "profile", consent: true }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error ?? "Unable to generate Atlas AI reflection.");
+      setAiInsight(body.insight ?? "");
+    } catch (error) {
+      setAiError(error instanceof Error ? error.message : "Unable to generate Atlas AI reflection.");
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
   async function save(event: FormEvent) {
     event.preventDefault();
     if (!db || !user || saving) return;
@@ -118,7 +153,7 @@ export default function RelationshipProfilePage() {
         createdAt: createdAt ?? serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      setMessage("Relationship profile saved privately. Matching is still disabled in v0.5.");
+      setMessage("Relationship profile saved privately. Your deterministic Atlas profile is ready for compatibility and optional AI explanation.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to save your relationship profile.");
     } finally {
@@ -134,9 +169,9 @@ export default function RelationshipProfilePage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Atlas Relationship Profile · v0.5</span>
+          <span className="eyebrow">Atlas Relationship Profile · v0.9.2.1</span>
           <h1>Help Atlas understand what fits.</h1>
-          <p className="lead">Go beyond a basic profile. These answers create structured compatibility dimensions for future recommendations. They remain private in v0.5 and are not visible to other members.</p>
+          <p className="lead">Go beyond a basic profile. These answers create structured compatibility dimensions. Atlas remains deterministic; optional AI can explain your saved answers only when you explicitly request it.</p>
         </div>
       </section>
 
@@ -185,7 +220,35 @@ export default function RelationshipProfilePage() {
               <h3>{insight.headline}</h3>
               <p>{insight.summary}</p>
               <div className="atlas-focus"><small>Likely compatibility focus</small>{insight.compatibilityFocus.map((item) => <span key={item}>{item}</span>)}</div>
-              <p className="atlas-disclaimer">This v0.5 insight is deterministic and explainable. It summarises your structured answers; it does not decide who you should match with.</p>
+              <p className="atlas-disclaimer">This deterministic Atlas insight remains the source of truth. It summarises your structured answers and does not decide who you should match with.</p>
+            </div>
+
+            <div className="card atlas-ai-card">
+              <div className="atlas-ai-title">
+                <div><span className="privacy-kicker">OPTIONAL AI LAYER</span><h3>Atlas AI reflection</h3></div>
+                <span className={`status-pill ${aiEnabled ? "" : "ai-off-pill"}`}>{aiEnabled ? "AVAILABLE" : "OFF"}</span>
+              </div>
+              <p>Gemini can turn your saved Atlas answers into a more natural reflection. It cannot change your compatibility dimensions or authenticity score.</p>
+
+              {aiEnabled ? (
+                <>
+                  <label className="consent-row ai-consent-row">
+                    <input type="checkbox" checked={aiConsent} onChange={(e) => setAiConsent(e.target.checked)} />
+                    <span><b>Use Gemini for this reflection</b><small>Your saved Atlas answers will be sent to the configured AI provider for this request. The generated reflection is not saved.</small></span>
+                  </label>
+                  <button type="button" className="btn btn-primary" disabled={!aiConsent || aiBusy} onClick={() => void generateAiReflection()}>
+                    {aiBusy ? "Asking Atlas AI…" : aiInsight ? "Regenerate reflection" : "Generate AI reflection"}
+                  </button>
+                  {aiInsight && <div className="atlas-ai-output"><span className="privacy-kicker">GEMINI EXPLANATION</span><p>{aiInsight}</p></div>}
+                  {aiError && <p className="notice">{aiError}</p>}
+                </>
+              ) : (
+                <div className="ai-disabled-note">
+                  <b>Optional AI is disabled.</b>
+                  <span>Set ATLAS_AI_ENABLED, GEMINI_API_KEY and GEMINI_MODEL on the server to enable it. AutoFace works normally without Gemini.</span>
+                </div>
+              )}
+              <p className="atlas-disclaimer">AI output is explanatory only. The structured Atlas profile and deterministic compatibility engine remain authoritative.</p>
             </div>
 
             <div className="card completeness-card">

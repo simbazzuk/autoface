@@ -109,6 +109,13 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // v0.9 photo-verification sessions remain server-owned. The account owner may
+    // read only their own session state; trusted server code writes results.
+    match /photoVerificationSessions/{sessionId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
 
     // v0.7.1 demo harness markers are server-owned and are only exposed
     // through the safe Discovery API projection.

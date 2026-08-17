@@ -70,10 +70,10 @@ const checks: VerificationCheck[] = [
   {
     key: "photoVerified",
     label: "Photo verification",
-    weight: "+15 · future",
-    available: false,
-    summary: "Future check connecting profile imagery to the verified person.",
-    detail: "This is reserved for a later release after profile-photo handling, consent and provider capabilities have been reviewed.",
+    weight: "+15",
+    available: true,
+    summary: "Confirms that profile imagery has been checked against the verified person.",
+    detail: "v0.9 adds a provider-neutral photo-verification boundary. In development this is simulated; production must use a specialist provider and AutoFace should retain the outcome/reference rather than raw biometric comparison data.",
   },
 ];
 
@@ -174,7 +174,7 @@ export default function Dashboard() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Authenticity Centre · v0.7</span>
+          <span className="eyebrow">Authenticity Centre · v0.9</span>
           <h1>Build your authenticity.</h1>
           <p className="lead">Your score comes from explicit verification evidence—not AI judgement, popularity or profile attractiveness.</p>
         </div>
@@ -292,10 +292,24 @@ export default function Dashboard() {
               )}
             </div>
 
+            <div className="security-action identity-action">
+              <div className="action-copy">
+                <strong>Profile photo verification</strong>
+                <p>Connect profile imagery to your verified identity through the provider boundary. This adds +15 authenticity points.</p>
+              </div>
+              {signals.photoVerified ? (
+                <p className="notice">✓ Profile photo verification evidence recorded.</p>
+              ) : signals.identityVerified && signals.livenessVerified ? (
+                <button className="btn btn-primary" onClick={() => router.push("/verify-photo")}>Verify profile photo</button>
+              ) : (
+                <p className="muted">Complete identity + liveness verification first.</p>
+              )}
+            </div>
+
             <div className="privacy-box">
               <span className="privacy-kicker">PRIVACY BY DESIGN</span>
               <b>Zero-ID Storage</b>
-              <p>AutoFace v0.7 has no passport, driving licence, selfie or biometric upload fields.</p>
+              <p>AutoFace v0.9 does not store passport images, driving-licence images, raw verification selfies or biometric templates.</p>
               <p className="privacy-note">Identity and liveness results are written server-side after a provider session; users cannot self-award these verification signals.</p>
             </div>
 
