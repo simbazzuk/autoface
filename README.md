@@ -207,3 +207,32 @@ Focuses on controlled-beta launch rather than adding matching features.
 - Registration continues directly into email verification.
 - Responsive polish for authentication and error states.
 - Carries forward v0.18 controlled-beta invitation access and v0.17 SupportAssistant null-safety fix.
+
+
+## v0.20 — The AutoFace Experience
+
+A complete public landing-page repositioning focused on what makes AutoFace different.
+
+- New proposition: dating should be more than a first impression.
+- Hero centres an example Atlas introduction with visible compatibility and authenticity.
+- Reframes AutoFace around understanding, discovery and mutual introduction rather than a feature inventory.
+- Clearly separates Atlas compatibility from authenticity evidence.
+- Removes technical architecture detail from the homepage while retaining links to Trust and How It Works.
+- Stronger controlled-beta CTA and waiting-list path.
+- Premium consumer-focused responsive visual language using the existing AutoFace dark brand.
+- Footer removes obsolete `v0.1 Foundation` wording.
+- No changes to matching, authentication, verification, safety or beta-access logic.
+
+
+## v0.20.1 — Hero Atlas Card Polish
+
+Refines the v0.20 public landing-page hero visual.
+
+- Removes the tilted recommendation-card treatment.
+- Removes floating external Atlas/authenticity callouts.
+- Makes the example recommendation card wider, shorter and visually calmer.
+- Replaces the competing `88% authenticity` score with `Strong authenticity`.
+- Reduces the example compatibility breakdown to three clear dimensions.
+- Adds explicit percentages to each dimension.
+- Strengthens the `Why Atlas recommended Maya` action.
+- Adds a softer background aura so the card feels like a premium product object rather than a dashboard screenshot.

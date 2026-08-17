@@ -1,38 +1,146 @@
 import Link from "next/link";
-import Image from "next/image";
-import { BadgeCheck, Brain, LockKeyhole, ShieldCheck, UserCheck, UsersRound } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, HeartHandshake, ShieldCheck, Sparkles } from "lucide-react";
+
+const alignments = [
+  { label: "Family outlook", value: 92, tone: "Strong alignment" },
+  { label: "Communication", value: 86, tone: "Strong alignment" },
+  { label: "Lifestyle rhythm", value: 81, tone: "Aligned" },
+];
 
 export default function Home() {
-  return <main>
-    <section className="hero"><div className="container">
-      <Image src="/autoface-logo.png" alt="AutoFace robot logo" width={128} height={128} className="hero-logo" priority />
-      <span className="eyebrow">AutoFace · Controlled beta</span>
-      <h1>Real people.<br/>Real compatibility.</h1>
-      <p className="lead">Meaningful relationships should start with confidence. AutoFace is being designed around authenticity, privacy and explainable compatibility — not endless swiping.</p>
-      <div className="hero-actions"><Link href="/early-access" className="btn btn-primary">Join early access</Link><Link href="/trust" className="btn">Explore our trust approach</Link></div>
-      <div className="trust-strip">
-        <div className="mini"><strong>Identity without data hoarding</strong><span>Designed so AutoFace does not need to store passport or driving licence images.</span></div>
-        <div className="mini"><strong>Authenticity by evidence</strong><span>Verification levels are based on clear security signals, not opaque AI judgement.</span></div>
-        <div className="mini"><strong>Privacy by default</strong><span>Personal information is only collected when it has a defined purpose.</span></div>
+  return <main className="experience-home">
+    <section className="experience-hero">
+      <div className="experience-glow experience-glow-one" />
+      <div className="experience-glow experience-glow-two" />
+      <div className="container experience-hero-grid">
+        <div className="experience-hero-copy">
+          <span className="experience-kicker"><Sparkles size={14}/> A different kind of introduction</span>
+          <h1>Dating should be more than a <em>first impression.</em></h1>
+          <p>AutoFace helps you discover people through compatibility, authenticity and mutual intent — so an introduction starts with more than a photo.</p>
+          <div className="experience-actions">
+            <Link className="experience-primary" href="/register">Join the beta <ArrowRight size={17}/></Link>
+            <Link className="experience-secondary" href="/how-it-works">See how Atlas works</Link>
+          </div>
+          <div className="experience-proof">
+            <span><Check size={14}/> No endless swipe feed</span>
+            <span><Check size={14}/> Explainable compatibility</span>
+            <span><Check size={14}/> Mutual interest before messaging</span>
+          </div>
+        </div>
+
+        <div className="experience-match-wrap" aria-label="Example Atlas compatibility card">
+          <div className="experience-card-aura" />
+          <article className="experience-match-card">
+            <div className="experience-card-top">
+              <div>
+                <span className="experience-card-label">ATLAS INTRODUCTION</span>
+                <h2>Maya, 36</h2>
+                <p>Leeds · Healthcare</p>
+              </div>
+              <span className="experience-auth-chip"><BadgeCheck size={13}/> Strong authenticity</span>
+            </div>
+
+            <div className="experience-score">
+              <strong>84%</strong>
+              <span>COMPATIBILITY</span>
+              <small>Strong alignment</small>
+            </div>
+
+            <div className="experience-alignments">
+              {alignments.map(item => <div className="experience-alignment" key={item.label}>
+                <div>
+                  <span><b>{item.label}</b><small>{item.tone}</small></span>
+                  <strong>{item.value}%</strong>
+                </div>
+                <div className="experience-alignment-meter"><i style={{width:`${item.value}%`}} /></div>
+              </div>)}
+            </div>
+
+            <div className="experience-card-footer">
+              <span>Why Atlas recommended Maya</span>
+              <ArrowRight size={16}/>
+            </div>
+          </article>
+        </div>
       </div>
-    </div></section>
+    </section>
 
-    <section className="section"><div className="container">
-      <div className="section-head"><span className="eyebrow">Why AutoFace</span><h2>Trust before matching.</h2><p>AutoFace now brings together authenticity, explainable compatibility, private recommendations, mutual introductions, safe messaging and human-led safety operations.</p></div>
-      <div className="grid-3">
-        <div className="card"><div className="icon"><UserCheck size={21}/></div><h3>Real people</h3><p>A progressive verification model can distinguish a basic account from a strongly identity-verified member.</p></div>
-        <div className="card"><div className="icon"><ShieldCheck size={21}/></div><h3>Security first</h3><p>Email, mobile, MFA/passkeys and later third-party identity verification form independent layers of assurance.</p></div>
-        <div className="card"><div className="icon"><Brain size={21}/></div><h3>Explainable Atlas</h3><p>Atlas explains deterministic compatibility dimensions. It does not decide whether a person's identity is genuine or whether a relationship will succeed.</p></div>
+    <section className="experience-statement">
+      <div className="container">
+        <span className="experience-section-label">WHY AUTOFACE</span>
+        <h2>Most dating apps start with a photo.<br/><em>AutoFace starts with understanding you.</em></h2>
+        <p>The aim is not to predict love. It is to help you make a more informed decision about who may be worth meeting.</p>
       </div>
-    </div></section>
+    </section>
 
-    <section className="section"><div className="container callout">
-      <div className="grid-2"><div><span className="eyebrow">Zero-ID storage principle</span><h2 style={{marginTop:18}}>Verify the person. Don't keep the document.</h2><p className="muted">The intended verification architecture sends identity-document and liveness checks to a specialist provider. AutoFace stores the verification outcome and minimal reference data, not copies of identity documents.</p><Link href="/trust" className="btn" style={{marginTop:10}}>See the privacy model</Link></div>
-      <div className="card"><LockKeyhole size={28}/><h3 style={{marginTop:18}}>Designed not to store</h3><div className="checklist"><div className="check"><span>Passport image</span><b>Not stored</b></div><div className="check"><span>Driving licence image</span><b>Not stored</b></div><div className="check"><span>Biometric template</span><b>Not stored</b></div><div className="check"><span>Verification outcome</span><b className="ok">Stored minimally</b></div></div></div></div>
-    </div></section>
+    <section className="experience-journey">
+      <div className="container">
+        <div className="experience-section-head">
+          <div><span className="experience-section-label">A MORE INTENTIONAL JOURNEY</span><h2>Less swiping. More context.</h2></div>
+          <p>Three simple stages keep the experience focused on understanding, mutuality and choice.</p>
+        </div>
 
-    <section className="section"><div className="container"><div className="section-head"><span className="eyebrow">The AutoFace journey</span><h2>From identity to introduction.</h2></div><div className="flow"><div className="step"><b>01 · Verify</b><p>Establish the account and authenticity signals.</p></div><div className="step"><b>02 · Understand</b><p>Build a relationship profile only after privacy foundations are ready.</p></div><div className="step"><b>03 · Match</b><p>Use deterministic compatibility dimensions with Atlas explanations.</p></div><div className="step"><b>04 · Introduce</b><p>Mutual consent before private communication.</p></div></div></div></section>
+        <div className="experience-three">
+          <article>
+            <span>01</span>
+            <div className="experience-stage-icon"><Sparkles size={22}/></div>
+            <h3>Understand</h3>
+            <p>Build your Atlas relationship profile around values, expectations and the way you want a relationship to work.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <div className="experience-stage-icon"><HeartHandshake size={22}/></div>
+            <h3>Discover</h3>
+            <p>See people who meet your preferences, with compatibility explained rather than hidden behind an opaque match score.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <div className="experience-stage-icon"><ShieldCheck size={22}/></div>
+            <h3>Introduce</h3>
+            <p>Nobody messages anybody until interest is mutual. An introduction opens only when both people independently choose it.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-    <section className="section"><div className="container"><div className="callout" style={{textAlign:'center'}}><BadgeCheck size={32}/><h2 style={{marginTop:16}}>Help shape AutoFace.</h2><p className="lead">Join the controlled beta and help shape a more intentional approach to introductions.</p><Link href="/early-access" className="btn btn-primary" style={{marginTop:24}}><UsersRound size={18}/>Join early access</Link></div></div></section>
+    <section className="experience-dual">
+      <div className="container experience-dual-grid">
+        <div className="experience-dual-copy">
+          <span className="experience-section-label">TWO DIFFERENT QUESTIONS</span>
+          <h2>Compatibility is only half the story.</h2>
+          <p>AutoFace deliberately separates whether two people may fit from whether a profile has stronger evidence of authenticity.</p>
+          <Link href="/trust" className="experience-inline-link">Explore the trust model <ArrowRight size={15}/></Link>
+        </div>
+        <div className="experience-dual-visual">
+          <div className="experience-orbit">
+            <div className="experience-orbit-centre">AUTOFACE</div>
+            <div className="experience-orbit-card orbit-atlas"><span>ATLAS</span><b>Do we fit?</b><small>Compatibility</small></div>
+            <div className="experience-orbit-card orbit-auth"><span>AUTHENTICITY</span><b>Are they real?</b><small>Trust evidence</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section className="experience-principle">
+      <div className="container">
+        <div className="experience-quote">
+          <span className="experience-section-label">THE AUTOFACE PRINCIPLE</span>
+          <blockquote>“Better information for a more intentional introduction.”</blockquote>
+          <p>Atlas explains compatibility. Authenticity builds confidence. You remain the person making the decision.</p>
+        </div>
+      </div>
+    </section>
+
+    <section className="experience-final">
+      <div className="container experience-final-inner">
+        <span className="experience-section-label">CONTROLLED BETA</span>
+        <h2>Ready for something more intentional?</h2>
+        <p>Join a small beta group helping shape AutoFace before wider release.</p>
+        <div className="experience-actions final-actions">
+          <Link className="experience-primary" href="/register">Create your AutoFace account <ArrowRight size={17}/></Link>
+          <Link className="experience-secondary" href="/early-access">Join the waiting list</Link>
+        </div>
+      </div>
+    </section>
   </main>;
 }
