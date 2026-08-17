@@ -36,11 +36,9 @@ export function SupportAssistant() {
 
   async function ask(text: string) {
     const trimmed = text.trim();
-
     if (!user || !trimmed || busy) return;
 
     const currentUser = user;
-
     const userMessage: ChatMessage = { id: nextId.current++, role: "user", text: trimmed };
     setMessages((current) => [...current, userMessage]);
     setQuestion("");
@@ -99,7 +97,7 @@ export function SupportAssistant() {
             <div className="support-avatar">A</div>
             <div>
               <b>Atlas Support</b>
-              <span>AutoFace product guide · v0.16</span>
+              <span>AutoFace product guide</span>
             </div>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close support">×</button>
           </div>

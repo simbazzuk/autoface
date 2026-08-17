@@ -127,7 +127,7 @@ export default function AdminPage() {
 
   return <main>
     <section className="page-hero compact-hero admin-hero"><div className="container">
-      <span className="eyebrow">Safety Operations · v0.14</span>
+      <span className="eyebrow">Safety Operations</span>
       <h1>Moderation with a privacy boundary.</h1>
       <p className="lead">Review member-submitted reports, account safety status and moderation metadata without routinely exposing private conversation contents.</p>
     </div></section>

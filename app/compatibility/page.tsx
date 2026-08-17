@@ -99,7 +99,7 @@ export default function CompatibilityPage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Compatibility Lab · v0.9.2.1</span>
+          <span className="eyebrow">Compatibility Lab</span>
           <h1>Understand why two people may fit.</h1>
           <p className="lead">AutoFace calculates compatibility deterministically. Optional Gemini explanations can make that published reasoning easier to read, but cannot alter the score.</p>
         </div>

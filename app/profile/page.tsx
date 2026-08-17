@@ -143,7 +143,7 @@ export default function ProfilePage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Profile Foundation · v0.5</span>
+          <span className="eyebrow">Profile Foundation</span>
           <h1>Create your profile.</h1>
           <p className="lead">Start with only the information AutoFace needs for a meaningful introduction. Your profile is private by default and matching is not enabled in v0.5.</p>
         </div>

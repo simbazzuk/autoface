@@ -68,7 +68,7 @@ export default function VerifyPhotoPage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">Photo Verification · v0.9</span>
+      <span className="eyebrow">Photo Verification</span>
       <h1>Connect the profile image to the verified person.</h1>
       <p className="lead">A production provider can compare profile imagery against verified identity evidence in its hosted journey. AutoFace records the verification result—not the biometric comparison data.</p>
     </div></section>

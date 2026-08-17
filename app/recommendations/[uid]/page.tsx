@@ -94,7 +94,7 @@ export default function RecommendationPage() {
     <main>
       <section className="page-hero compact-hero recommendation-page-hero">
         <div className="container">
-          <span className="eyebrow">Atlas Recommendation · v0.12.3</span>
+          <span className="eyebrow">Atlas Recommendation</span>
           <h1>Why {c.firstName} is being recommended.</h1>
           <p className="lead">
             Atlas explains where your relationship preferences align — and where a conversation may be useful.

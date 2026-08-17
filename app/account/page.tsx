@@ -147,7 +147,7 @@ export default function AccountPage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Account & Privacy · v0.13</span>
+          <span className="eyebrow">Account & Privacy</span>
           <h1>Your account. Your data. Your control.</h1>
           <p className="lead">Manage discovery participation, understand what AutoFace holds, export your data or permanently delete your account.</p>
         </div>

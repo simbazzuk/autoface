@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { BetaInviteManager } from "@/components/BetaInviteManager";
 
 type FunnelItem = { id:string; label:string; count:number; percent:number };
 type Feedback = { id:string; email:string; category:string; message:string; status:string; appVersion:string; createdAt:string|null };
@@ -75,7 +76,7 @@ export default function BetaOperationsPage(){
 
   return <main>
     <section className="page-hero compact-hero ops-hero"><div className="container">
-      <span className="eyebrow">Beta Operations · v0.17</span>
+      <span className="eyebrow">Beta Operations</span>
       <h1>Is the product actually working for people?</h1>
       <p className="lead">A privacy-conscious operational view of onboarding, Discovery readiness, engagement, safety and beta feedback.</p>
       <div className="ops-hero-actions"><a className="btn" href="/admin">Safety Operations</a><button className="btn btn-primary" onClick={()=>void load()}>Refresh metrics</button></div>
@@ -157,6 +158,8 @@ export default function BetaOperationsPage(){
         </div>
       </div>
 
+      <BetaInviteManager />
+
       <div className="ops-feedback-heading">
         <div><span className="privacy-kicker">BETA FEEDBACK QUEUE</span><h2>Triage feedback without leaving AutoFace</h2></div>
         <div className="admin-filter">{["all","new","reviewed","planned","closed"].map(item=><button key={item} className={feedbackFilter===item?"active":""} onClick={()=>setFeedbackFilter(item)}>{item}</button>)}</div>
@@ -175,7 +178,7 @@ export default function BetaOperationsPage(){
       <div className="card ops-privacy-card">
         <span className="privacy-kicker">OPERATING BOUNDARY</span>
         <h2>Measure the product, not people's private relationships.</h2>
-        <p>v0.17 reports completion, usage and explicit feedback metadata. It does not expose private message contents, private Atlas free-text answers, attractiveness scores or behavioural engagement ranking.</p>
+        <p>Beta Operations reports completion, usage and explicit feedback metadata. It does not expose private message contents, private Atlas free-text answers, attractiveness scores or behavioural engagement ranking.</p>
       </div>
     </div></section>
   </main>;

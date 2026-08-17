@@ -178,3 +178,19 @@ Adds an admin-only operational dashboard at `/admin/operations`.
 - Feedback status changes create admin audit events.
 - When real beta users exist, member-readiness metrics exclude `@autoface.test` demo profiles; otherwise demo data is clearly labelled.
 - No private message content or private Atlas free-text responses are exposed in Beta Operations.
+
+
+## v0.18 — Beta Launch Readiness
+
+Focuses on controlled-beta launch rather than adding matching features.
+
+- Optional invitation-only registration controlled by `AUTOFACE_BETA_INVITE_REQUIRED=true`.
+- Admin-created, limited-use beta invitation codes in Beta Operations.
+- Server-owned `betaInvites` and `betaAccess` records.
+- Registration validates and claims invitation codes while preserving Firebase email verification.
+- Explicit Beta Terms / Privacy Notice acknowledgement during registration.
+- Plain-language `/terms` and `/privacy` pages for the beta baseline.
+- Removes internal version-number artefacts from user-facing UI copy.
+- Refreshes old prototype/early-access wording.
+- Carries forward the tested SupportAssistant TypeScript null-narrowing fix from v0.17.
+- No change to compatibility scoring, authenticity scoring, recommendations, messaging or safety decisions.

@@ -60,7 +60,7 @@ export default function DiscoverPage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">Discovery · v0.12.1</span>
+      <span className="eyebrow">Discovery</span>
       <h1>Introductions, not endless swiping.</h1>
       <p className="lead">Your hard preferences define the eligible pool. Atlas then ranks those eligible members using the deterministic compatibility model and explains why each recommendation appears.</p>
     </div></section>

@@ -1,0 +1,16 @@
+"use client";
+import { FormEvent,useCallback,useEffect,useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
+
+type Invite={code:string;enabled:boolean;maxUses:number;uses:number;note:string;createdAt:string|null};
+
+export function BetaInviteManager(){
+ const {user}=useAuth(); const [items,setItems]=useState<Invite[]>([]); const [code,setCode]=useState(""); const [note,setNote]=useState(""); const [maxUses,setMaxUses]=useState(1); const [message,setMessage]=useState(""); const [busy,setBusy]=useState(false);
+ const load=useCallback(async()=>{if(!user)return;const token=await user.getIdToken();const r=await fetch("/api/admin/beta-invites",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});const b=await r.json();if(r.ok)setItems(b.invites??[])},[user]);
+ useEffect(()=>{void load()},[load]);
+ async function create(e:FormEvent){e.preventDefault();if(!user||busy)return;setBusy(true);setMessage("");try{const token=await user.getIdToken();const r=await fetch("/api/admin/beta-invites",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({code,maxUses,note})});const b=await r.json();if(!r.ok)throw new Error(b.error==="INVITE_EXISTS"?"That code already exists.":b.error??"Unable to create invite.");setCode("");setNote("");setMaxUses(1);setMessage(`Invite ${b.code} created.`);await load()}catch(e){setMessage(e instanceof Error?e.message:"Unable to create invite.")}finally{setBusy(false)}}
+ async function toggle(item:Invite){if(!user||busy)return;setBusy(true);try{const token=await user.getIdToken();await fetch("/api/admin/beta-invites",{method:"PATCH",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({code:item.code,enabled:!item.enabled})});await load()}finally{setBusy(false)}}
+ return <div className="card beta-invite-manager"><div className="ops-section-head"><div><span className="privacy-kicker">BETA ACCESS</span><h2>Invitation codes</h2></div><span className="status-pill">ADMIN CONTROLLED</span></div><p>Create limited-use codes when invitation-only registration is enabled.</p>
+ <form className="beta-invite-form" onSubmit={create}><label>Code<input value={code} onChange={e=>setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g,""))} placeholder="FOUNDERS-001" minLength={4} required/></label><label>Max uses<input type="number" min={1} max={100} value={maxUses} onChange={e=>setMaxUses(Number(e.target.value))}/></label><label>Note<input value={note} maxLength={200} onChange={e=>setNote(e.target.value)} placeholder="Optional cohort note"/></label><button className="btn btn-primary" disabled={busy}>Create invite</button></form>
+ {message&&<p className="notice">{message}</p>}<div className="beta-invite-list">{items.length===0?<p className="muted">No invitation codes created yet.</p>:items.map(item=><div className="beta-invite-row" key={item.code}><span><b>{item.code}</b><small>{item.note||"No note"} · {item.uses}/{item.maxUses} used</small></span><span className={`status-pill ${item.enabled?"privacy-live":""}`}>{item.enabled?"ACTIVE":"DISABLED"}</span><button className="btn" disabled={busy} onClick={()=>void toggle(item)}>{item.enabled?"Disable":"Enable"}</button></div>)}</div></div>
+}

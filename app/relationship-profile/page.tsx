@@ -169,7 +169,7 @@ export default function RelationshipProfilePage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Atlas Relationship Profile · v0.9.2.1</span>
+          <span className="eyebrow">Atlas Relationship Profile</span>
           <h1>Help Atlas understand what fits.</h1>
           <p className="lead">Go beyond a basic profile. These answers create structured compatibility dimensions. Atlas remains deterministic; optional AI can explain your saved answers only when you explicitly request it.</p>
         </div>

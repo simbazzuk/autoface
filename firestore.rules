@@ -167,6 +167,16 @@ service cloud.firestore {
     }
 
 
+
+    // v0.18 controlled-beta invitations and access records are server-owned.
+    match /betaInvites/{code} {
+      allow read, write: if false;
+    }
+
+    match /betaAccess/{uid} {
+      allow read, write: if false;
+    }
+
     // v0.17 Beta Operations reads server-owned aggregates through an admin API.
     // Feedback status changes and operational audit events are also server-owned.
 

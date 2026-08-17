@@ -88,7 +88,7 @@ export default function GetStartedPage() {
 
   return <main>
     <section className="page-hero compact-hero beta-hero"><div className="container">
-      <span className="eyebrow">Beta Readiness · v0.15</span>
+      <span className="eyebrow">Beta Readiness</span>
       <h1>{data.readyForDiscovery ? `You're ready, ${data.firstName}.` : `Let's get you ready, ${data.firstName}.`}</h1>
       <p className="lead">A guided setup for the parts of AutoFace that matter before meaningful recommendations begin.</p>
     </div></section>

@@ -49,7 +49,7 @@ export default function IntroductionsPage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">Introductions · v0.10.1</span>
+      <span className="eyebrow">Introductions</span>
       <h1>Mutual interest, clearly established.</h1>
       <p className="lead">These are people where interest has been expressed independently in both directions. Each mutual introduction now has a private Connection space with explainable compatibility, conversation starters and safety controls.</p>
     </div></section>

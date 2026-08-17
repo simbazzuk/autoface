@@ -174,7 +174,7 @@ export default function Dashboard() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Authenticity Centre · v0.9</span>
+          <span className="eyebrow">Authenticity Centre</span>
           <h1>Build your authenticity.</h1>
           <p className="lead">Your score comes from explicit verification evidence—not AI judgement, popularity or profile attractiveness.</p>
         </div>

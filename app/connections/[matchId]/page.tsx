@@ -26,7 +26,7 @@ export default function ConnectionPage(){
  const o=data.other; const active=stages.findIndex(s=>s.id===data.myStage);
  return <main>
   <section className="page-hero compact-hero"><div className="container">
-   <span className="eyebrow">Connection · v0.10.1</span><h1>Your introduction with {o.firstName}.</h1>
+   <span className="eyebrow">Connection</span><h1>Your introduction with {o.firstName}.</h1>
    <p className="lead">A private place to understand why Atlas introduced you, start a conversation and record how the connection is progressing.</p>
   </div></section>
   <section className="section connection-section"><div className="container connection-layout">

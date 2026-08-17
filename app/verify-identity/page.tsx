@@ -46,7 +46,7 @@ export default function VerifyIdentityPage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Identity Verification · v0.5</span>
+          <span className="eyebrow">Identity Verification</span>
           <h1>Prove you’re really you.</h1>
           <p className="lead">AutoFace is designed to receive verification evidence from a specialist provider—not your passport, driving licence or biometric files.</p>
         </div>
