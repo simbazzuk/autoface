@@ -57,7 +57,7 @@ service cloud.firestore {
           'uid','familyOrientation','communicationDirectness','socialEnergy',
           'careerPriority','routineVsAdventure','relocationFlexibility',
           'sharedInterestsImportance','independencePreference','relationshipPace',
-          'idealWeekend','whatMattersMost','nonNegotiables','consentForCompatibility',
+          'idealWeekend','whatMattersMost','nonNegotiables','consentForCompatibility','consentForAiDiscovery',
           'createdAt','updatedAt'
         ])
         && request.resource.data.familyOrientation is int
@@ -83,7 +83,8 @@ service cloud.firestore {
         && request.resource.data.whatMattersMost.size() > 0 && request.resource.data.whatMattersMost.size() <= 500
         && request.resource.data.nonNegotiables is string
         && request.resource.data.nonNegotiables.size() > 0 && request.resource.data.nonNegotiables.size() <= 400
-        && request.resource.data.consentForCompatibility is bool;
+        && request.resource.data.consentForCompatibility is bool
+        && request.resource.data.consentForAiDiscovery is bool;
       allow delete: if signedInAs(uid);
     }
 

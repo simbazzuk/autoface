@@ -14,6 +14,8 @@ export default function DiscoverPage() {
   const [data, setData] = useState<DiscoveryResponse | null>(null);
   const [busyUid, setBusyUid] = useState("");
   const [message, setMessage] = useState("");
+  const [resetBusy, setResetBusy] = useState(false);
+  const isTestProfile = Boolean(user?.email?.endsWith("@autoface.test"));
 
   useEffect(() => { if (!loading && !user) router.replace("/sign-in"); }, [loading, user, router]);
   async function load(signal?: AbortSignal) {
@@ -42,6 +44,30 @@ export default function DiscoverPage() {
     return () => controller.abort();
   }, [user]);
 
+  async function resetDemoRecommendations() {
+    if (!user || resetBusy) return;
+    const current = user;
+    try {
+      setResetBusy(true);
+      setMessage("");
+      const token = await current.getIdToken();
+      const response = await fetch("/api/demo/recommendations/reset", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error ?? "Unable to reset demo recommendations.");
+      setMessage(body.skippedMutual
+        ? `Reset ${body.reset} demo decision(s). ${body.skippedMutual} mutual introduction(s) were preserved.`
+        : `Reset ${body.reset} demo recommendation decision(s).`);
+      await load();
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "Unable to reset demo recommendations.");
+    } finally {
+      setResetBusy(false);
+    }
+  }
+
   async function decide(toUid: string, action: "interested" | "pass") {
     if (!user || busyUid) return;
     setBusyUid(toUid); setMessage("");
@@ -62,11 +88,14 @@ export default function DiscoverPage() {
     <section className="page-hero compact-hero"><div className="container">
       <span className="eyebrow">Discovery</span>
       <h1>Introductions, not endless swiping.</h1>
-      <p className="lead">Your hard preferences define the eligible pool. Atlas then ranks those eligible members using the deterministic compatibility model and explains why each recommendation appears.</p>
+      <p className="lead">Your hard preferences define the eligible pool. Atlas ranks eligible members deterministically. On recommendation details, opted-in members can also use Atlas AI Discovery to uncover semantic themes Gemini notices in their relationship answers.</p>
     </div></section>
-    <section className="section discovery-section"><div className="container"><div className="discovery-toolbar"><div><span className="privacy-kicker">ATLAS RECOMMENDATIONS</span><p>Eligibility → preferences → deterministic ranking</p></div><a className="btn" href="/discovery-preferences">Discovery preferences</a></div>
+    <section className="section discovery-section"><div className="container"><div className="discovery-toolbar">
+        <div><span className="privacy-kicker">ATLAS RECOMMENDATIONS</span><p>Eligibility → preferences → deterministic ranking → optional AI insight</p></div>
+        <div className="discovery-toolbar-actions"><a className="btn" href="/recommendations/history">Reviewed recommendations</a><a className="btn" href="/discovery-preferences">Discovery preferences</a></div>
+      </div>
       {!data.eligible ? <div className="card discovery-empty"><span className="privacy-kicker">DISCOVERY LOCKED</span><h2>Finish the trust foundation first</h2><p>To enter Discovery, set your profile visibility to <b>Future matches</b>, keep compatibility consent enabled, and have at least 50% authenticity.</p><div className="hero-actions left-actions"><a className="btn btn-primary" href="/profile">Update profile visibility</a><a className="btn" href="/dashboard">Check authenticity</a></div></div>
-      : data.candidates.length === 0 ? <div className="card discovery-empty"><span className="privacy-kicker">YOU’RE READY</span><h2>No new introductions yet</h2><p>Your profile is eligible for Discovery. AutoFace found no other eligible members that you have not already reviewed.</p><a className="btn" href="/compatibility">Open Compatibility Lab</a></div>
+      : data.candidates.length === 0 ? <div className="card discovery-empty"><span className="privacy-kicker">YOU’RE READY</span><h2>No new introductions yet</h2><p>Your profile is eligible for Discovery. AutoFace found no other eligible members that you have not already reviewed.</p><div className="discovery-empty-actions"><a className="btn btn-primary" href="/recommendations/history">View reviewed recommendations</a><a className="btn" href="/compatibility">Open Compatibility Lab</a>{isTestProfile&&<button className="btn demo-reset-button" disabled={resetBusy} onClick={()=>void resetDemoRecommendations()}>{resetBusy?"Resetting…":"Reset demo recommendations"}</button>}</div>{isTestProfile&&<p className="demo-reset-note">Test profiles only: reset removes your non-mutual review decisions so candidates can appear in Discover again. Existing mutual introductions are preserved.</p>}</div>
       : <div className="discovery-grid">{data.candidates.map((c) => <article className="card discovery-card" key={c.uid}>
           {c.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}<div className="candidate-identity"><div className="profile-placeholder">{c.firstName.slice(0,1).toUpperCase()}</div><div><h2>{c.firstName}{c.age ? `, ${c.age}` : ""}</h2><p>{[c.generalLocation,c.occupation].filter(Boolean).join(" · ") || "Limited profile details"}</p></div></div>
           <div className="trust-pair"><span><b>{c.authenticityScore}%</b><small>Authenticity</small></span><span><b>{c.compatibilityScore}%</b><small>Compatibility</small></span></div>

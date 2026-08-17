@@ -236,3 +236,38 @@ Refines the v0.20 public landing-page hero visual.
 - Adds explicit percentages to each dimension.
 - Strengthens the `Why Atlas recommended Maya` action.
 - Adds a softer background aura so the card feels like a premium product object rather than a dashboard screenshot.
+
+
+## v0.21 — Atlas AI Discovery
+
+Adds a meaningful Gemini-powered semantic layer to real AutoFace recommendations without replacing the deterministic engine.
+
+- Eligibility, hard Discovery preferences and the official compatibility percentage remain deterministic.
+- New explicit `consentForAiDiscovery` permission on the private Atlas Relationship Profile.
+- Atlas AI Discovery is available only when **both** members explicitly opt in.
+- On a recommendation detail page, the viewer provides an additional per-request confirmation before Gemini is called.
+- Gemini compares the two opted-in relationship profiles and returns structured JSON containing:
+  - a concise semantic headline;
+  - 2–3 shared themes;
+  - strength labels;
+  - neutral explanations;
+  - 1–2 topics worth discussing.
+- Gemini is instructed not to predict relationship success, infer sensitive traits, judge either member, or change the published compatibility score.
+- AI Discovery results are session-only and are not persisted.
+- Private messages, identity-verification evidence and authenticity data are not sent to Gemini for AI Discovery.
+- Firestore rules explicitly allow the new boolean consent field and keep relationship profiles owner-only.
+
+
+## v0.21.1 — Reviewed Recommendations & Demo Reset
+
+Improves the Atlas AI Discovery testing flow and fixes a product-journey gap discovered during v0.21 testing.
+
+- New `/recommendations/history` page lets members revisit people they already reviewed.
+- Previous `Interested` and `Not for me` decisions no longer make the recommendation explanation effectively inaccessible.
+- Recommendation history reuses the current deterministic Atlas projection and links back to full recommendation details, including Atlas AI Discovery where available.
+- Discover includes a `Reviewed recommendations` action.
+- Test/demo accounts get a `Reset demo recommendations` control when no new candidates remain.
+- Demo reset deletes only the signed-in test profile's **non-mutual** outgoing review decisions.
+- Existing mutual introductions are deliberately preserved rather than silently dismantled.
+- Reset endpoint verifies the server-owned `demoProfiles.isTestProfile` marker, so production members cannot use the test reset function.
+- No new Firestore client permissions are required.

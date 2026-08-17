@@ -1181,3 +1181,30 @@ body{
   .experience-card-top{display:grid}
   .experience-auth-chip{width:max-content}
 }
+
+
+/* AutoFace v0.21 — Atlas AI Discovery */
+.ai-discovery-consent{margin-top:12px;border-color:rgba(168,132,255,.22);background:linear-gradient(145deg,rgba(124,92,255,.065),rgba(255,105,157,.025))}
+.ai-discovery-card{border-color:rgba(160,118,255,.22);background:radial-gradient(circle at 100% 0%,rgba(124,92,255,.10),transparent 28%),linear-gradient(155deg,rgba(20,25,43,.96),rgba(12,17,29,.97))}
+.ai-discovery-title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}.ai-discovery-title-row h2{margin:6px 0 0}.ai-discovery-live{color:#c8b9ff!important;border-color:rgba(149,112,255,.30)!important;background:rgba(124,92,255,.09)!important}
+.ai-discovery-intro{max-width:790px;font-size:12px!important;line-height:1.65!important}
+.ai-discovery-unavailable{display:grid;gap:6px;margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.018)}.ai-discovery-unavailable b{font-size:12px}.ai-discovery-unavailable span{font-size:10px;line-height:1.5;color:#8190a5}.ai-discovery-unavailable .btn{width:max-content;margin-top:6px}
+.ai-discovery-request-consent{margin:18px 0}
+.ai-discovery-generate{margin-bottom:4px}
+.ai-discovery-output{display:grid;gap:18px;margin-top:20px}
+.ai-discovery-headline{display:grid;grid-template-columns:42px 1fr;gap:12px;padding:17px;border-radius:16px;border:1px solid rgba(124,92,255,.20);background:linear-gradient(135deg,rgba(124,92,255,.09),rgba(255,105,157,.035))}
+.ai-spark{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#7558ff,#ff6e9c);font-size:18px;box-shadow:0 10px 24px rgba(124,92,255,.22)}
+.ai-discovery-headline small{font-size:8px;letter-spacing:.11em;font-weight:900;color:#a79bff}.ai-discovery-headline h3{font-size:20px;margin:4px 0 6px}.ai-discovery-headline p{margin:0;font-size:11px;line-height:1.55}
+.ai-theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.ai-theme-card{display:grid;align-content:start;gap:7px;padding:15px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}.ai-theme-card>b{font-size:12px}.ai-theme-card p{margin:0;font-size:10px!important;line-height:1.55!important}.ai-theme-strength{width:max-content;padding:4px 7px;border-radius:999px;font-size:7px;font-weight:900;letter-spacing:.08em}.ai-theme-strength.strong{color:#9be4c7;border:1px solid rgba(67,209,158,.18);background:rgba(67,209,158,.055)}.ai-theme-strength.moderate{color:#d8c4ff;border:1px solid rgba(155,117,255,.20);background:rgba(124,92,255,.06)}
+.ai-discussion{display:grid;gap:8px;padding:15px;border:1px solid rgba(255,181,79,.14);border-radius:14px;background:rgba(255,181,79,.025)}.ai-discussion>small{font-size:8px;letter-spacing:.1em;font-weight:900;color:#cba86f}.ai-discussion>div{display:grid;grid-template-columns:150px 1fr;gap:12px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}.ai-discussion b{font-size:10px}.ai-discussion span{font-size:10px;line-height:1.5;color:#8997aa}
+@media(max-width:800px){.ai-theme-grid{grid-template-columns:1fr}.ai-discovery-title-row{display:grid}.ai-discussion>div{grid-template-columns:1fr}.ai-discovery-headline{grid-template-columns:36px 1fr}.ai-spark{width:34px;height:34px}}
+
+
+/* AutoFace v0.21.1 — reviewed recommendations & demo reset */
+.discovery-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.discovery-empty-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.demo-reset-button{border-color:rgba(255,184,77,.20);color:#ffd29d;background:rgba(255,184,77,.035)}
+.demo-reset-note{max-width:720px;margin:14px 0 0!important;padding-top:12px;border-top:1px solid var(--line);font-size:9px!important;line-height:1.5!important;color:#7d899a!important}
+.reviewed-section{padding-top:36px}.reviewed-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;color:#7f8da1;font-size:10px}.reviewed-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.reviewed-card{display:grid;gap:15px}.reviewed-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.reviewed-decision{display:inline-flex;padding:6px 8px;border-radius:999px;font-size:7px;font-weight:900;letter-spacing:.07em;border:1px solid var(--line);white-space:nowrap}.reviewed-decision.interested{color:#9de2c7;border-color:rgba(67,209,158,.18);background:rgba(67,209,158,.05)}.reviewed-decision.pass{color:#a3afc0;background:rgba(255,255,255,.025)}.reviewed-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}.reviewed-summary>div{padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.018)}.reviewed-summary small{font-size:8px;font-weight:900;letter-spacing:.08em;color:#78bfff}.reviewed-summary p{margin:5px 0 0;font-size:10px;line-height:1.5;color:#9ba9ba}.reviewed-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:2px}.reviewed-footer>span{font-size:8px;color:#718097}
+@media(max-width:850px){.reviewed-grid{grid-template-columns:1fr}.discovery-toolbar{align-items:flex-start}.discovery-toolbar-actions{justify-content:flex-start}.reviewed-summary{grid-template-columns:1fr}}
+@media(max-width:620px){.reviewed-toolbar,.reviewed-card-top,.reviewed-footer{display:grid}.discovery-toolbar-actions,.discovery-empty-actions{display:grid}.discovery-toolbar-actions .btn,.discovery-empty-actions .btn{width:100%}}

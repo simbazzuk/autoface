@@ -166,6 +166,7 @@ export function Header() {
                 <Link href="/profile"><b>My Profile</b><small>Personal details and visibility</small></Link>
                 <Link href="/relationship-profile"><b>Atlas Profile</b><small>Relationship preferences</small></Link>
                 <Link href="/compatibility"><b>Compatibility</b><small>Explainable compatibility model</small></Link>
+                <Link href="/recommendations/history"><b>Reviewed Recommendations</b><small>Revisit previous Atlas explanations</small></Link>
                 <Link href="/discovery-preferences"><b>Discovery Preferences</b><small>Control who Atlas can recommend</small></Link>
                 <Link href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
                 <Link href="/verify-photo"><b>Photo Verification</b><small>Profile-photo authenticity</small></Link>
@@ -228,6 +229,7 @@ export function Header() {
                 <Link href="/profile" onClick={closeMobile}>My Profile</Link>
                 <Link href="/relationship-profile" onClick={closeMobile}>Atlas Profile</Link>
                 <Link href="/compatibility" onClick={closeMobile}>Compatibility</Link>
+                <Link href="/recommendations/history" onClick={closeMobile}>Reviewed Recommendations</Link>
                 <Link href="/discovery-preferences" onClick={closeMobile}>Discovery Preferences</Link>
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
                 <Link href="/verify-photo" onClick={closeMobile}>Photo Verification</Link>

@@ -15,6 +15,7 @@ export type RelationshipProfile = {
   whatMattersMost: string;
   nonNegotiables: string;
   consentForCompatibility: boolean;
+  consentForAiDiscovery?: boolean;
   createdAt?: unknown;
   updatedAt?: unknown;
 };

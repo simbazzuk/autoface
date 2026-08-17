@@ -27,6 +27,7 @@ const emptyForm = {
   whatMattersMost: "",
   nonNegotiables: "",
   consentForCompatibility: false,
+  consentForAiDiscovery: false,
 };
 
 type FormState = typeof emptyForm;
@@ -92,6 +93,7 @@ export default function RelationshipProfilePage() {
           whatMattersMost: data.whatMattersMost ?? "",
           nonNegotiables: data.nonNegotiables ?? "",
           consentForCompatibility: data.consentForCompatibility ?? false,
+          consentForAiDiscovery: data.consentForAiDiscovery ?? false,
         });
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "Unable to load your relationship profile.");
@@ -153,7 +155,9 @@ export default function RelationshipProfilePage() {
         createdAt: createdAt ?? serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      setMessage("Relationship profile saved privately. Your deterministic Atlas profile is ready for compatibility and optional AI explanation.");
+      setMessage(form.consentForAiDiscovery
+        ? "Relationship profile saved. Deterministic compatibility and optional Atlas AI Discovery are enabled."
+        : "Relationship profile saved privately. Deterministic Atlas compatibility is enabled; AI Discovery remains off.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to save your relationship profile.");
     } finally {
@@ -208,7 +212,15 @@ export default function RelationshipProfilePage() {
             <div className="field"><label htmlFor="matters">What matters most in a long-term relationship?</label><textarea id="matters" maxLength={500} rows={4} value={form.whatMattersMost} onChange={(e) => change("whatMattersMost", e.target.value)} placeholder="Describe the qualities and relationship dynamic that matter to you." /><small>{form.whatMattersMost.length}/500</small></div>
             <div className="field"><label htmlFor="nonNegotiables">What are your relationship non-negotiables?</label><textarea id="nonNegotiables" maxLength={400} rows={4} value={form.nonNegotiables} onChange={(e) => change("nonNegotiables", e.target.value)} placeholder="Keep this focused on relationship expectations and lifestyle rather than sensitive personal data." /><small>{form.nonNegotiables.length}/400</small></div>
 
-            <label className="consent-card"><input type="checkbox" checked={form.consentForCompatibility} onChange={(e) => change("consentForCompatibility", e.target.checked)} /><span><b>Use these answers for future compatibility recommendations</b><small>v0.5 stores the profile privately. No matching or sharing occurs yet, and you can change these answers later.</small></span></label>
+            <label className="consent-card"><input type="checkbox" checked={form.consentForCompatibility} onChange={(e) => change("consentForCompatibility", e.target.checked)} /><span><b>Use these answers for compatibility recommendations</b><small>Your structured answers power the deterministic Atlas compatibility engine. You can change this permission later.</small></span></label>
+
+            <label className="consent-card ai-discovery-consent">
+              <input type="checkbox" checked={form.consentForAiDiscovery} onChange={(e) => change("consentForAiDiscovery", e.target.checked)} />
+              <span>
+                <b>Allow Atlas AI Discovery to use my relationship answers</b>
+                <small>Optional. When both members opt in, Gemini may compare their saved relationship answers to generate shared themes and neutral discussion points. It does not receive private messages or identity-verification evidence, and it cannot change the Atlas compatibility score.</small>
+              </span>
+            </label>
 
             {message && <p className="notice profile-message">{message}</p>}
             <div className="profile-actions"><button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save relationship profile"}</button></div>

@@ -49,6 +49,14 @@ export const supportTopics: SupportTopic[] = [
     actionUrl: "/discovery-preferences",
   },
   {
+    id: "reviewed_recommendations",
+    title: "Reviewed recommendations",
+    keywords: ["reviewed recommendations","previous recommendations","past recommendations","profile disappeared","recommendation history","already reviewed"],
+    answer: "Once you choose Interested or Not for me, that profile leaves your active Discover queue. You can still revisit the recommendation explanation from Reviewed Recommendations.",
+    actionLabel: "View Reviewed Recommendations",
+    actionUrl: "/recommendations/history",
+  },
+  {
     id: "introductions",
     title: "Introductions",
     keywords: ["introduction","introductions","mutual","interested","interest","match","matched"],
@@ -108,7 +116,7 @@ export const supportTopics: SupportTopic[] = [
     id: "gemini",
     title: "Gemini and Atlas AI",
     keywords: ["gemini","ai reflection","ai","atlas ai"],
-    answer: "Gemini is an optional explanatory layer where enabled. It does not calculate compatibility, change your structured Atlas profile, determine Discovery eligibility or make moderation decisions.",
+    answer: "Gemini is an optional Atlas layer. Atlas AI Discovery can compare two explicitly opted-in relationship profiles to find semantic shared themes and neutral discussion points. Gemini never sets eligibility, hard filters, authenticity or the official deterministic compatibility score.",
     actionLabel: "Open Atlas Profile",
     actionUrl: "/relationship-profile",
   },

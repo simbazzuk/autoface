@@ -21,3 +21,49 @@ export async function safeProjectionFor(viewerUid:string,targetUid:string){const
 export async function recommendationFor(viewerUid:string,targetUid:string){if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");const [viewer,target,prefs]=await Promise.all([getEligibleMember(viewerUid),getEligibleMember(targetUid),preferencesFor(viewerUid)]);if(!viewer||!target||!passesPreferences(viewer,target,prefs))return null;const result=calculateCompatibility(viewer.relationship,target.relationship);return{candidate:projection(targetUid,target,result),dimensions:result.dimensions.map(d=>({code:d.key,label:d.label,weight:d.weight,score:d.score,explanation:d.explanation})),summary:result.summary,preferences:{minAge:prefs.minAge,maxAge:prefs.maxAge,locationPreference:prefs.locationPreference,relationshipIntents:prefs.relationshipIntents,requireRelocationOpen:prefs.requireRelocationOpen}}
 
 }
+
+
+export type ReviewedRecommendation = SafeDiscoveryProfile & {
+  decision: "interested" | "pass";
+  reviewedAt: string | null;
+  mutual: boolean;
+};
+
+function timestampIso(value: unknown) {
+  const v = value as { toDate?: () => Date } | null | undefined;
+  return v?.toDate ? v.toDate().toISOString() : null;
+}
+
+export async function reviewedRecommendationsFor(requesterUid: string) {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+
+  const requester = await getEligibleMember(requesterUid);
+  if (!requester) return { eligible: false, items: [] as ReviewedRecommendation[] };
+
+  const decisions = await adminDb.collection("interests").where("fromUid", "==", requesterUid).get();
+  const items: ReviewedRecommendation[] = [];
+
+  for (const decisionDoc of decisions.docs) {
+    const data = decisionDoc.data();
+    const targetUid = String(data.toUid ?? "");
+    const decision = String(data.status ?? "");
+    if (!targetUid || !["interested", "pass"].includes(decision)) continue;
+
+    const target = await getEligibleMember(targetUid);
+    if (!target) continue;
+
+    const result = calculateCompatibility(requester.relationship, target.relationship);
+    const participants = [requesterUid, targetUid].sort();
+    const matchSnap = await adminDb.collection("matches").doc(participants.join("__")).get();
+
+    items.push({
+      ...projection(targetUid, target, result),
+      decision: decision as "interested" | "pass",
+      reviewedAt: timestampIso(data.updatedAt ?? data.createdAt),
+      mutual: matchSnap.exists && String(matchSnap.data()?.status ?? "") === "mutual",
+    });
+  }
+
+  items.sort((a, b) => (b.reviewedAt ?? "").localeCompare(a.reviewedAt ?? ""));
+  return { eligible: true, items };
+}
