@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const matches = await adminDb.collection("matches").where("participants", "array-contains", user.uid).limit(20).get();
     const introductions = [];
     for (const match of matches.docs) {
+      if (match.data().status !== "mutual") continue;
       const participants = (match.data().participants ?? []) as string[];
       const otherUid = participants.find((uid) => uid !== user.uid);
       if (!otherUid) continue;

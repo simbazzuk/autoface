@@ -147,10 +147,26 @@ async function deleteQuery(query) {
 }
 
 async function clearMatchState(uids) {
+  const matchIds = new Set();
   for (const uid of uids) {
     await deleteQuery(db.collection("interests").where("fromUid", "==", uid));
     await deleteQuery(db.collection("interests").where("toUid", "==", uid));
-    await deleteQuery(db.collection("matches").where("participants", "array-contains", uid));
+    const matches = await db.collection("matches").where("participants", "array-contains", uid).get();
+    for (const doc of matches.docs) matchIds.add(doc.id);
+    await deleteQuery(db.collection("blocks").where("blockerUid", "==", uid));
+    await deleteQuery(db.collection("blocks").where("blockedUid", "==", uid));
+    await deleteQuery(db.collection("reports").where("reporterUid", "==", uid));
+    await deleteQuery(db.collection("reports").where("reportedUid", "==", uid));
+  }
+  for (const matchId of matchIds) {
+    const messages = await db.collection("conversations").doc(matchId).collection("messages").get();
+    for (let i = 0; i < messages.docs.length; i += 400) {
+      const batch = db.batch();
+      messages.docs.slice(i, i + 400).forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+    }
+    await db.collection("conversations").doc(matchId).delete();
+    await db.collection("matches").doc(matchId).delete();
   }
 }
 
@@ -176,7 +192,7 @@ async function cleanDemoUsers() {
 }
 
 async function main() {
-  console.log(`\nAutoFace v0.7.1 demo harness`);
+  console.log(`\nAutoFace v0.8 demo harness`);
   console.log(`Project: ${projectId}`);
 
   if (isClean) {
@@ -213,7 +229,7 @@ async function main() {
         uid: member.uid,
         isTestProfile: true,
         label: "TEST PROFILE",
-        seedVersion: "0.7.1",
+        seedVersion: "0.8",
         email: member.email,
         seededAt: now,
       }, { merge: true }),

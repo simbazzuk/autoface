@@ -124,5 +124,24 @@ service cloud.firestore {
     match /matches/{matchId} {
       allow read, write: if false;
     }
+
+
+    // v0.8 Safe Messaging. Conversations, messages, blocks and reports are
+    // server-owned. Authenticated clients use API routes that enforce mutual-match
+    // membership and block/unmatch state before any message is returned or written.
+    match /conversations/{matchId} {
+      allow read, write: if false;
+      match /messages/{messageId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /blocks/{blockId} {
+      allow read, write: if false;
+    }
+
+    match /reports/{reportId} {
+      allow read, write: if false;
+    }
   }
 }

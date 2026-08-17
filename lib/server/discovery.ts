@@ -63,8 +63,14 @@ export async function buildDiscoveryFor(requesterUid: string) {
   const requester = await getEligibleMember(requesterUid);
   if (!requester) return { eligible: false, candidates: [] as SafeDiscoveryProfile[] };
 
-  const decisions = await adminDb.collection("interests").where("fromUid", "==", requesterUid).get();
+  const [decisions, blocksByMe, blocksOfMe] = await Promise.all([
+    adminDb.collection("interests").where("fromUid", "==", requesterUid).get(),
+    adminDb.collection("blocks").where("blockerUid", "==", requesterUid).get(),
+    adminDb.collection("blocks").where("blockedUid", "==", requesterUid).get(),
+  ]);
   const excluded = new Set(decisions.docs.map((d) => String(d.data().toUid)));
+  for (const doc of blocksByMe.docs) excluded.add(String(doc.data().blockedUid));
+  for (const doc of blocksOfMe.docs) excluded.add(String(doc.data().blockerUid));
   excluded.add(requesterUid);
 
   const profiles = await adminDb.collection("profiles").where("visibility", "==", "future_matches").limit(40).get();

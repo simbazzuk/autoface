@@ -19,6 +19,14 @@ export async function POST(request: Request) {
     if (!fromMember) return NextResponse.json({ error: "DISCOVERY_NOT_ENABLED" }, { status: 403 });
     if (!toMember) return NextResponse.json({ error: "TARGET_NOT_AVAILABLE" }, { status: 404 });
 
+    const [blockedByMe, blockedByThem] = await Promise.all([
+      db.collection("blocks").doc(`${user.uid}__${body.toUid}`).get(),
+      db.collection("blocks").doc(`${body.toUid}__${user.uid}`).get(),
+    ]);
+    if (blockedByMe.exists || blockedByThem.exists) {
+      return NextResponse.json({ error: "TARGET_NOT_AVAILABLE" }, { status: 404 });
+    }
+
     const interestId = `${user.uid}_${body.toUid}`;
     await db.collection("interests").doc(interestId).set({
       fromUid: user.uid,
