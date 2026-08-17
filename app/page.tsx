@@ -14,17 +14,18 @@ export default function Home() {
       <div className="experience-glow experience-glow-two" />
       <div className="container experience-hero-grid">
         <div className="experience-hero-copy">
-          <span className="experience-kicker"><Sparkles size={14}/> A different kind of introduction</span>
-          <h1>Dating should be more than a <em>first impression.</em></h1>
-          <p>AutoFace helps you discover people through compatibility, authenticity and mutual intent — so an introduction starts with more than a photo.</p>
+          <span className="experience-kicker"><Sparkles size={14}/> Considered introductions, explained by Atlas</span>
+          <h1>Dating shouldn&apos;t feel like searching.<br/><em>It should feel like being introduced.</em></h1>
+          <p>Tell Atlas who you are. AutoFace recommends a small number of people who make sense — and explains why each introduction may be worth getting to know.</p>
           <div className="experience-actions">
             <Link className="experience-primary" href="/register">Join the beta <ArrowRight size={17}/></Link>
             <Link className="experience-secondary" href="/how-it-works">See how Atlas works</Link>
           </div>
           <div className="experience-proof">
-            <span><Check size={14}/> No endless swipe feed</span>
+            <span><Check size={14}/> No endless swiping</span>
             <span><Check size={14}/> Explainable compatibility</span>
-            <span><Check size={14}/> Mutual interest before messaging</span>
+            <span><Check size={14}/> Mutual introductions</span>
+            <span><Check size={14}/> Private by design</span>
           </div>
         </div>
 
@@ -68,15 +69,15 @@ export default function Home() {
     <section className="experience-statement">
       <div className="container">
         <span className="experience-section-label">WHY AUTOFACE</span>
-        <h2>Most dating apps start with a photo.<br/><em>AutoFace starts with understanding you.</em></h2>
-        <p>The aim is not to predict love. It is to help you make a more informed decision about who may be worth meeting.</p>
+        <h2>Fewer profiles.<br/><em>Better reasons to meet.</em></h2>
+        <p>AutoFace is not trying to predict love. Atlas helps narrow the noise, explains the compatibility signals and leaves the decision with you.</p>
       </div>
     </section>
 
     <section className="experience-journey">
       <div className="container">
         <div className="experience-section-head">
-          <div><span className="experience-section-label">A MORE INTENTIONAL JOURNEY</span><h2>Less swiping. More context.</h2></div>
+          <div><span className="experience-section-label">A MORE INTENTIONAL JOURNEY</span><h2>A few people worth considering. And here&apos;s why.</h2></div>
           <p>Three simple stages keep the experience focused on understanding, mutuality and choice.</p>
         </div>
 
@@ -125,7 +126,7 @@ export default function Home() {
       <div className="container">
         <div className="experience-quote">
           <span className="experience-section-label">THE AUTOFACE PRINCIPLE</span>
-          <blockquote>“Better information for a more intentional introduction.”</blockquote>
+          <blockquote>“Atlas doesn&apos;t just show you people. It explains why you might work.”</blockquote>
           <p>Atlas explains compatibility. Authenticity builds confidence. You remain the person making the decision.</p>
         </div>
       </div>
@@ -134,8 +135,8 @@ export default function Home() {
     <section className="experience-final">
       <div className="container experience-final-inner">
         <span className="experience-section-label">CONTROLLED BETA</span>
-        <h2>Ready for something more intentional?</h2>
-        <p>Join a small beta group helping shape AutoFace before wider release.</p>
+        <h2>Ready to be introduced, not overwhelmed?</h2>
+        <p>Join the controlled beta and help shape a dating experience built around fewer, more considered introductions.</p>
         <div className="experience-actions final-actions">
           <Link className="experience-primary" href="/register">Create your AutoFace account <ArrowRight size={17}/></Link>
           <Link className="experience-secondary" href="/early-access">Join the waiting list</Link>

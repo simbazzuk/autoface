@@ -515,3 +515,13 @@ This patch removes Firebase Storage as a development-time dependency while prese
 - Makes Member View feel more like an actual Discovery profile card.
 - Adds stronger visual hierarchy to Atlas Readiness and privacy/minimisation content.
 - No profile schema, Firestore rules, photo storage, matching or Atlas scoring changes.
+
+
+## v0.28.3 — Landing Message Patch
+
+- Sharpens the landing-page proposition around considered introductions rather than generic AI dating.
+- New hero: “Dating shouldn’t feel like searching. It should feel like being introduced.”
+- Positions Atlas as the reason behind recommendations: fewer people, with an explanation of why each may be worth getting to know.
+- Strengthens the proof strip with no endless swiping, explainable compatibility, mutual introductions and private-by-design messaging.
+- Refreshes the Why AutoFace, journey, principle and final beta CTA copy to reinforce the same proposition.
+- No application logic, Firebase, matching, Atlas scoring, photo storage or environment changes.
