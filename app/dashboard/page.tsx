@@ -174,7 +174,7 @@ export default function Dashboard() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Authenticity Centre · v0.5</span>
+          <span className="eyebrow">Authenticity Centre · v0.7</span>
           <h1>Build your authenticity.</h1>
           <p className="lead">Your score comes from explicit verification evidence—not AI judgement, popularity or profile attractiveness.</p>
         </div>
@@ -295,7 +295,7 @@ export default function Dashboard() {
             <div className="privacy-box">
               <span className="privacy-kicker">PRIVACY BY DESIGN</span>
               <b>Zero-ID Storage</b>
-              <p>AutoFace v0.5 has no passport, driving licence, selfie or biometric upload fields.</p>
+              <p>AutoFace v0.7 has no passport, driving licence, selfie or biometric upload fields.</p>
               <p className="privacy-note">Identity and liveness results are written server-side after a provider session; users cannot self-award these verification signals.</p>
             </div>
 

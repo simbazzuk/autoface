@@ -108,5 +108,21 @@ service cloud.firestore {
       allow read: if request.auth != null && resource.data.uid == request.auth.uid;
       allow write: if false;
     }
+
+
+    // v0.7.1 demo harness markers are server-owned and are only exposed
+    // through the safe Discovery API projection.
+    match /demoProfiles/{uid} {
+      allow read, write: if false;
+    }
+
+    // v0.7 discovery decisions and matches are server-owned. Clients use authenticated API routes.
+    match /interests/{interestId} {
+      allow read, write: if false;
+    }
+
+    match /matches/{matchId} {
+      allow read, write: if false;
+    }
   }
 }

@@ -213,3 +213,38 @@ h2{font-size:clamp(30px,4vw,48px);letter-spacing:-.04em;margin:0 0 18px}
 .methodology-card p{font-size:13px;margin-bottom:10px}.compatibility-blocked{max-width:760px}.compatibility-blocked h2{margin-top:7px}
 @media(max-width:960px){.compatibility-layout{grid-template-columns:1fr}.compatibility-side{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}.methodology-card{grid-column:1/-1}}
 @media(max-width:800px){.candidate-tabs{grid-template-columns:1fr}.compatibility-title-row{display:block}.compatibility-title-row .status-pill{margin-top:12px}.compatibility-side{grid-template-columns:1fr}.methodology-card{grid-column:auto}.dimension-row{grid-template-columns:1fr 48px}.dimension-score{width:44px;height:44px}.match-score-head{display:block}.match-level{text-align:left;margin:0 0 14px}.dimension-heading{align-items:flex-start}}
+
+/* v0.7 controlled discovery + mutual introductions */
+.discovery-section{padding-top:38px}.discovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.discovery-card{display:flex;flex-direction:column;gap:18px}.candidate-identity{display:flex;align-items:center;gap:14px}.profile-placeholder{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(124,92,255,.28),rgba(58,167,255,.18));border:1px solid rgba(124,92,255,.3);font-size:24px;font-weight:900}.candidate-identity h2,.discovery-card>h2{font-size:30px;margin:0}.candidate-identity p{margin:4px 0 0;color:var(--muted);font-size:13px}.trust-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.trust-pair span{display:grid;gap:3px;padding:14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025)}.trust-pair b{font-size:24px}.trust-pair small{color:var(--muted)}.candidate-badges{display:flex;gap:7px;flex-wrap:wrap}.candidate-badges span{padding:6px 8px;border-radius:999px;border:1px solid rgba(124,92,255,.25);background:rgba(124,92,255,.08);font-size:10px;color:#d8d2ff}.candidate-about{color:#c6d0e2!important;line-height:1.6!important;margin:0!important}.discovery-insights{display:grid;gap:10px}.discovery-insights>div{padding:12px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid var(--line)}.discovery-insights small{color:#8ea0bb;font-size:9px;letter-spacing:.1em;font-weight:800}.discovery-insights p{margin:5px 0 0!important;font-size:12px!important;line-height:1.45!important}.discovery-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto}.discovery-empty{max-width:780px}.left-actions{justify-content:flex-start}.discovery-message{margin-top:18px}.discovery-privacy{margin-top:20px;max-width:860px}.discovery-privacy h3{font-size:24px}.discovery-privacy .btn{margin-top:8px}@media(max-width:900px){.discovery-grid{grid-template-columns:1fr}}@media(max-width:800px){.discovery-actions{grid-template-columns:1fr}.trust-pair{grid-template-columns:1fr 1fr}}
+
+/* v0.7.1 development test-profile marker */
+.test-profile-pill {
+  border-style: dashed;
+  letter-spacing: .08em;
+}
+.intro-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+}
+
+/* v0.7.2 signed-in user indicator */
+.account-menu{position:relative;margin-left:-4px}
+.account-menu>summary{list-style:none}.account-menu>summary::-webkit-details-marker{display:none}
+.account-chip{display:flex;align-items:center;gap:9px;min-height:46px;padding:6px 10px 6px 7px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.035);color:var(--text);cursor:pointer;user-select:none;transition:border-color .18s ease,background .18s ease}
+.account-chip:hover,.account-menu[open] .account-chip{border-color:rgba(124,92,255,.48);background:rgba(124,92,255,.08)}
+.account-avatar{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-size:13px;font-weight:900;box-shadow:0 8px 18px rgba(58,167,255,.16)}
+.account-chip-copy{display:grid;gap:1px;line-height:1.05;min-width:0}.account-chip-copy b{font-size:12px;max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-chip-copy small{font-size:8px;letter-spacing:.08em;color:#92a1ba;font-weight:800;white-space:nowrap}
+.account-test-badge{padding:3px 5px;border-radius:999px;background:rgba(255,184,77,.12);border:1px solid rgba(255,184,77,.28);color:#ffd49b;font-size:8px;font-weight:900;letter-spacing:.08em}
+.account-chevron{font-size:14px;color:#8090aa;transform:translateY(-1px)}.account-menu[open] .account-chevron{transform:rotate(180deg) translateY(1px)}
+.account-dropdown{position:absolute;right:0;top:calc(100% + 12px);width:286px;padding:18px;border-radius:18px;border:1px solid var(--line);background:#0d1422;box-shadow:0 24px 70px rgba(0,0,0,.42);display:grid;gap:7px;z-index:40}
+.account-dropdown:before{content:"";position:absolute;right:25px;top:-6px;width:11px;height:11px;background:#0d1422;border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.account-dropdown-kicker{font-size:9px;letter-spacing:.12em;color:#6fbfff;font-weight:900}.account-dropdown>strong{font-size:19px}.account-email{font-size:12px;color:#9cabc1;overflow-wrap:anywhere}.account-demo-badge{justify-self:start;margin-top:4px;padding:5px 8px}
+.account-trust-row{display:flex;align-items:center;justify-content:space-between;margin:8px 0 2px;padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:12px;color:#aab7ca}.account-trust-row b{font-size:17px;color:#fff}
+.account-dropdown-links{display:grid;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 0;margin-top:3px}.account-dropdown-links a{padding:9px 7px;border-radius:9px;color:#d7dfeb;font-size:12px}.account-dropdown-links a:hover{background:rgba(124,92,255,.09);color:#fff}
+.account-signout{appearance:none;border:0;background:transparent;color:#ffaaa8;text-align:left;padding:9px 7px;border-radius:9px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.account-signout:hover{background:rgba(255,108,105,.08)}
+@media(max-width:1100px){.nav-links{gap:14px}.account-chip-copy small{display:none}}
+@media(max-width:800px){.nav-links>.account-menu{display:block}.account-chip{min-height:40px;padding:4px 7px}.account-avatar{width:30px;height:30px}.account-chip-copy{display:none}.account-test-badge{display:none}.account-dropdown{position:fixed;right:14px;top:68px;width:min(300px,calc(100vw - 28px))}.account-dropdown:before{display:none}}
+
+@media(max-width:800px){.account-dropdown a{display:block!important}}
