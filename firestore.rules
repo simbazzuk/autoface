@@ -167,6 +167,9 @@ service cloud.firestore {
     }
 
 
+    // v0.17 Beta Operations reads server-owned aggregates through an admin API.
+    // Feedback status changes and operational audit events are also server-owned.
+
     // v0.16 support assistant is stateless and does not create a chat-history collection.
     // Support requests use authenticated server APIs and curated product guidance.
 

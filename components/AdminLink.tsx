@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 
 export function AdminLink({ mobile = false }: { mobile?: boolean }) {
@@ -28,7 +28,10 @@ export function AdminLink({ mobile = false }: { mobile?: boolean }) {
   }, [user]);
 
   if (!isAdmin) return null;
-  return mobile
-    ? <Link href="/admin">Safety Operations</Link>
-    : <Link href="/admin"><b>Safety Operations</b><small>Reports & moderation</small></Link>;
+
+  return <Fragment>
+    {mobile
+      ? <><Link href="/admin/operations">Beta Operations</Link><Link href="/admin">Safety Operations</Link></>
+      : <><Link href="/admin/operations"><b>Beta Operations</b><small>Onboarding, usage & feedback</small></Link><Link href="/admin"><b>Safety Operations</b><small>Reports & moderation</small></Link></>}
+  </Fragment>;
 }

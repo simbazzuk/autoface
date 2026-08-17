@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       category,
       message,
       status: "new",
-      appVersion: "0.15.0",
+      appVersion: "0.17.0",
       createdAt: FieldValue.serverTimestamp(),
     });
 

@@ -163,3 +163,18 @@ Adds an authenticated floating product-support assistant throughout AutoFace.
 - The support session is stateless: v0.16 does not create or persist a support-chat history collection.
 - The assistant does not inspect private messages, calculate compatibility, recommend partners, or make moderation decisions.
 - Gemini is not required for v0.16 support answers; approved AutoFace guidance is the source of truth.
+
+
+## v0.17 — Beta Operations Dashboard
+
+Adds an admin-only operational dashboard at `/admin/operations`.
+
+- Registration and readiness summary.
+- Onboarding funnel: registration → profile → Atlas → authenticity → Discovery readiness.
+- Engagement counts for interested actions, mutual introductions, conversations and messages.
+- Safety summary with direct link to the existing Safety Operations console.
+- Recent-member readiness view without exposing private Atlas answers.
+- Beta feedback summary and in-product triage states: new, reviewed, planned and closed.
+- Feedback status changes create admin audit events.
+- When real beta users exist, member-readiness metrics exclude `@autoface.test` demo profiles; otherwise demo data is clearly labelled.
+- No private message content or private Atlas free-text responses are exposed in Beta Operations.

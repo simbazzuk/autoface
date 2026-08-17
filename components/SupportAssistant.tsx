@@ -36,7 +36,10 @@ export function SupportAssistant() {
 
   async function ask(text: string) {
     const trimmed = text.trim();
-    if (!trimmed || busy) return;
+
+    if (!user || !trimmed || busy) return;
+
+    const currentUser = user;
 
     const userMessage: ChatMessage = { id: nextId.current++, role: "user", text: trimmed };
     setMessages((current) => [...current, userMessage]);
@@ -44,7 +47,7 @@ export function SupportAssistant() {
     setBusy(true);
 
     try {
-      const token = await user.getIdToken();
+      const token = await currentUser.getIdToken();
       const response = await fetch("/api/support-chat", {
         method: "POST",
         headers: {
