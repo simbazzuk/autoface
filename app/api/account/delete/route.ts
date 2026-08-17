@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { adminAuth, adminDb, requireUser } from "@/lib/server/firebase-admin";
+import { adminAuth, adminDb, adminStorage, requireUser } from "@/lib/server/firebase-admin";
+import { unlink } from "node:fs/promises";
 
 export const runtime = "nodejs";
 const CONFIRMATION = "DELETE MY AUTOFACE ACCOUNT";
@@ -65,6 +66,16 @@ export async function POST(request: Request) {
       deleteDocs(adminDb.collection("photoVerificationSessions").where("uid", "==", uid).limit(500)),
     ]);
 
+    // Remove the member profile image from private Storage before deleting metadata.
+    const photoMeta = await adminDb.collection("profilePhotos").doc(uid).get();
+    const photoPath = String(photoMeta.data()?.storagePath ?? "");
+    const photoProvider = String(photoMeta.data()?.storageProvider ?? "firebase");
+    if (photoPath && photoProvider === "local-dev") {
+      await unlink(photoPath).catch(() => {});
+    } else if (photoPath && adminStorage) {
+      await adminStorage.bucket().file(photoPath).delete({ ignoreNotFound: true }).catch(() => {});
+    }
+
     // Direct account documents.
     const directDocs = [
       "profiles",
@@ -73,6 +84,7 @@ export async function POST(request: Request) {
       "authenticity",
       "discoveryPreferences",
       "notificationPreferences",
+      "profilePhotos",
       "users",
       "demoProfiles",
     ];

@@ -453,3 +453,65 @@ Consolidates the member's most important privacy choices into Account & Privacy.
 - Adds a Coming Soon facial-verification pricing note without committing to a provider or fixed price.
 - Adds Pricing to the desktop Trust menu, mobile navigation and footer.
 - No Firebase, Firestore, billing provider or environment changes are introduced.
+
+
+## v0.27 — Production Hardening
+
+This release intentionally adds little new product functionality. It hardens the MVP boundary before controlled external testing.
+
+- Adds one bounded retry for temporary Gemini capacity/rate-limit/server failures and timeouts.
+- Converts provider 429/5xx responses into `ATLAS_AI_TEMPORARILY_UNAVAILABLE`.
+- Stops raw Gemini provider messages from being exposed to member-facing clients.
+- Atlas APIs return a friendly degradation message while deterministic compatibility remains available.
+- Existing deterministic Discovery, compatibility scoring and mutual-introduction flows remain independent of Gemini availability.
+- Adds `/api/health` for non-secret deployment/configuration sanity checks.
+- Adds baseline response security headers and removes the Next.js `X-Powered-By` header.
+- Adds `MVP-PRODUCTION-CHECKLIST.md` covering security, privacy, two-user, blocking, Firebase, mobile and operational checks.
+- No new Firebase collections, rules or environment variables are required.
+
+
+## v0.28 — Profile Photo Experience
+
+Adds production-oriented member profile-photo management without introducing biometric processing.
+
+- Members can upload, replace and remove one primary profile photograph from My Profile.
+- Accepts JPEG, PNG and WebP only, with a 5 MB server-enforced limit.
+- File type is validated from image bytes rather than trusting the browser MIME declaration.
+- Photo bytes are stored under a per-user Firebase Storage path and are never made public through a permanent download URL.
+- Photos are streamed through an authenticated AutoFace API.
+- The photo endpoint denies access after either member blocks the other.
+- Other-member photo access is limited to an eligible recommendation or an existing mutual introduction.
+- Profile photos now appear in Profile Preview, Atlas Daily Discovery and Recommendation Details with an initials fallback.
+- Profile-photo metadata is server-owned in Firestore, included in account export, and deleted with the account.
+- Stored profile-photo bytes are also deleted during account deletion.
+- Facial verification remains separate and Coming Soon. v0.28 does not perform face matching, liveness, biometric templating or facial recognition.
+- Requires Firebase Storage to be enabled for the project and the Firebase Admin service account to have bucket object permissions.
+- Uses existing `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`; optionally set `FIREBASE_ADMIN_STORAGE_BUCKET` if the Admin bucket differs.
+
+
+## v0.28.1 — Local Development Photo Storage
+
+This patch removes Firebase Storage as a development-time dependency while preserving the v0.28 authenticated photo API.
+
+- In `npm run dev`, profile-photo bytes default to private local storage under `.autoface-local/profile-photos/`.
+- `.autoface-local/` is gitignored and must never be committed.
+- Firestore continues to store only server-owned profile-photo metadata.
+- The browser still retrieves photos only through the authenticated `/api/profile-photo/[uid]` route.
+- Recommendation/mutual/block visibility checks are unchanged.
+- Upload/replace/remove, 5 MB limit and JPEG/PNG/WebP byte-signature checks are unchanged.
+- Production continues to use Firebase Storage; local filesystem storage is intentionally disabled when `NODE_ENV=production`.
+- Set `AUTOFACE_LOCAL_PHOTO_STORAGE=false` in development only when you deliberately want to test Firebase Storage.
+- `/api/health` reports `photoStorage: "local-dev"` during normal local development.
+- Local photos are machine-local development data and are not suitable for Vercel, Cloud Run, multi-instance hosting, backups or real beta members.
+
+
+## v0.28.2 — Profile Visual Refresh
+
+- Redesigns My Profile to use the same stronger visual language as Atlas Daily Discovery.
+- Adds a profile identity summary with photo, member details, relationship intent, profile completeness and Atlas readiness.
+- Breaks the long edit form into three aligned colour-accented cards: About You, Relationship and Visibility.
+- Removes old development-era `v0.5` language from the Profile experience.
+- Completely refreshes the photo manager with a stronger photo stage, upload dropzone, photo-quality guidance, trust messaging and clearer remove action.
+- Makes Member View feel more like an actual Discovery profile card.
+- Adds stronger visual hierarchy to Atlas Readiness and privacy/minimisation content.
+- No profile schema, Firestore rules, photo storage, matching or Atlas scoring changes.

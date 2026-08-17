@@ -7,6 +7,23 @@ export function atlasAiEnabled() {
     && Boolean(process.env.GEMINI_MODEL);
 }
 
+const GEMINI_RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function providerErrorCode(status: number) {
+  return GEMINI_RETRYABLE_STATUS.has(status)
+    ? "ATLAS_AI_TEMPORARILY_UNAVAILABLE"
+    : `ATLAS_AI_PROVIDER_ERROR_${status}`;
+}
+
+function isTemporaryAtlasError(error: unknown) {
+  return error instanceof Error
+    && ["ATLAS_AI_TEMPORARILY_UNAVAILABLE", "ATLAS_AI_TIMEOUT"].includes(error.message);
+}
+
 function scale(value: number) {
   return ["", "Low", "Somewhat low", "Balanced", "Important", "Very important"][value] ?? "Balanced";
 }
@@ -70,50 +87,56 @@ ${dimensions}
 `.trim();
 }
 
-async function callGemini(prompt: string) {
+async function requestGeminiText(prompt: string) {
   if (!atlasAiEnabled()) throw new Error("ATLAS_AI_NOT_CONFIGURED");
 
   const apiKey = process.env.GEMINI_API_KEY!;
   const model = process.env.GEMINI_MODEL!;
   const base = (process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com/v1beta").replace(/\/$/, "");
   const url = `${base}/models/${encodeURIComponent(model)}:generateContent`;
-
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeout = setTimeout(() => controller.abort(), 20000);
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.25,
-          maxOutputTokens: 300,
-        },
-      }),
-      signal: controller.signal,
-      cache: "no-store",
-    });
-
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const providerMessage = body?.error?.message;
-      throw new Error(providerMessage ? `ATLAS_AI_PROVIDER_ERROR: ${providerMessage}` : `ATLAS_AI_PROVIDER_ERROR_${response.status}`);
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.25, maxOutputTokens: 300 },
+        }),
+        signal: controller.signal,
+        cache: "no-store",
+      });
+    } catch (error) {
+      if ((error instanceof DOMException && error.name === "AbortError")
+        || (error instanceof Error && /aborted/i.test(error.message))) {
+        throw new Error("ATLAS_AI_TIMEOUT");
+      }
+      throw error;
     }
 
-    const text = body?.candidates?.[0]?.content?.parts
-      ?.map((part: { text?: string }) => part.text ?? "")
-      .join("")
-      .trim();
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(providerErrorCode(response.status));
 
+    const text = body?.candidates?.[0]?.content?.parts
+      ?.map((part: { text?: string }) => part.text ?? "").join("").trim();
     if (!text) throw new Error("ATLAS_AI_EMPTY_RESPONSE");
     return text;
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+async function callGemini(prompt: string) {
+  try {
+    return await requestGeminiText(prompt);
+  } catch (error) {
+    if (!isTemporaryAtlasError(error)) throw error;
+    await sleep(650);
+    return requestGeminiText(prompt);
   }
 }
 
@@ -403,12 +426,7 @@ async function requestGeminiJson(prompt: string, responseJsonSchema?: GeminiJson
 
     const body = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const providerMessage = body?.error?.message;
-      throw new Error(
-        providerMessage
-          ? `ATLAS_AI_PROVIDER_ERROR: ${providerMessage}`
-          : `ATLAS_AI_PROVIDER_ERROR_${response.status}`,
-      );
+      throw new Error(providerErrorCode(response.status));
     }
 
     const text = body?.candidates?.[0]?.content?.parts
@@ -424,15 +442,22 @@ async function requestGeminiJson(prompt: string, responseJsonSchema?: GeminiJson
 }
 
 async function callGeminiJson(prompt: string, responseJsonSchema?: GeminiJsonSchema) {
-  const firstText = await requestGeminiJson(prompt, responseJsonSchema);
+  let firstText: string;
+  try {
+    firstText = await requestGeminiJson(prompt, responseJsonSchema);
+  } catch (error) {
+    if (!isTemporaryAtlasError(error)) throw error;
+    await sleep(650);
+    firstText = await requestGeminiJson(prompt, responseJsonSchema);
+  }
 
   try {
     return parseGeminiJson(firstText);
   } catch (error) {
     if (!(error instanceof Error) || error.message !== "ATLAS_AI_INVALID_JSON") throw error;
 
-    // One controlled retry only. This is used solely when the provider returned
-    // text that could not be safely parsed as JSON.
+    // One controlled format retry only. Provider errors are never exposed to
+    // the client as raw provider messages.
     const retryPrompt = `${prompt}
 
 RETRY FORMAT REQUIREMENT:

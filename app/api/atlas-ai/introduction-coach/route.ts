@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { atlasApiError } from "@/lib/server/atlas-api-errors";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { requireActiveMatch } from "@/lib/server/messaging";
 import { atlasAiEnabled, generateIntroductionCoach } from "@/lib/server/atlas-ai";
@@ -52,29 +53,7 @@ export async function POST(request: Request) {
     const coach = await generateIntroductionCoach(otherName, viewer, other, result);
     return NextResponse.json({ coach, persisted: false, notice: "Atlas generated editable conversation starters. Nothing was sent or saved." });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    const status = message === "UNAUTHENTICATED" ? 401
-      : message === "ATLAS_AI_TIMEOUT" ? 504
-      : 502;
+    return atlasApiError(error);
 
-    const safeDiagnosticCodes = new Set([
-      "ATLAS_AI_INVALID_JSON",
-      "ATLAS_AI_INVALID_COACH_OBJECT",
-      "ATLAS_AI_INVALID_INTRO",
-      "ATLAS_AI_INVALID_STARTERS",
-      "ATLAS_AI_INVALID_STARTER",
-      "ATLAS_AI_INVALID_THEME",
-      "ATLAS_AI_INVALID_QUESTION",
-      "ATLAS_AI_INVALID_BASIS",
-      "ATLAS_AI_TIMEOUT",
-      "ATLAS_AI_EMPTY_RESPONSE",
-    ]);
-
-    return NextResponse.json({
-      error: message,
-      ...(process.env.NODE_ENV !== "production" && safeDiagnosticCodes.has(message)
-        ? { diagnostic: message }
-        : {}),
-    }, { status });
   }
 }

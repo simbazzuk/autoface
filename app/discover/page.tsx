@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { relationshipIntentLabels } from "@/lib/profile";
 import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
 
@@ -133,7 +134,7 @@ export default function DiscoverPage() {
         </div>
         <div className="discovery-grid daily-discovery-grid">{data.candidates.map((c,index) => <article className="card discovery-card daily-discovery-card" key={c.uid}>
           <div className="daily-rank"><span>ATLAS PICK</span><b>{index+1} of {data.candidates.length}</b></div>
-          {c.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}<div className="candidate-identity"><div className="profile-placeholder">{c.firstName.slice(0,1).toUpperCase()}</div><div><h2>{c.firstName}{c.age ? `, ${c.age}` : ""}</h2><p>{[c.generalLocation,c.occupation].filter(Boolean).join(" · ") || "Limited profile details"}</p></div></div>
+          {c.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}<div className="candidate-identity"><ProfilePhoto uid={c.uid} name={c.firstName} className="discovery-profile-photo"/><div><h2>{c.firstName}{c.age ? `, ${c.age}` : ""}</h2><p>{[c.generalLocation,c.occupation].filter(Boolean).join(" · ") || "Limited profile details"}</p></div></div>
           <div className="trust-pair"><span><b>{c.authenticityScore}%</b><small>Authenticity</small></span><span><b>{c.compatibilityScore}%</b><small>Compatibility</small></span></div>
           <div className="candidate-badges"><span>{c.authenticityLevel}</span><span>{c.compatibilityLevel} alignment</span><span>{relationshipIntentLabels[c.relationshipIntent]}</span></div>
           <p className="candidate-about">{c.aboutMe}</p>

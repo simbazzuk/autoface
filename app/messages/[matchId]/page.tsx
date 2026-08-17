@@ -79,7 +79,7 @@ export default function MessagePage() {
       const token = await current.getIdToken();
       const response = await fetch("/api/atlas-ai/introduction-coach", { method:"POST", headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`}, body:JSON.stringify({matchId,consent:true}) });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.error ?? "Unable to generate conversation starters.");
+      if (!response.ok) throw new Error(body.message ?? body.error ?? "Unable to generate conversation starters.");
       setCoach(body.coach ?? null);
     } catch (err) {
       const raw = err instanceof Error ? err.message : "Unable to generate conversation starters.";

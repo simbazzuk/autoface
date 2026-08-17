@@ -1,6 +1,7 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 
 const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
 const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
@@ -15,11 +16,13 @@ const adminApp = firebaseAdminConfigured
         clientEmail: clientEmail!,
         privateKey: privateKey!,
       }),
+      storageBucket: process.env.FIREBASE_ADMIN_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     }))
   : null;
 
 export const adminAuth = adminApp ? getAuth(adminApp) : null;
 export const adminDb = adminApp ? getFirestore(adminApp) : null;
+export const adminStorage = adminApp ? getStorage(adminApp) : null;
 
 export async function requireUser(request: Request) {
   if (!adminAuth) throw new Error("SERVER_NOT_CONFIGURED");

@@ -123,7 +123,7 @@ export default function RelationshipProfilePage() {
         body: JSON.stringify({ mode: "profile", consent: true }),
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.error ?? "Unable to generate Atlas AI reflection.");
+      if (!response.ok) throw new Error(body.message ?? body.error ?? "Unable to generate Atlas AI reflection.");
       setAiInsight(body.insight ?? "");
     } catch (error) {
       setAiError(error instanceof Error ? error.message : "Unable to generate Atlas AI reflection.");

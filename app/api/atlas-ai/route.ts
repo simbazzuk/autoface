@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { atlasApiError } from "@/lib/server/atlas-api-errors";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { atlasAiEnabled, generateCompatibilityReflection, generateProfileReflection } from "@/lib/server/atlas-ai";
 import { calculateCompatibility } from "@/lib/compatibility";
@@ -67,8 +68,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: "INVALID_MODE" }, { status: 400 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    const status = message === "UNAUTHENTICATED" ? 401 : message === "SERVER_NOT_CONFIGURED" ? 500 : 502;
-    return NextResponse.json({ error: message }, { status });
+    return atlasApiError(error);
+
   }
 }

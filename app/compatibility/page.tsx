@@ -82,7 +82,7 @@ export default function CompatibilityPage() {
         body: JSON.stringify({ mode: "compatibility", consent: true, candidateId: selected.id }),
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.error ?? "Unable to generate Atlas AI explanation.");
+      if (!response.ok) throw new Error(body.message ?? body.error ?? "Unable to generate Atlas AI explanation.");
       if (body.deterministicScore !== result.score) throw new Error("AI explanation score check failed.");
       setAiInsight(body.insight ?? "");
     } catch (error) {

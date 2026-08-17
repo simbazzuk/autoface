@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { atlasApiError } from "@/lib/server/atlas-api-errors";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { atlasAiEnabled, generateAiDiscoveryInsight } from "@/lib/server/atlas-ai";
 import { recommendationFor } from "@/lib/server/discovery";
@@ -93,11 +94,7 @@ export async function POST(
       notice: "Gemini found semantic themes in two explicitly opted-in relationship profiles. It did not calculate eligibility, authenticity or the official compatibility score.",
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    const status = message === "UNAUTHENTICATED" ? 401
-      : message.includes("OPT_IN_REQUIRED") || message === "AI_CONSENT_REQUIRED" ? 409
-      : message === "SERVER_NOT_CONFIGURED" ? 500
-      : 502;
-    return NextResponse.json({ error: message }, { status });
+    return atlasApiError(error);
+
   }
 }

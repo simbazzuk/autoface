@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { relationshipIntentLabels, type RelationshipIntent } from "@/lib/profile";
 
 type RecommendationCandidate = {
@@ -118,7 +119,7 @@ export default function RecommendationPage() {
         body: JSON.stringify({ consent: true }),
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.error ?? "Unable to generate Atlas AI Discovery insight.");
+      if (!response.ok) throw new Error(body.message ?? body.error ?? "Unable to generate Atlas AI Discovery insight.");
       setAiInsight(body.insight ?? null);
     } catch (e) {
       setAiError(e instanceof Error ? e.message : "Unable to generate Atlas AI Discovery insight.");
@@ -159,7 +160,7 @@ export default function RecommendationPage() {
         <div className="container recommendation-layout">
           <div className="recommendation-main">
             <div className="card recommendation-person">
-              <div className="connection-avatar">{c.firstName.slice(0, 1).toUpperCase()}</div>
+              <ProfilePhoto uid={uid} name={c.firstName} className="recommendation-profile-photo"/>
 
               <div className="recommendation-person-copy">
                 <span className="privacy-kicker">RECOMMENDED INTRODUCTION</span>
