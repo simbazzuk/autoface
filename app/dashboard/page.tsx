@@ -69,11 +69,11 @@ const checks: VerificationCheck[] = [
   },
   {
     key: "photoVerified",
-    label: "Photo verification",
+    label: "Facial verification",
     weight: "+15",
-    available: true,
-    summary: "Confirms that profile imagery has been checked against the verified person.",
-    detail: "v0.9 adds a provider-neutral photo-verification boundary. In development this is simulated; production must use a specialist provider and AutoFace should retain the outcome/reference rather than raw biometric comparison data.",
+    available: false,
+    summary: "Coming soon — a secure live facial check to strengthen authenticity.",
+    detail: "Facial verification is planned as a specialist-provider integration. It will be used for authenticity only and will never influence compatibility, ranking or Atlas recommendations.",
   },
 ];
 
@@ -292,24 +292,19 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="security-action identity-action">
+            <div className="security-action identity-action facial-coming-soon">
               <div className="action-copy">
-                <strong>Profile photo verification</strong>
-                <p>Connect profile imagery to your verified identity through the provider boundary. This adds +15 authenticity points.</p>
+                <div className="facial-title-row"><strong>Facial verification</strong><span className="coming-soon">COMING SOON</span></div>
+                <p>Use a secure live facial check to strengthen your authenticity. A specialist provider will perform liveness and verification outside the AutoFace matching engine.</p>
+                <div className="facial-principle">Used for authenticity, never matching.</div>
               </div>
-              {signals.photoVerified ? (
-                <p className="notice">✓ Profile photo verification evidence recorded.</p>
-              ) : signals.identityVerified && signals.livenessVerified ? (
-                <button className="btn btn-primary" onClick={() => router.push("/verify-photo")}>Verify profile photo</button>
-              ) : (
-                <p className="muted">Complete identity + liveness verification first.</p>
-              )}
+              <button className="btn" disabled>Verify my face · Coming soon</button>
             </div>
 
             <div className="privacy-box">
               <span className="privacy-kicker">PRIVACY BY DESIGN</span>
               <b>Zero-ID Storage</b>
-              <p>AutoFace v0.9 does not store passport images, driving-licence images, raw verification selfies or biometric templates.</p>
+              <p>AutoFace does not store passport images, driving-licence images, raw verification selfies or biometric templates.</p>
               <p className="privacy-note">Identity and liveness results are written server-side after a provider session; users cannot self-award these verification signals.</p>
             </div>
 

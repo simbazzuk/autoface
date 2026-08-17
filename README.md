@@ -271,3 +271,185 @@ Improves the Atlas AI Discovery testing flow and fixes a product-journey gap dis
 - Existing mutual introductions are deliberately preserved rather than silently dismantled.
 - Reset endpoint verifies the server-owned `demoProfiles.isTestProfile` marker, so production members cannot use the test reset function.
 - No new Firestore client permissions are required.
+
+
+## v0.21.2 — Atlas AI Discovery Teaser Patch
+
+Makes the Gemini capability visible earlier in the recommendation journey without generating AI content automatically.
+
+- Discover now checks AI Discovery availability for displayed candidates in one authenticated server request.
+- When both members have opted in and Gemini is configured, the recommendation card shows an `Atlas AI Discovery available` teaser.
+- The teaser links to recommendation details but does **not** call Gemini or claim an AI insight already exists.
+- When the viewer opted in but the candidate did not, Discover explains that semantic comparison is unavailable rather than silently hiding the feature.
+- Reviewed Recommendations also indicates which previous recommendations are eligible for Atlas AI Discovery.
+- Recommendation details use stronger visual hierarchy and clearer separation between the official deterministic score and the optional Gemini semantic layer.
+- No AI-generated insight is persisted and no Gemini call occurs until the member explicitly confirms it on recommendation details.
+
+
+## v0.22 — Atlas Introduction Coach
+
+Adds an optional Gemini-powered conversation-coaching layer after a mutual introduction.
+
+- Introduction Coach appears inside an active mutual conversation.
+- Requires the existing Atlas AI configuration and both members' explicit `consentForAiDiscovery` opt-in.
+- The signed-in member provides an additional per-generation confirmation before Gemini is called.
+- Gemini returns structured, editable conversation starters grounded in the two opted-in relationship profiles and published deterministic compatibility dimensions.
+- Prompts prohibit sensitive-trait inference, private/contact-data requests, relationship-success predictions and prescriptive dating decisions.
+- `Use this question` copies a starter into the message composer; it never sends automatically.
+- Generated starters are not persisted to Firestore.
+- Existing messaging, moderation, blocking, reporting, matching and deterministic compatibility logic is unchanged.
+- No new Firestore client permissions or schema deployment is required.
+
+
+## v0.22.1 — Demo Mutual Introduction Harness
+
+Adds a test-profile-only way to create a complete mutual introduction without knowing another demo member's login credentials.
+
+- New server-restricted demo harness in Compatibility Lab.
+- Lists eligible real Firestore demo/test profiles and their current deterministic compatibility score.
+- `Create mutual introduction` writes both reciprocal Interested decisions, the mutual match, initial Connection state and Conversation shell.
+- Optionally enables `consentForAiDiscovery` on the **synthetic target only**, allowing Atlas AI Discovery and Atlas Introduction Coach to be tested without the target login.
+- The signed-in tester's own AI consent is never changed.
+- Existing block records are respected; the harness refuses to bypass safety controls.
+- Creates audit/security metadata and demo notifications.
+- Normal production accounts receive `TEST_PROFILE_REQUIRED` and cannot access the harness.
+- No new client-writeable Firestore permissions are introduced.
+
+
+## v0.22.2 — Demo Block Recovery Patch
+
+Improves the test-profile mutual-introduction harness after blocked demo pairs made the Coach journey difficult to test.
+
+- Demo dropdown now labels each eligible synthetic profile as `READY`, `BLOCKED` or `MUTUAL`.
+- Selected profile preview displays the pair state explicitly.
+- Blocked demo pairs expose a clear `Clear demo block` action.
+- Clearing a block is server-side restricted to test profiles on both sides.
+- The patch deletes only the two directional block documents for the selected demo pair.
+- A previously blocked match is moved to an unmatched test state; a new mutual introduction is **not** silently created.
+- The tester must still explicitly click `Create mutual introduction` after clearing the block.
+- Demo block clearing is written to `securityEvents`.
+- Normal production users cannot access either the demo match harness or the clear-block action.
+
+
+## v0.22.3 — Atlas Coach JSON Reliability Patch
+
+Hardens the Gemini response path after `ATLAS_AI_INVALID_JSON` was observed in the Introduction Coach.
+
+- Gemini JSON responses are now parsed through a tolerant but bounded parser.
+- Accepts clean JSON, JSON wrapped in Markdown fences and a single balanced JSON object surrounded by accidental provider text.
+- Safely removes trailing commas before one final parse attempt.
+- If the first Gemini response is still invalid, AutoFace performs one controlled retry with a stricter JSON-only instruction.
+- Gemini generation temperature is reduced and output headroom increased for more reliable structured output.
+- Introduction Coach prompt explicitly forbids Markdown wrappers, commentary and trailing text.
+- Fixes the v0.22.2 TypeScript `state` field declaration in the demo mutual-introduction API.
+- The UI now turns raw JSON-format failures into a user-friendly retry message.
+- No changes to compatibility scoring, AI consent, message sending, Firestore security rules or persistence boundaries.
+
+
+## v0.22.4 — Gemini Timeout Reliability Patch
+
+Improves Atlas Introduction Coach reliability when Gemini takes longer to respond.
+
+- Extends the Gemini request timeout from 20 seconds to 45 seconds.
+- Converts abort/timeout failures into the stable `ATLAS_AI_TIMEOUT` application error.
+- The JSON-repair retry is not attempted after a timeout; retries remain limited to invalid JSON only.
+- Slightly shortens the Introduction Coach prompt and reduces output token headroom to improve latency.
+- Conversation UI shows a clear `Atlas is thinking…` wait state.
+- Raw browser/server abort messages are replaced with `Atlas is taking longer than expected. Please try again.`
+- No changes to matching, consent, Firestore permissions, persistence or message sending.
+
+
+## v0.22.5 — Atlas Coach Structured Output Fix
+
+Moves Atlas Introduction Coach from prompt-only JSON formatting to Gemini structured output.
+
+- Sends `responseMimeType: application/json` plus `responseJsonSchema` in the Gemini `generateContent` request.
+- The response schema requires exactly three conversation starters.
+- Every starter must contain `theme`, `question` and `basis`.
+- `basis` is constrained by schema to `shared_theme` or `discussion_point`.
+- Unknown object fields are rejected by the response schema.
+- Server validation now reports narrow development diagnostics such as `ATLAS_AI_INVALID_INTRO`, `ATLAS_AI_INVALID_STARTERS`, `ATLAS_AI_INVALID_BASIS`, and `ATLAS_AI_EMPTY_RESPONSE`.
+- Diagnostics never include private relationship answers or raw Gemini response text.
+- The 45-second timeout and bounded JSON repair from v0.22.4 remain in place.
+- Atlas AI Discovery remains unchanged; structured output is applied specifically to Introduction Coach.
+- No Firestore rules, collections, consent rules, matching logic or message-send behaviour change.
+
+
+## v0.23 — Profile Experience
+
+- Reframes the Profile page around member readiness rather than simple form completion.
+- Adds Atlas Readiness, combining member-profile completeness with Atlas relationship-profile completeness.
+- Readiness is explicitly separate from attractiveness, authenticity and compatibility scoring.
+- Improves the existing profile preview into a clearer `Member View`, respecting age/location/occupation visibility choices.
+- Clarifies that private Atlas relationship answers and AI analysis are not automatically exposed in the public-facing preview.
+- Adds Facial Verification to the Authenticity Centre as a clearly disabled `COMING SOON` capability.
+- Facial Verification is positioned as authenticity-only: it will never influence compatibility, ranking or Atlas recommendations.
+- No biometric processing is introduced in v0.23.
+- No new Firestore collections, rules or environment variables are required.
+
+
+## v0.24 — Atlas Daily Discovery
+
+Reframes Discovery around considered introductions instead of a swipe-style catalogue.
+
+- Atlas now returns up to the top **3** currently eligible recommendations rather than a larger browseable queue.
+- Ranking remains deterministic: compatibility first, then authenticity as a tie-breaker.
+- Adds `Atlas Daily Discovery` language and a clear `quality over quantity` explanation.
+- Each card is numbered as an Atlas pick and shows a concise `Why Atlas showed you ...` explanation.
+- Recommendation details remain available for the full deterministic dimension breakdown and optional Atlas AI Discovery.
+- No AI model is used to select or rank the daily picks.
+- Reviewed Recommendations, demo reset, Interested / Not for me, and safety boundaries remain unchanged.
+- No new Firestore rules, collections or environment variables are required.
+
+
+## v0.25 — Thoughtful Decisions
+
+Adds a lower-pressure decision path to Atlas Daily Discovery.
+
+- Discovery now offers `Interested`, `Save for later`, and `Not for me`.
+- `Save for later` is private and never notifies the other member.
+- Saved profiles leave the active Daily Discovery queue so the next eligible recommendation can surface.
+- Recommendation History becomes a considered-decisions area with All, Saved, Interested and Not for me filters.
+- Non-mutual decisions can be reconsidered directly from history.
+- Changing a saved recommendation to Interested uses the existing mutual-interest flow; no unsolicited messaging is introduced.
+- Existing mutual introductions are protected from history decision controls.
+- Uses the existing `interests` collection with a new `saved` status; no new Firestore collection or environment variable is required.
+
+
+## v0.26 — Privacy & Control
+
+Consolidates the member's most important privacy choices into Account & Privacy.
+
+- Existing `Pause Discovery` remains the main control for temporarily leaving new recommendations without deleting the account.
+- Adds direct visibility controls for age, general location and occupation.
+- Clearly lists data never shown in Discovery: email, mobile number, private Atlas answers and verification documents.
+- Adds in-app notification preferences for introductions, messages, connection updates and verification updates.
+- Safety and account-protection notifications are deliberately non-optional.
+- Server-side notification creation now honours notification preferences before creating routine notification records.
+- Adds a server-owned `notificationPreferences/{uid}` document.
+- Notification preferences are included in account data export and removed during account deletion.
+- The navigation label is updated to `Privacy & Control`.
+- No new environment variables are required.
+- Updated Firestore rules explicitly keep notification preferences server-owned.
+
+
+## v0.26.1 — Recommendation History JSX Fix
+
+- Fixes the invalid nested JSX conditional introduced with the v0.25 Saved / history filters.
+- Rewrites Recommendation History rendering into explicit, readable conditional blocks.
+- Preserves All, Saved, Interested and Not for me filters.
+- Preserves reconsidering non-mutual decisions directly from history.
+- Preserves Atlas AI Discovery availability links and mutual-introduction protection.
+- No Firestore, rules, schema or environment changes.
+
+
+## v0.26.2 — Public Pricing Page
+
+- Adds a public `/pricing` page accessible without authentication.
+- Shows the proposed Free, AutoFace+ (£9.99/month) and Atlas Premium (£19.99/month) product structure.
+- Clearly labels commercial pricing as indicative/planned while AutoFace remains in controlled beta.
+- States that premium capabilities are currently unlocked for founding-member beta testing.
+- Reinforces product principles: safety is never premium, mutual messaging is not a premium gate, and paid value focuses on deeper intelligence rather than boosts.
+- Adds a Coming Soon facial-verification pricing note without committing to a provider or fixed price.
+- Adds Pricing to the desktop Trust menu, mobile navigation and footer.
+- No Firebase, Firestore, billing provider or environment changes are introduced.

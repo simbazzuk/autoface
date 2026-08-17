@@ -137,7 +137,7 @@ export function Header() {
           <Link href="/profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>My Profile</Link>
           <Link href="/relationship-profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Atlas Profile</Link>
           <Link href="/dashboard" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Security & Verification</Link>
-          <Link href="/account" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Account & Privacy</Link>
+          <Link href="/account" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Privacy & Control</Link>
           <Link href="/introductions" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Introductions</Link>
         </div>
 
@@ -170,7 +170,7 @@ export function Header() {
                 <Link href="/discovery-preferences"><b>Discovery Preferences</b><small>Control who Atlas can recommend</small></Link>
                 <Link href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
                 <Link href="/verify-photo"><b>Photo Verification</b><small>Profile-photo authenticity</small></Link>
-                <Link href="/account"><b>Account & Privacy</b><small>Discovery, data export and deletion</small></Link>
+                <Link href="/account"><b>Privacy & Control</b><small>Discovery, data export and deletion</small></Link>
                 <AdminLink />
               </div>
             </details>
@@ -180,6 +180,7 @@ export function Header() {
             <summary>Trust <span aria-hidden="true">⌄</span></summary>
             <div className="nav-group-menu trust-menu">
               <Link href="/how-it-works"><b>How it works</b><small>Understand the AutoFace journey</small></Link>
+              <Link href="/pricing"><b>Pricing</b><small>Beta access and planned membership tiers</small></Link>
               <Link href="/trust"><b>Trust & Privacy</b><small>Security and data minimisation</small></Link>
               <Link href="/privacy"><b>Privacy Notice</b><small>How AutoFace handles beta data</small></Link>
               <Link href="/terms"><b>Beta Terms</b><small>Terms for controlled beta access</small></Link>
@@ -233,7 +234,7 @@ export function Header() {
                 <Link href="/discovery-preferences" onClick={closeMobile}>Discovery Preferences</Link>
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
                 <Link href="/verify-photo" onClick={closeMobile}>Photo Verification</Link>
-                <Link href="/account" onClick={closeMobile}>Account & Privacy</Link>
+                <Link href="/account" onClick={closeMobile}>Privacy & Control</Link>
                 <AdminLink mobile />
               </div>
             </>
@@ -248,6 +249,7 @@ export function Header() {
           <div className="mobile-nav-section">
             <span className="mobile-nav-label">TRUST</span>
             <Link href="/how-it-works" onClick={closeMobile}>How it works</Link>
+            <Link href="/pricing" onClick={closeMobile}>Pricing</Link>
             <Link href="/trust" onClick={closeMobile}>Trust & Privacy</Link>
           </div>
 

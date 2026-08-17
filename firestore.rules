@@ -169,6 +169,14 @@ service cloud.firestore {
 
 
 
+
+
+    // v0.26 notification preferences are server-owned. Account holders manage
+    // them through authenticated account APIs; clients cannot write them directly.
+    match /notificationPreferences/{uid} {
+      allow read, write: if false;
+    }
+
     // v0.18 controlled-beta invitations and access records are server-owned.
     match /betaInvites/{code} {
       allow read, write: if false;

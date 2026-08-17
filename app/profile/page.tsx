@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { useAuth } from "@/components/AuthProvider";
 import { db } from "@/lib/firebase";
+import { calculateRelationshipCompleteness, type RelationshipProfile } from "@/lib/relationship-profile";
 import {
   calculateProfileCompleteness,
   relationshipIntentLabels,
@@ -36,6 +37,7 @@ export default function ProfilePage() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [relationshipProfile, setRelationshipProfile] = useState<Partial<RelationshipProfile> | null>(null);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
@@ -73,6 +75,13 @@ export default function ProfilePage() {
     return () => { active = false; };
   }, [user]);
 
+  useEffect(() => {
+    if (!db || !user) return;
+    getDoc(doc(db, "relationshipProfiles", user.uid))
+      .then((snapshot) => setRelationshipProfile(snapshot.exists() ? snapshot.data() as Partial<RelationshipProfile> : {}))
+      .catch(() => setRelationshipProfile({}));
+  }, [user]);
+
   const profileForScore = useMemo<Partial<AutoFaceProfile>>(() => ({
     firstName: form.firstName,
     age: Number(form.age),
@@ -85,6 +94,9 @@ export default function ProfilePage() {
   }), [form]);
 
   const completeness = calculateProfileCompleteness(profileForScore);
+  const atlasCompleteness = calculateRelationshipCompleteness(relationshipProfile ?? {});
+  const atlasReadiness = atlasCompleteness.score >= 85 ? "STRONG" : atlasCompleteness.score >= 60 ? "GOOD" : "BUILDING";
+  const readinessScore = Math.round((completeness.score * 0.45) + (atlasCompleteness.score * 0.55));
 
   function change<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -143,9 +155,9 @@ export default function ProfilePage() {
     <main>
       <section className="page-hero compact-hero">
         <div className="container">
-          <span className="eyebrow">Profile Foundation</span>
-          <h1>Create your profile.</h1>
-          <p className="lead">Start with only the information AutoFace needs for a meaningful introduction. Your profile is private by default and matching is not enabled in v0.5.</p>
+          <span className="eyebrow">Profile Experience</span>
+          <h1>Your profile, ready for better introductions.</h1>
+          <p className="lead">Build a clear member profile, see exactly what you share, and understand whether Atlas has enough relationship context to make useful recommendations.</p>
         </div>
       </section>
 
@@ -187,22 +199,27 @@ export default function ProfilePage() {
           </form>
 
           <aside className="profile-side">
-            <div className="card completeness-card">
-              <span className="muted">Profile completeness</span>
-              <div className="score">{completeness.score}%</div>
-              <div className="meter"><span style={{ width: `${completeness.score}%` }} /></div>
-              <p>{completeness.completed} of {completeness.total} profile signals completed.</p>
-              <p className="side-note">Completeness is separate from your Authenticity Score. Filling in more profile information does not make your identity more verified.</p>
+            <div className="card completeness-card readiness-card">
+              <div className="profile-section-head"><div><span className="privacy-kicker">ATLAS READINESS</span><h3>Ready for better introductions</h3></div><span className={`status-pill readiness-${atlasReadiness.toLowerCase()}`}>{atlasReadiness}</span></div>
+              <div className="score">{readinessScore}%</div>
+              <div className="meter"><span style={{ width: `${readinessScore}%` }} /></div>
+              <div className="readiness-breakdown">
+                <span><b>Member profile</b><em>{completeness.score}%</em></span>
+                <span><b>Atlas relationship profile</b><em>{atlasCompleteness.score}%</em></span>
+              </div>
+              <p className="side-note">Readiness measures useful profile context, not attractiveness or identity. It does not increase your compatibility score.</p>
+              {atlasCompleteness.score < 85 && <a className="btn" href="/relationship-profile">Improve Atlas readiness</a>}
             </div>
 
             <div className="card preview-card">
-              <span className="privacy-kicker">PRIVATE PREVIEW</span>
+              <span className="privacy-kicker">PROFILE PREVIEW · MEMBER VIEW</span>
               <h3>{form.firstName.trim() || "Your first name"}{form.showAge && form.age ? `, ${form.age}` : ""}</h3>
               {form.showLocation && form.generalLocation && <p>{form.generalLocation}</p>}
               {form.showOccupation && form.occupation && <p>{form.occupation}</p>}
               <span className="intent-chip">{relationshipIntentLabels[form.relationshipIntent]}</span>
               <p className="preview-about">{form.aboutMe || "Your introduction will appear here."}</p>
-              <div className="private-banner">🔒 Only you can read this profile in v0.5.</div>
+              <div className="private-banner">👁 Preview only — this mirrors the profile fields you have allowed AutoFace to show.</div>
+              <p className="side-note">Atlas relationship answers and AI analysis are not automatically exposed here.</p>
             </div>
 
             <div className="card minimisation-card">

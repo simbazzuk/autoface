@@ -21,6 +21,13 @@ type AccountData = {
     photoVerified: boolean;
     photoVerifiedAt: string | null;
   };
+  notificationPreferences: {
+    introductions: boolean;
+    messages: boolean;
+    connectionUpdates: boolean;
+    verificationUpdates: boolean;
+    safetyUpdates: true;
+  };
   hasDiscoveryPreferences: boolean;
 };
 
@@ -79,6 +86,59 @@ export default function AccountPage() {
       setMessage(enabled ? "Discovery participation enabled." : "Discovery participation paused. Your profile is no longer eligible for new recommendations.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to update discovery.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function updateVisibility(key: "showAge" | "showLocation" | "showOccupation", enabled: boolean) {
+    if (!user || busy) return;
+    try {
+      setBusy(true);
+      setMessage("");
+      const token = await user.getIdToken();
+      const response = await fetch("/api/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ [key]: enabled }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Unable to update profile visibility.");
+      setData((current) => current ? {
+        ...current,
+        privacy: { ...current.privacy, [key]: enabled },
+      } : current);
+      setMessage("Profile visibility updated.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to update profile visibility.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function updateNotificationPreference(
+    key: "introductions" | "messages" | "connectionUpdates" | "verificationUpdates",
+    enabled: boolean,
+  ) {
+    if (!user || busy) return;
+    try {
+      setBusy(true);
+      setMessage("");
+      const token = await user.getIdToken();
+      const response = await fetch("/api/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ notificationPreferences: { [key]: enabled } }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Unable to update notification preferences.");
+      setData((current) => current ? {
+        ...current,
+        notificationPreferences: { ...current.notificationPreferences, [key]: enabled },
+      } : current);
+      setMessage("Notification preference updated.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to update notification preferences.");
     } finally {
       setBusy(false);
     }
@@ -149,7 +209,7 @@ export default function AccountPage() {
         <div className="container">
           <span className="eyebrow">Account & Privacy</span>
           <h1>Your account. Your data. Your control.</h1>
-          <p className="lead">Manage discovery participation, understand what AutoFace holds, export your data or permanently delete your account.</p>
+          <p className="lead">Control who can discover you, what profile details other members may see, which activity notifications you receive, and what AutoFace stores.</p>
         </div>
       </section>
 
@@ -179,6 +239,49 @@ export default function AccountPage() {
                   {data.privacy.discoveryEnabled ? "Pause Discovery" : "Resume Discovery"}
                 </button>
               </div>
+            </div>
+
+            <div className="card account-control-card">
+              <div className="account-control-head">
+                <div><span className="privacy-kicker">VISIBILITY</span><h2>What another member may see</h2></div>
+                <span className="status-pill">YOU CONTROL THIS</span>
+              </div>
+              <p>These controls affect the safe profile projection used in recommendations. Your email, phone number and private Atlas answers are never included here.</p>
+              <div className="privacy-control-stack">
+                <label className="toggle-row">
+                  <input type="checkbox" checked={data.privacy.showAge} disabled={busy} onChange={(e) => void updateVisibility("showAge", e.target.checked)} />
+                  <span><b>Show my age</b><small>Allow your age to appear on recommendation cards.</small></span>
+                </label>
+                <label className="toggle-row">
+                  <input type="checkbox" checked={data.privacy.showLocation} disabled={busy} onChange={(e) => void updateVisibility("showLocation", e.target.checked)} />
+                  <span><b>Show my general location</b><small>Only the broad area from your profile — never a home address.</small></span>
+                </label>
+                <label className="toggle-row">
+                  <input type="checkbox" checked={data.privacy.showOccupation} disabled={busy} onChange={(e) => void updateVisibility("showOccupation", e.target.checked)} />
+                  <span><b>Show my occupation</b><small>Your employer and workplace address are not separately exposed.</small></span>
+                </label>
+              </div>
+              <div className="visibility-never-shared">
+                <small>NEVER SHOWN IN DISCOVERY</small>
+                <span>Email address</span><span>Mobile number</span><span>Private Atlas answers</span><span>Verification documents</span>
+              </div>
+              <a className="btn" href="/profile">Preview my member profile</a>
+            </div>
+
+            <div className="card account-control-card">
+              <div className="account-control-head">
+                <div><span className="privacy-kicker">NOTIFICATIONS</span><h2>Choose which activity reaches you</h2></div>
+                <span className="status-pill">IN-APP</span>
+              </div>
+              <p>Turn off routine categories without affecting the underlying feature. Safety and account-protection notices always remain enabled.</p>
+              <div className="privacy-control-stack">
+                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.introductions} disabled={busy} onChange={(e) => void updateNotificationPreference("introductions", e.target.checked)} /><span><b>New introductions</b><small>Mutual-interest and introduction activity.</small></span></label>
+                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.messages} disabled={busy} onChange={(e) => void updateNotificationPreference("messages", e.target.checked)} /><span><b>New messages</b><small>Conversation activity from mutual introductions.</small></span></label>
+                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.connectionUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("connectionUpdates", e.target.checked)} /><span><b>Connection updates</b><small>Changes to your shared Connection journey.</small></span></label>
+                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.verificationUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("verificationUpdates", e.target.checked)} /><span><b>Verification updates</b><small>Authenticity and verification result activity.</small></span></label>
+                <label className="toggle-row locked-toggle"><input type="checkbox" checked readOnly /><span><b>Safety & account protection</b><small>Always enabled so important trust and security notices cannot be missed.</small></span></label>
+              </div>
+              <a className="btn" href="/notifications">Open Activity</a>
             </div>
 
             <div className="card account-control-card">
@@ -217,12 +320,14 @@ export default function AccountPage() {
           <aside className="account-privacy-side">
             <div className="card">
               <span className="privacy-kicker">PRIVACY SNAPSHOT</span>
-              <h3>What other members may see</h3>
+              <h3>Your current member-view settings</h3>
               <div className="privacy-status-list">
                 <span><b>Age</b>{data.privacy.showAge ? "Allowed" : "Hidden"}</span>
                 <span><b>General location</b>{data.privacy.showLocation ? "Allowed" : "Hidden"}</span>
                 <span><b>Occupation</b>{data.privacy.showOccupation ? "Allowed" : "Hidden"}</span>
-                <span><b>Atlas compatibility</b>{data.privacy.compatibilityConsent ? "Enabled" : "Disabled"}</span>
+                <span><b>Atlas compatibility</b>{data.privacy.compatibilityConsent ? "Used for recommendations" : "Disabled"}</span>
+                <span><b>Email / mobile</b>Never shown</span>
+                <span><b>Private Atlas answers</b>Never shown directly</span>
               </div>
               <a className="btn" href="/profile">Edit profile privacy</a>
             </div>
@@ -241,7 +346,7 @@ export default function AccountPage() {
             <div className="card privacy-principle-card">
               <span className="privacy-kicker">AUTOFACE PRINCIPLE</span>
               <h3>Leaving should be as clear as joining.</h3>
-              <p>Privacy controls should not be hidden behind support requests. v0.13 makes discovery, export and deletion available directly to the authenticated account holder.</p>
+              <p>Privacy controls should not be hidden behind support requests. Discovery, visibility, notifications, export and deletion are available directly to the authenticated account holder.</p>
             </div>
           </aside>
         </div>

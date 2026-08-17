@@ -72,6 +72,7 @@ export async function POST(request: Request) {
       "identity",
       "authenticity",
       "discoveryPreferences",
+      "notificationPreferences",
       "users",
       "demoProfiles",
     ];

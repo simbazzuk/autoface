@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase";
 import { calculateCompatibility } from "@/lib/compatibility";
 import { demoCompatibilityProfiles } from "@/lib/demo-compatibility-profiles";
 import type { RelationshipProfile } from "@/lib/relationship-profile";
+import { DemoMutualIntroduction } from "@/components/DemoMutualIntroduction";
 
 export default function CompatibilityPage() {
   const { user, loading } = useAuth();
@@ -184,6 +185,8 @@ export default function CompatibilityPage() {
                     </div>
                   ) : <p>No major structured differences appeared in this demonstration.</p>}
                 </div>
+
+                <DemoMutualIntroduction />
 
                 <div className="card methodology-card">
                   <span className="privacy-kicker">METHOD</span>

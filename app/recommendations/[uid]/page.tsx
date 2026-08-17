@@ -216,7 +216,7 @@ export default function RecommendationPage() {
               <div className="ai-discovery-title-row">
                 <div>
                   <span className="privacy-kicker">ATLAS AI DISCOVERY</span>
-                  <h2>Go beyond the score.</h2>
+                  <h2>What might you have in common beyond the numbers?</h2>
                 </div>
                 <span className={`status-pill ${aiStatus?.available ? "ai-discovery-live" : "ai-off-pill"}`}>
                   {aiStatus?.available ? "GEMINI AVAILABLE" : "OPT-IN REQUIRED"}
@@ -224,8 +224,8 @@ export default function RecommendationPage() {
               </div>
 
               <p className="ai-discovery-intro">
-                The official {c.compatibilityScore}% compatibility score above remains deterministic.
-                When both members opt in, Gemini can look for semantic themes in the relationship answers you each wrote in your own words.
+                Your official {c.compatibilityScore}% compatibility score remains deterministic. Atlas AI Discovery is a separate,
+                optional Gemini layer that looks for meaning and shared themes in the relationship answers you each wrote in your own words.
               </p>
 
               {!aiStatus?.enabled ? (
@@ -284,7 +284,7 @@ export default function RecommendationPage() {
                     </span>
                   </label>
                   <button className="btn btn-primary ai-discovery-generate" disabled={!aiConsent || aiBusy} onClick={() => void generateAiDiscovery()}>
-                    {aiBusy ? "Atlas is looking for shared themes…" : "Discover what Atlas AI noticed"}
+                    {aiBusy ? "Atlas is looking for shared themes…" : "See what Gemini notices"}
                   </button>
                 </>
               )}

@@ -4,7 +4,7 @@ import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { getEligibleMember } from "@/lib/server/discovery";
 import { createNotification } from "@/lib/server/notifications";
 
-type Body = { toUid?: string; action?: "interested" | "pass" };
+type Body = { toUid?: string; action?: "interested" | "saved" | "pass" };
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
     const db = adminDb;
     const body = (await request.json()) as Body;
-    if (!body.toUid || !["interested", "pass"].includes(body.action ?? "")) {
+    if (!body.toUid || !["interested", "saved", "pass"].includes(body.action ?? "")) {
       return NextResponse.json({ error: "INVALID_REQUEST" }, { status: 400 });
     }
     if (body.toUid === user.uid) return NextResponse.json({ error: "INVALID_TARGET" }, { status: 400 });
