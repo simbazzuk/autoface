@@ -645,3 +645,7 @@ Improves readability of the Discover readiness checklist without changing eligib
 
 ## v0.34.3 — Engaging Empty Discovery
 Replaces the dead-end empty Discovery state with an active-profile message and a browser-only This or That activity while Atlas waits for a suitable introduction.
+
+
+## v0.34.4 — Blue Community Map
+Updates the landing-page community network map with a richer blue background while preserving the existing responsive map and labels.
