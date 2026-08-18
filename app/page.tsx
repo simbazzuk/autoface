@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Check, HeartHandshake, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, Heart, HeartHandshake, MessageCircle, Search, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 
 const alignments = [
   { label: "Family outlook", value: 92, tone: "Strong alignment" },
@@ -98,32 +98,78 @@ export default function Home() {
       </div>
     </section>
 
-    <section className="experience-journey">
+    <section className="autoface-how-flow">
       <div className="container">
-        <div className="experience-section-head">
-          <div><span className="experience-section-label">A MORE INTENTIONAL JOURNEY</span><h2>A few people worth considering. And here&apos;s why.</h2></div>
-          <p>Three simple stages keep the experience focused on understanding, mutuality and choice.</p>
+        <div className="experience-section-head autoface-how-head">
+          <div><span className="experience-section-label">FROM PROFILE TO INTRODUCTION</span><h2>A considered way to meet someone.<br/><em>One step at a time.</em></h2></div>
+          <p>AutoFace keeps the journey clear: understand yourself, discover a few people, choose privately, and only open a conversation when interest is mutual.</p>
         </div>
 
-        <div className="experience-three">
-          <article>
-            <span>01</span>
-            <div className="experience-stage-icon"><Sparkles size={22}/></div>
-            <h3>Understand</h3>
-            <p>Build your Atlas relationship profile around values, expectations and the way you want a relationship to work.</p>
+        <div className="autoface-flow-line">
+          <article className="autoface-flow-step">
+            <span className="flow-number">01</span>
+            <div className="flow-icon flow-profile"><UserRound size={22}/></div>
+            <h3>Create</h3>
+            <b>Build your profile</b>
+            <p>Share who you are, your lifestyle, values and what matters in an introduction.</p>
           </article>
-          <article>
-            <span>02</span>
-            <div className="experience-stage-icon"><HeartHandshake size={22}/></div>
+
+          <span className="flow-connector"><ArrowRight size={18}/></span>
+
+          <article className="autoface-flow-step">
+            <span className="flow-number">02</span>
+            <div className="flow-icon flow-atlas"><Sparkles size={22}/></div>
+            <h3>Atlas</h3>
+            <b>Understand compatibility</b>
+            <p>Atlas builds a relationship profile and explains the signals behind each recommendation.</p>
+          </article>
+
+          <span className="flow-connector"><ArrowRight size={18}/></span>
+
+          <article className="autoface-flow-step">
+            <span className="flow-number">03</span>
+            <div className="flow-icon flow-discover"><Search size={22}/></div>
             <h3>Discover</h3>
-            <p>See people who meet your preferences, with compatibility explained rather than hidden behind an opaque match score.</p>
+            <b>Meet considered people</b>
+            <p>See a small number of profiles chosen around compatibility, preferences and authenticity.</p>
           </article>
+
+          <span className="flow-connector"><ArrowRight size={18}/></span>
+
+          <article className="autoface-flow-step">
+            <span className="flow-number">04</span>
+            <div className="flow-icon flow-interest"><Heart size={22}/></div>
+            <h3>Interest</h3>
+            <b>Choose privately</b>
+            <p>Interested, save for later, or simply say not for me. Nobody is pressured into a conversation.</p>
+          </article>
+        </div>
+
+        <div className="autoface-mutual-stage">
+          <div className="mutual-side mutual-you"><span>YOU</span><Heart size={16}/><b>Interested</b></div>
+          <div className="mutual-path"><i/><i/></div>
+          <div className="mutual-centre">
+            <span className="flow-number">05</span>
+            <div className="flow-icon flow-mutual"><HeartHandshake size={24}/></div>
+            <h3>Mutual interest</h3>
+            <p>When you both independently choose each other, AutoFace creates an introduction.</p>
+          </div>
+          <div className="mutual-path mutual-path-right"><i/><i/></div>
+          <div className="mutual-side mutual-them"><span>THEM</span><Heart size={16}/><b>Interested</b></div>
+        </div>
+
+        <div className="autoface-introduction-finish">
+          <span className="finish-line"/>
           <article>
-            <span>03</span>
-            <div className="experience-stage-icon"><ShieldCheck size={22}/></div>
-            <h3>Introduce</h3>
-            <p>Nobody messages anybody until interest is mutual. An introduction opens only when both people independently choose it.</p>
+            <span className="flow-number">06</span>
+            <div className="flow-icon flow-message"><MessageCircle size={23}/></div>
+            <div><h3>Introduced</h3><b>Start a conversation when you&apos;re both ready.</b><p>Messaging opens only after mutual interest — with Atlas available to help you understand the connection along the way.</p></div>
           </article>
+        </div>
+
+        <div className="autoface-flow-principle">
+          <ShieldCheck size={17}/>
+          <span><b>No endless swiping. No popularity contest. No pressure.</b> Considered introductions, mutual choice and explainable recommendations.</span>
         </div>
       </div>
     </section>

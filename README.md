@@ -593,3 +593,15 @@ Adds private surname + optional preferred name and a Development Tools Discovery
 
 ## v0.30.8.4 — Neutral Homepage Demo Labels
 Public landing-page examples now use neutral `Profile A/B/C` labels rather than realistic personal names.
+
+
+## v0.30.8.5 — Homepage User Journey Flow
+Adds a visual six-stage `Profile → Atlas → Discover → Interest → Mutual → Introduced` journey to explain how AutoFace works.
+
+
+## v0.31.0 — My Introductions
+Adds a member journey for Waiting, Saved and Mutual Introductions, with clear progression from Introduced through Connection progressing.
+
+
+## v0.32.0 — Guided Onboarding & Readiness
+Reworks Getting Started into `My Journey`, with six-step onboarding, setup progress, next-best-action guidance and clear Discovery readiness.
