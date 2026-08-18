@@ -22,6 +22,8 @@ export function Header() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const menuRef = useRef<HTMLDetailsElement>(null);
+  const myAutoFaceRef = useRef<HTMLDetailsElement>(null);
+  const trustRef = useRef<HTMLDetailsElement>(null);
   const [identity, setIdentity] = useState<HeaderIdentity | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [developmentTools, setDevelopmentTools] = useState(false);
@@ -100,13 +102,36 @@ export function Header() {
 
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
-      if (menuRef.current?.open && !menuRef.current.contains(event.target as Node)) {
-        menuRef.current.open = false;
+      const target = event.target as Node;
+      for (const details of [menuRef.current, myAutoFaceRef.current, trustRef.current]) {
+        if (details?.open && !details.contains(target)) details.open = false;
       }
     }
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      if (menuRef.current) menuRef.current.open = false;
+      if (myAutoFaceRef.current) myAutoFaceRef.current.open = false;
+      if (trustRef.current) trustRef.current.open = false;
+    }
     document.addEventListener("mousedown", closeOnOutsideClick);
-    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
   }, []);
+
+  function handleNavGroupToggle(group: "my-autoface" | "trust", open: boolean) {
+    if (!open) return;
+    if (group === "my-autoface" && trustRef.current) trustRef.current.open = false;
+    if (group === "trust" && myAutoFaceRef.current) myAutoFaceRef.current.open = false;
+    if (menuRef.current) menuRef.current.open = false;
+  }
+
+  function closeDesktopMenus() {
+    if (myAutoFaceRef.current) myAutoFaceRef.current.open = false;
+    if (trustRef.current) trustRef.current.open = false;
+  }
 
   useEffect(() => {
     document.body.classList.toggle("mobile-nav-open", mobileOpen);
@@ -178,32 +203,32 @@ export function Header() {
           {user && <Link className="nav-priority-link" href="/introductions">My Introductions</Link>}
 
           {user && (
-            <details className="nav-group">
+            <details className="nav-group" ref={myAutoFaceRef} onToggle={(event)=>handleNavGroupToggle("my-autoface",event.currentTarget.open)}>
               <summary>My AutoFace <span aria-hidden="true">⌄</span></summary>
               <div className="nav-group-menu">
-                <Link href="/get-started"><b>My Journey</b><small>Guided setup and readiness</small></Link>
-                <Link href="/profile"><b>My Profile</b><small>Personal details and visibility</small></Link>
-                <Link href="/relationship-profile"><b>Atlas Profile</b><small>Relationship preferences</small></Link>
-                <Link href="/compatibility"><b>Compatibility</b><small>Explainable compatibility model</small></Link>
-                <Link href="/recommendations/history"><b>Reviewed Recommendations</b><small>Revisit previous Atlas explanations</small></Link>
-                <Link href="/discovery-preferences"><b>Discovery Preferences</b><small>Control who Atlas can recommend</small></Link>
-                <Link href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
-                <Link href="/verify-photo"><b>Photo Verification</b><small>Profile-photo authenticity</small></Link>
-                <Link href="/account"><b>Privacy & Control</b><small>Discovery, data export and deletion</small></Link>
-                {developmentTools && <Link href="/development-tools"><b>Development Tools</b><small>Reset and seed synthetic test data</small></Link>}
+                <Link onClick={closeDesktopMenus} href="/get-started"><b>My Journey</b><small>Guided setup and readiness</small></Link>
+                <Link onClick={closeDesktopMenus} href="/profile"><b>My Profile</b><small>Personal details and visibility</small></Link>
+                <Link onClick={closeDesktopMenus} href="/relationship-profile"><b>Atlas Profile</b><small>Relationship preferences</small></Link>
+                <Link onClick={closeDesktopMenus} href="/compatibility"><b>Compatibility</b><small>Explainable compatibility model</small></Link>
+                <Link onClick={closeDesktopMenus} href="/recommendations/history"><b>Reviewed Recommendations</b><small>Revisit previous Atlas explanations</small></Link>
+                <Link onClick={closeDesktopMenus} href="/discovery-preferences"><b>Introduction Preferences</b><small>What matters when Atlas considers people</small></Link>
+                <Link onClick={closeDesktopMenus} href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
+                <Link onClick={closeDesktopMenus} href="/verify-photo"><b>Photo Verification</b><small>Profile-photo authenticity</small></Link>
+                <Link onClick={closeDesktopMenus} href="/account"><b>Privacy & Control</b><small>Discovery, data export and deletion</small></Link>
+                {developmentTools && <Link onClick={closeDesktopMenus} href="/development-tools"><b>Development Tools</b><small>Reset and seed synthetic test data</small></Link>}
                 <AdminLink />
               </div>
             </details>
           )}
 
-          <details className="nav-group">
+          <details className="nav-group" ref={trustRef} onToggle={(event)=>handleNavGroupToggle("trust",event.currentTarget.open)}>
             <summary>Trust <span aria-hidden="true">⌄</span></summary>
             <div className="nav-group-menu trust-menu">
-              <Link href="/how-it-works"><b>How it works</b><small>Understand the AutoFace journey</small></Link>
-              <Link href="/pricing"><b>Pricing</b><small>Beta access and planned membership tiers</small></Link>
-              <Link href="/trust"><b>Trust & Privacy</b><small>Security and data minimisation</small></Link>
-              <Link href="/privacy"><b>Privacy Notice</b><small>How AutoFace handles beta data</small></Link>
-              <Link href="/terms"><b>Beta Terms</b><small>Terms for controlled beta access</small></Link>
+              <Link onClick={closeDesktopMenus} href="/how-it-works"><b>How it works</b><small>Understand the AutoFace journey</small></Link>
+              <Link onClick={closeDesktopMenus} href="/pricing"><b>Pricing</b><small>Beta access and planned membership tiers</small></Link>
+              <Link onClick={closeDesktopMenus} href="/trust"><b>Trust & Privacy</b><small>Security and data minimisation</small></Link>
+              <Link onClick={closeDesktopMenus} href="/privacy"><b>Privacy Notice</b><small>How AutoFace handles beta data</small></Link>
+              <Link onClick={closeDesktopMenus} href="/terms"><b>Beta Terms</b><small>Terms for controlled beta access</small></Link>
             </div>
           </details>
 
@@ -251,7 +276,7 @@ export function Header() {
                 <Link href="/relationship-profile" onClick={closeMobile}>Atlas Profile</Link>
                 <Link href="/compatibility" onClick={closeMobile}>Compatibility</Link>
                 <Link href="/recommendations/history" onClick={closeMobile}>Reviewed Recommendations</Link>
-                <Link href="/discovery-preferences" onClick={closeMobile}>Discovery Preferences</Link>
+                <Link href="/discovery-preferences" onClick={closeMobile}>Introduction Preferences</Link>
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
                 <Link href="/verify-photo" onClick={closeMobile}>Photo Verification</Link>
                 <Link href="/account" onClick={closeMobile}>Privacy & Control</Link>

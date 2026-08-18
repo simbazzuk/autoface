@@ -9,16 +9,105 @@ export const DISCOVERY_AUTHENTICITY_THRESHOLD=50;
 export type RecommendationReason={code:string;label:string;score:number;kind:"strength"|"consideration"};
 export type SafeDiscoveryProfile={uid:string;firstName:string;age:number|null;generalLocation:string|null;heightCm:number|null;occupation:string|null;professionArea:AutoFaceProfile["professionArea"]|null;employmentType:AutoFaceProfile["employmentType"]|null;careerImportance:AutoFaceProfile["careerImportance"]|null;educationLevel:AutoFaceProfile["educationLevel"]|null;educationField:string|null;educationInstitution:string|null;sikhAppearance:AutoFaceProfile["sikhAppearance"]|null;sikhPractice:AutoFaceProfile["sikhPractice"]|null;diet:AutoFaceProfile["diet"]|null;caste:string|null;hobbies:string[];relationshipIntent:AutoFaceProfile["relationshipIntent"];aboutMe:string;authenticityScore:number;authenticityLevel:string;compatibilityScore:number;compatibilityLevel:string;careerPreferenceFit:"preferred"|"similar_outlook"|"neutral";strongestAlignments:string[];conversationPoints:string[];recommendationReasons:RecommendationReason[];isTestProfile:boolean};
 
-async function authenticityFor(uid:string){if(!adminAuth||!adminDb)throw new Error("SERVER_NOT_CONFIGURED");const [authUser,identitySnap]=await Promise.all([adminAuth.getUser(uid),adminDb.collection("identity").doc(uid).get()]);const identity=identitySnap.data()??{};return calculateAuthenticity({emailVerified:authUser.emailVerified===true,phoneVerified:Boolean(authUser.phoneNumber),mfaEnabled:Boolean(authUser.multiFactor?.enrolledFactors?.length),identityVerified:identity.identityVerified===true,livenessVerified:identity.livenessVerified===true,photoVerified:identity.photoVerified===true})}
-export async function getEligibleMember(uid:string){if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");const [profileSnap,relationshipSnap,authenticity]=await Promise.all([adminDb.collection("profiles").doc(uid).get(),adminDb.collection("relationshipProfiles").doc(uid).get(),authenticityFor(uid)]);if(!profileSnap.exists||!relationshipSnap.exists)return null;const profile=profileSnap.data() as AutoFaceProfile;const relationship=relationshipSnap.data() as RelationshipProfile;if(profile.visibility!=="future_matches"||relationship.consentForCompatibility!==true||authenticity.score<DISCOVERY_AUTHENTICITY_THRESHOLD)return null;const demoSnap=await adminDb.collection("demoProfiles").doc(uid).get();return{profile,relationship,authenticity,isTestProfile:demoSnap.exists&&demoSnap.data()?.isTestProfile===true}}
+function isMissingAuthUser(error:unknown){
+  if(!error||typeof error!=="object")return false;
+  const value=error as {code?:string;errorInfo?:{code?:string};message?:string};
+  const code=value.code??value.errorInfo?.code??"";
+  const message=value.message??"";
+  return code==="auth/user-not-found"||message.includes("no user record corresponding to the provided identifier");
+}
+
+async function authenticityFor(uid:string,strictAuth=false){
+  if(!adminAuth||!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
+  try{
+    const [authUser,identitySnap]=await Promise.all([
+      adminAuth.getUser(uid),
+      adminDb.collection("identity").doc(uid).get()
+    ]);
+    const identity=identitySnap.data()??{};
+    return calculateAuthenticity({
+      emailVerified:authUser.emailVerified===true,
+      phoneVerified:Boolean(authUser.phoneNumber),
+      mfaEnabled:Boolean(authUser.multiFactor?.enrolledFactors?.length),
+      identityVerified:identity.identityVerified===true,
+      livenessVerified:identity.livenessVerified===true,
+      photoVerified:identity.photoVerified===true
+    });
+  }catch(error){
+    if(isMissingAuthUser(error)){
+      if(strictAuth)throw new Error("REQUESTER_AUTH_USER_MISSING");
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function getEligibleMember(uid:string,options?:{strictAuth?:boolean}){
+  if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
+  const [profileSnap,relationshipSnap,authenticity]=await Promise.all([
+    adminDb.collection("profiles").doc(uid).get(),
+    adminDb.collection("relationshipProfiles").doc(uid).get(),
+    authenticityFor(uid,options?.strictAuth===true)
+  ]);
+  if(!authenticity||!profileSnap.exists||!relationshipSnap.exists)return null;
+  const profile=profileSnap.data() as AutoFaceProfile;
+  const relationship=relationshipSnap.data() as RelationshipProfile;
+  if(profile.visibility!=="future_matches"||relationship.consentForCompatibility!==true||authenticity.score<DISCOVERY_AUTHENTICITY_THRESHOLD)return null;
+  const demoSnap=await adminDb.collection("demoProfiles").doc(uid).get();
+  return{profile,relationship,authenticity,isTestProfile:demoSnap.exists&&demoSnap.data()?.isTestProfile===true}
+}
 async function preferencesFor(uid:string){if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");const snap=await adminDb.collection("discoveryPreferences").doc(uid).get();return{uid,...defaultDiscoveryPreferences,...(snap.data()??{})} as DiscoveryPreferences}
 function area(value:string){return value.toLowerCase().split(",")[0].trim()}
 function passesPreferences(requester:Awaited<ReturnType<typeof getEligibleMember>>,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs:DiscoveryPreferences){if(!requester)return false;if(target.profile.age<prefs.minAge||target.profile.age>prefs.maxAge)return false;if(!prefs.relationshipIntents.includes(target.profile.relationshipIntent))return false;if(prefs.locationPreference==="same_general_area"&&area(requester.profile.generalLocation)!==area(target.profile.generalLocation))return false;if(prefs.requireRelocationOpen&&Number(target.relationship.relocationFlexibility)<3)return false;return true}
 function reasons(result:ReturnType<typeof calculateCompatibility>){const strengths=result.strongestAlignments.map(x=>({code:x.key,label:x.label,score:x.score,kind:"strength" as const}));const considerations=result.conversationPoints.map(x=>({code:x.key,label:x.label,score:x.score,kind:"consideration" as const}));return[...strengths,...considerations]}
 function careerFit(requester:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs:DiscoveryPreferences):SafeDiscoveryProfile["careerPreferenceFit"]{if(prefs.professionPreferenceMode==="preferred_areas"&&target.profile.professionArea&&prefs.preferredProfessionAreas.includes(target.profile.professionArea))return"preferred";if(prefs.professionPreferenceMode==="similar_outlook"&&requester.profile.careerImportance&&target.profile.careerImportance&&requester.profile.careerImportance===target.profile.careerImportance)return"similar_outlook";return"neutral"}
 function projection(targetUid:string,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,result:ReturnType<typeof calculateCompatibility>,requester?:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs?:DiscoveryPreferences):SafeDiscoveryProfile{return{uid:targetUid,firstName:target.profile.preferredName?.trim()||target.profile.firstName,age:target.profile.showAge?target.profile.age:null,generalLocation:target.profile.showLocation?target.profile.generalLocation:null,heightCm:target.profile.heightCm??null,occupation:target.profile.showOccupation?target.profile.occupation:null,professionArea:target.profile.professionArea??null,employmentType:target.profile.employmentType??null,careerImportance:target.profile.careerImportance??null,educationLevel:target.profile.educationLevel??null,educationField:target.profile.educationField?.trim()||null,educationInstitution:target.profile.educationInstitution?.trim()||null,sikhAppearance:target.profile.sikhAppearance??null,sikhPractice:target.profile.sikhPractice??null,diet:target.profile.diet??null,caste:target.profile.caste?.trim()||null,hobbies:Array.isArray(target.profile.hobbies)?target.profile.hobbies:[],relationshipIntent:target.profile.relationshipIntent,aboutMe:target.profile.aboutMe,authenticityScore:target.authenticity.score,authenticityLevel:target.authenticity.level,compatibilityScore:result.score,compatibilityLevel:result.level,careerPreferenceFit:requester&&prefs?careerFit(requester,target,prefs):"neutral",strongestAlignments:result.strongestAlignments.map(x=>x.label),conversationPoints:result.conversationPoints.map(x=>x.label),recommendationReasons:reasons(result),isTestProfile:target.isTestProfile}}
-export async function buildDiscoveryFor(requesterUid:string){if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");const [requester,prefs]=await Promise.all([getEligibleMember(requesterUid),preferencesFor(requesterUid)]);if(!requester)return{eligible:false,candidates:[] as SafeDiscoveryProfile[],preferences:prefs};const [decisions,blocksByMe,blocksOfMe]=await Promise.all([adminDb.collection("interests").where("fromUid","==",requesterUid).get(),adminDb.collection("blocks").where("blockerUid","==",requesterUid).get(),adminDb.collection("blocks").where("blockedUid","==",requesterUid).get()]);const excluded=new Set(decisions.docs.map(d=>String(d.data().toUid)));for(const d of blocksByMe.docs)excluded.add(String(d.data().blockedUid));for(const d of blocksOfMe.docs)excluded.add(String(d.data().blockerUid));excluded.add(requesterUid);const profiles=await adminDb.collection("profiles").where("visibility","==","future_matches").limit(60).get();const candidates:SafeDiscoveryProfile[]=[];for(const docSnap of profiles.docs){const uid=docSnap.id;if(excluded.has(uid))continue;const target=await getEligibleMember(uid);if(!target||!passesPreferences(requester,target,prefs))continue;const result=calculateCompatibility(requester.relationship,target.relationship);candidates.push(projection(uid,target,result,requester,prefs))}candidates.sort((a,b)=>b.compatibilityScore-a.compatibilityScore||b.authenticityScore-a.authenticityScore);return{eligible:true,candidates:candidates.slice(0,3),preferences:prefs,curation:{mode:"daily",limit:3,available:candidates.length}}}
-export async function safeProjectionFor(viewerUid:string,targetUid:string){const [viewer,target,prefs]=await Promise.all([getEligibleMember(viewerUid),getEligibleMember(targetUid),preferencesFor(viewerUid)]);if(!viewer||!target)return null;return projection(targetUid,target,calculateCompatibility(viewer.relationship,target.relationship),viewer,prefs)}
+export async function buildDiscoveryFor(requesterUid:string){
+  if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
+  const [requester,prefs]=await Promise.all([
+    getEligibleMember(requesterUid,{strictAuth:true}),
+    preferencesFor(requesterUid)
+  ]);
+  if(!requester)return{eligible:false,candidates:[] as SafeDiscoveryProfile[],preferences:prefs};
+
+  const [decisions,blocksByMe,blocksOfMe]=await Promise.all([
+    adminDb.collection("interests").where("fromUid","==",requesterUid).get(),
+    adminDb.collection("blocks").where("blockerUid","==",requesterUid).get(),
+    adminDb.collection("blocks").where("blockedUid","==",requesterUid).get()
+  ]);
+  const excluded=new Set(decisions.docs.map(d=>String(d.data().toUid)));
+  for(const d of blocksByMe.docs)excluded.add(String(d.data().blockedUid));
+  for(const d of blocksOfMe.docs)excluded.add(String(d.data().blockerUid));
+  excluded.add(requesterUid);
+
+  const profiles=await adminDb.collection("profiles").where("visibility","==","future_matches").limit(60).get();
+  const candidates:SafeDiscoveryProfile[]=[];
+  let skippedStaleProfiles=0;
+
+  for(const docSnap of profiles.docs){
+    const uid=docSnap.id;
+    if(excluded.has(uid))continue;
+    const target=await getEligibleMember(uid);
+    if(!target){
+      // A Firestore profile can outlive its Firebase Authentication user during
+      // development/admin cleanup. It must never break Discovery for everyone else.
+      skippedStaleProfiles+=1;
+      continue;
+    }
+    if(!passesPreferences(requester,target,prefs))continue;
+    const result=calculateCompatibility(requester.relationship,target.relationship);
+    candidates.push(projection(uid,target,result,requester,prefs));
+  }
+
+  candidates.sort((a,b)=>b.compatibilityScore-a.compatibilityScore||b.authenticityScore-a.authenticityScore);
+  return{
+    eligible:true,
+    candidates:candidates.slice(0,3),
+    preferences:prefs,
+    curation:{mode:"daily" as const,limit:3,available:candidates.length,skippedStaleProfiles}
+  };
+}
+export async function safeProjectionFor(viewerUid:string,targetUid:string){const [viewer,target,prefs]=await Promise.all([getEligibleMember(viewerUid,{strictAuth:true}),getEligibleMember(targetUid),preferencesFor(viewerUid)]);if(!viewer||!target)return null;return projection(targetUid,target,calculateCompatibility(viewer.relationship,target.relationship),viewer,prefs)}
 
 export type ProfileAlignmentIndicator={
   key:"lifestyle"|"career"|"sikh_lifestyle"|"shared_interests"|"location";
@@ -144,7 +233,7 @@ function timestampIso(value: unknown) {
 export async function reviewedRecommendationsFor(requesterUid: string) {
   if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
 
-  const [requester,prefs] = await Promise.all([getEligibleMember(requesterUid),preferencesFor(requesterUid)]);
+  const [requester,prefs] = await Promise.all([getEligibleMember(requesterUid,{strictAuth:true}),preferencesFor(requesterUid)]);
   if (!requester) return { eligible: false, items: [] as ReviewedRecommendation[] };
 
   const decisions = await adminDb.collection("interests").where("fromUid", "==", requesterUid).get();

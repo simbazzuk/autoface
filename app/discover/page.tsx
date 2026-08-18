@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
+import { MemberJourney } from "@/components/MemberJourney";
 import { relationshipIntentLabels } from "@/lib/profile";
 import { BriefcaseBusiness, CircleUserRound, GraduationCap, HandHeart, Leaf, Sparkles } from "lucide-react";
 import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
 
-type DiscoveryResponse = { eligible: boolean; candidates: SafeDiscoveryProfile[]; preferences?: unknown; curation?: {mode:"daily";limit:number;available:number}; error?: string };
+type DiscoveryResponse = { eligible: boolean; candidates: SafeDiscoveryProfile[]; preferences?: unknown; curation?: {mode:"daily";limit:number;available:number;skippedStaleProfiles?:number}; error?: string };
 type AiStatus = { enabled:boolean; viewerOptIn:boolean; candidateOptIn:boolean; available:boolean };
+type SetupReadiness={steps:Array<{id:string;title:string;complete:boolean;href:string}>;readyForDiscovery:boolean;authenticityScore:number;setupPercent:number};
 
 export default function DiscoverPage() {
   const { user, loading } = useAuth();
@@ -17,8 +19,11 @@ export default function DiscoverPage() {
   const [data, setData] = useState<DiscoveryResponse | null>(null);
   const [busyUid, setBusyUid] = useState("");
   const [message, setMessage] = useState("");
+  const [loadError,setLoadError]=useState<{code:string;message:string}|null>(null);
   const [resetBusy, setResetBusy] = useState(false);
   const [aiStatuses, setAiStatuses] = useState<Record<string,AiStatus>>({});
+  const [setup,setSetup]=useState<SetupReadiness|null>(null);
+  const [developmentTools,setDevelopmentTools]=useState(false);
   const isTestProfile = Boolean(user?.email?.endsWith("@autoface.test"));
 
   useEffect(() => { if (!loading && !user) router.replace("/sign-in"); }, [loading, user, router]);
@@ -32,13 +37,20 @@ export default function DiscoverPage() {
         cache: "no-store",
       });
       const body = await res.json().catch(() => ({ error: `Discovery request failed (${res.status})` }));
-      if (!res.ok) throw new Error(body.error ?? `Discovery request failed (${res.status})`);
+      if (!res.ok) {
+        setLoadError({code:String(body.code??"DISCOVERY_ERROR"),message:String(body.error??`Discovery request failed (${res.status})`)});
+        setData({eligible:false,candidates:[]});
+        setMessage("");
+        return;
+      }
       setData(body);
+      setLoadError(null);
       setMessage("");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
-      setMessage(error instanceof Error ? error.message : "Unable to load Discovery.");
+      setLoadError({code:"DISCOVERY_ERROR",message:error instanceof Error ? error.message : "Unable to load Discovery."});
       setData({ eligible: false, candidates: [] });
+      setMessage("");
     }
   }
   useEffect(() => {
@@ -47,6 +59,22 @@ export default function DiscoverPage() {
     void load(controller.signal);
     return () => controller.abort();
   }, [user]);
+  useEffect(()=>{
+    if(!user)return;
+    let active=true;
+    (async()=>{try{const token=await user.getIdToken();const response=await fetch("/api/readiness",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});if(response.ok&&active)setSetup(await response.json())}catch{}})();
+    return()=>{active=false};
+  },[user]);
+  useEffect(()=>{
+    if(!user||process.env.NODE_ENV==="production"){setDevelopmentTools(false);return}
+    let active=true;
+    (async()=>{try{
+      const token=await user.getIdToken();
+      const response=await fetch("/api/dev/status",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
+      if(active)setDevelopmentTools(response.ok&&Boolean((await response.json()).developmentTools));
+    }catch{if(active)setDevelopmentTools(false)}})();
+    return()=>{active=false};
+  },[user]);
 
   useEffect(() => {
     if (!user || !data?.candidates?.length) {
@@ -126,9 +154,20 @@ export default function DiscoverPage() {
         <div><span className="privacy-kicker">TODAY&apos;S ATLAS PICKS</span><p>Eligibility → preferences → deterministic ranking → up to 3 considered introductions</p></div>
         <div className="discovery-toolbar-actions"><a className="btn" href="/recommendations/history">Reviewed recommendations</a><a className="btn" href="/discovery-preferences">Discovery preferences</a></div>
       </div>
-      {!data.eligible ? <div className="card discovery-empty"><span className="privacy-kicker">DISCOVERY LOCKED</span><h2>Finish the trust foundation first</h2><p>To enter Discovery, set your profile visibility to <b>Future matches</b>, keep compatibility consent enabled, and have at least 50% authenticity.</p><div className="hero-actions left-actions"><a className="btn btn-primary" href="/profile">Update profile visibility</a><a className="btn" href="/dashboard">Check authenticity</a></div></div>
-      : data.candidates.length === 0 ? <div className="card discovery-empty"><span className="privacy-kicker">YOU’RE READY</span><h2>No new introductions yet</h2><p>Your profile is eligible for Discovery. AutoFace found no other eligible members that you have not already reviewed.</p><div className="discovery-empty-actions"><a className="btn btn-primary" href="/recommendations/history">View reviewed recommendations</a><a className="btn" href="/compatibility">Open Compatibility Lab</a>{isTestProfile&&<button className="btn demo-reset-button" disabled={resetBusy} onClick={()=>void resetDemoRecommendations()}>{resetBusy?"Resetting…":"Reset demo recommendations"}</button>}</div>{isTestProfile&&<p className="demo-reset-note">Test profiles only: reset removes your non-mutual review decisions so candidates can appear in Discover again. Existing mutual introductions are preserved.</p>}</div>
+      {loadError ? <div className="card discovery-empty discovery-account-error">
+        <span className="privacy-kicker">{loadError.code==="ACCOUNT_RECORD_MISSING"?"ACCOUNT SESSION NEEDS ATTENTION":"DISCOVERY TEMPORARILY UNAVAILABLE"}</span>
+        <h2>{loadError.code==="ACCOUNT_RECORD_MISSING"?"Your setup is complete — this is an account record issue.":"Atlas could not load Discovery."}</h2>
+        <p>{loadError.message}</p>
+        {loadError.code==="ACCOUNT_RECORD_MISSING"?<div className="discovery-empty-actions"><a className="btn btn-primary" href="/sign-out">Sign out</a><a className="btn" href="/sign-in">Sign in again</a></div>:<div className="discovery-empty-actions"><button className="btn btn-primary" onClick={()=>void load()}>Try again</button><a className="btn" href="/get-started">Open My Journey</a></div>}
+        <p className="account-error-note">Your Profile, Atlas answers and preferences have not been changed by this error.</p>
+      </div>
+      : !data.eligible ? <div className="card discovery-empty discovery-guided-lock"><span className="privacy-kicker">ONE MORE STEP BEFORE DISCOVERY</span><h2>Atlas is not ready to introduce people yet.</h2><p>AutoFace only opens Discovery after the parts needed for a considered recommendation are complete. Finish the next item below and come back when you&apos;re ready.</p>
+        {setup&&<div className="discover-readiness-list">{setup.steps.map(step=><a href={step.href} key={step.id} className={step.complete?"complete":""}><span>{step.complete?"✓":"○"}</span><b>{step.title}</b><small>{step.complete?"Complete":"Needs attention"}</small></a>)}</div>}
+        <div className="hero-actions left-actions">{setup?.steps.find(step=>!step.complete)?<a className="btn btn-primary" href={setup.steps.find(step=>!step.complete)!.href}>Continue: {setup.steps.find(step=>!step.complete)!.title}</a>:<a className="btn btn-primary" href="/get-started">Open My Journey</a>}<a className="btn" href="/get-started">View setup</a></div>
+      </div>
+      : data.candidates.length === 0 ? <div className="card discovery-empty"><span className="privacy-kicker">YOU’RE READY</span><h2>No new introductions yet</h2><p>Your profile is eligible for Discovery. AutoFace found no other eligible members that you have not already reviewed.</p><div className="discovery-empty-actions"><a className="btn btn-primary" href="/recommendations/history">View reviewed recommendations</a><a className="btn" href="/compatibility">Open Compatibility Lab</a>{(isTestProfile||developmentTools)&&<button className="btn demo-reset-button" disabled={resetBusy} onClick={()=>void resetDemoRecommendations()}>{resetBusy?"Resetting…":"Reset reviewed profiles"}</button>}</div>{(isTestProfile||developmentTools)&&<p className="demo-reset-note">Development testing: reset clears your non-mutual Interested, Saved and Not for me decisions so synthetic profiles can appear in Discovery again. Existing mutual introductions are preserved.</p>}</div>
       : <div>
+        {Boolean(data.curation?.skippedStaleProfiles)&&isTestProfile&&<p className="notice stale-profile-notice">Development note: {data.curation?.skippedStaleProfiles} stale test profile record(s) were ignored because they are no longer eligible or no longer have an Authentication account.</p>}
         <div className="daily-discovery-intro">
           <div><span className="privacy-kicker">QUALITY OVER QUANTITY</span><h2>Atlas selected {data.candidates.length} introduction{data.candidates.length===1?"":"s"} for you.</h2><p>These are the highest-ranked eligible people currently available under your Discovery preferences. A high score is a reason to look closer — never a prediction of relationship success.</p></div>
           <div className="daily-count"><b>{data.candidates.length}</b><span>of 3 today</span></div>

@@ -100,6 +100,17 @@ export default function GetStartedPage() {
       <div className="onboarding-main">
         {error&&<p className="notice">{error}</p>}
 
+        <div className="card simple-journey-card">
+          <span className="privacy-kicker">THE SIMPLE VERSION</span><h2>Three things. Then you can meet people.</h2>
+          <div className="simple-journey-grid">
+            <div><span>01</span><UserRound size={20}/><b>About you</b><p>Build your profile, add a photo and establish enough trust to participate.</p></div>
+            <i>→</i>
+            <div><span>02</span><Sparkles size={20}/><b>What matters to you</b><p>Complete Atlas and tell us the practical preferences that shape an introduction.</p></div>
+            <i>→</i>
+            <div><span>03</span><Compass size={20}/><b>Meet people</b><p>Discover a small number of considered profiles and understand why Atlas showed them.</p></div>
+          </div>
+        </div>
+
         <div className="card onboarding-roadmap">
           <div className="onboarding-card-head"><div><span className="privacy-kicker">YOUR ROADMAP</span><h2>{data.completed} of {data.total} steps complete</h2></div><span className={data.readyForDiscovery?"status-pill ready-pill":"status-pill"}>{data.readyForDiscovery?"DISCOVERY READY":"IN PROGRESS"}</span></div>
           <div className="onboarding-rail">

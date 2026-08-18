@@ -80,8 +80,9 @@ service cloud.firestore {
           'uid','familyOrientation','communicationDirectness','socialEnergy',
           'careerPriority','routineVsAdventure','relocationFlexibility',
           'sharedInterestsImportance','independencePreference','relationshipPace',
-          'idealWeekend','whatMattersMost','nonNegotiables','consentForCompatibility','consentForAiDiscovery',
-          'createdAt','updatedAt'
+          'idealWeekend','whatMattersMost','nonNegotiables',
+          'weekendPreferences','relationshipPriorities','nonNegotiablePreferences','relationshipContext',
+          'consentForCompatibility','consentForAiDiscovery','createdAt','updatedAt'
         ])
         && request.resource.data.familyOrientation is int
         && request.resource.data.familyOrientation >= 1 && request.resource.data.familyOrientation <= 5
@@ -106,6 +107,14 @@ service cloud.firestore {
         && request.resource.data.whatMattersMost.size() > 0 && request.resource.data.whatMattersMost.size() <= 500
         && request.resource.data.nonNegotiables is string
         && request.resource.data.nonNegotiables.size() > 0 && request.resource.data.nonNegotiables.size() <= 400
+        && request.resource.data.weekendPreferences is list
+        && request.resource.data.weekendPreferences.size() >= 1 && request.resource.data.weekendPreferences.size() <= 4
+        && request.resource.data.relationshipPriorities is list
+        && request.resource.data.relationshipPriorities.size() >= 1 && request.resource.data.relationshipPriorities.size() <= 5
+        && request.resource.data.nonNegotiablePreferences is list
+        && request.resource.data.nonNegotiablePreferences.size() >= 1 && request.resource.data.nonNegotiablePreferences.size() <= 5
+        && request.resource.data.relationshipContext is string
+        && request.resource.data.relationshipContext.size() <= 350
         && request.resource.data.consentForCompatibility is bool
         && request.resource.data.consentForAiDiscovery is bool;
       allow delete: if signedInAs(uid);

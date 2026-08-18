@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { useAuth } from "@/components/AuthProvider";
+import { MemberJourney } from "@/components/MemberJourney";
 import { db } from "@/lib/firebase";
 import {
   buildAtlasRelationshipInsight,
@@ -26,11 +27,44 @@ const emptyForm = {
   idealWeekend: "",
   whatMattersMost: "",
   nonNegotiables: "",
+  weekendPreferences: [] as string[],
+  relationshipPriorities: [] as string[],
+  nonNegotiablePreferences: [] as string[],
+  relationshipContext: "",
   consentForCompatibility: false,
   consentForAiDiscovery: false,
 };
 
 type FormState = typeof emptyForm;
+
+const weekendOptions = [
+  ["quiet_time","Quiet time"],["family_time","Family time"],["friends","Friends"],
+  ["eating_out","Eating out"],["travel","Travel"],["outdoors","Outdoors"],
+  ["sport_fitness","Sport / fitness"],["cinema_entertainment","Cinema / entertainment"],
+  ["events","Events"],["faith_community","Faith / community"],["cooking","Cooking"],
+  ["exploring","Exploring somewhere new"],
+] as const;
+
+const priorityOptions = [
+  ["trust","Trust"],["stability","Stability"],["communication","Communication"],
+  ["family","Family"],["affection","Affection"],["shared_values","Shared values"],
+  ["independence","Independence"],["ambition","Ambition"],["faith","Faith"],
+  ["humour","Humour"],["adventure","Adventure"],["financial_stability","Financial stability"],
+] as const;
+
+const nonNegotiableOptions = [
+  ["honesty","Honesty"],["loyalty","Loyalty"],["family_oriented","Family-oriented"],
+  ["good_communication","Good communication"],["mutual_respect","Mutual respect"],
+  ["financial_responsibility","Financial responsibility"],["similar_lifestyle","Similar lifestyle"],
+  ["shared_faith_outlook","Shared faith outlook"],["personal_independence","Personal independence"],
+  ["career_support","Career support"],["children_family_goals","Children / family goals"],
+  ["kindness","Kindness"],
+] as const;
+
+function selectedText(values:string[], options:readonly (readonly [string,string])[]){
+  const labels=new Map(options);
+  return values.map(value=>labels.get(value)??value.replaceAll("_"," ")).join(", ");
+}
 
 const questions: Array<{ key: keyof Pick<FormState, "familyOrientation" | "communicationDirectness" | "socialEnergy" | "careerPriority" | "routineVsAdventure" | "relocationFlexibility" | "sharedInterestsImportance" | "independencePreference">; title: string; hint: string; left: string; right: string }> = [
   { key: "familyOrientation", title: "How important is family involvement in your future relationship?", hint: "This is about family outlook, not religion or cultural identity.", left: "Mostly independent", right: "Very family-oriented" },
@@ -51,6 +85,7 @@ export default function RelationshipProfilePage() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [journeySaved,setJourneySaved]=useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
   const [aiConsent, setAiConsent] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
@@ -92,6 +127,10 @@ export default function RelationshipProfilePage() {
           idealWeekend: data.idealWeekend ?? "",
           whatMattersMost: data.whatMattersMost ?? "",
           nonNegotiables: data.nonNegotiables ?? "",
+          weekendPreferences: Array.isArray(data.weekendPreferences) ? data.weekendPreferences : [],
+          relationshipPriorities: Array.isArray(data.relationshipPriorities) ? data.relationshipPriorities : [],
+          nonNegotiablePreferences: Array.isArray(data.nonNegotiablePreferences) ? data.nonNegotiablePreferences : [],
+          relationshipContext: data.relationshipContext ?? "",
           consentForCompatibility: data.consentForCompatibility ?? false,
           consentForAiDiscovery: data.consentForAiDiscovery ?? false,
         });
@@ -110,6 +149,14 @@ export default function RelationshipProfilePage() {
   function change<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
   }
+  function toggleSelection(key:"weekendPreferences"|"relationshipPriorities"|"nonNegotiablePreferences", value:string, max:number) {
+    setForm((current) => {
+      const values=current[key] as string[];
+      const next=values.includes(value) ? values.filter((item)=>item!==value) : values.length<max ? [...values,value] : values;
+      return {...current,[key]:next};
+    });
+  }
+
 
   async function generateAiReflection() {
     if (!user || aiBusy || !aiConsent) return;
@@ -135,8 +182,8 @@ export default function RelationshipProfilePage() {
   async function save(event: FormEvent) {
     event.preventDefault();
     if (!db || !user || saving) return;
-    if (!form.idealWeekend.trim() || !form.whatMattersMost.trim() || !form.nonNegotiables.trim()) {
-      setMessage("Complete the three written relationship questions before saving.");
+    if (form.weekendPreferences.length < 1 || form.relationshipPriorities.length < 1 || form.nonNegotiablePreferences.length < 1) {
+      setMessage("Choose at least one tile in each relationship section before saving.");
       return;
     }
     if (!form.consentForCompatibility) {
@@ -149,15 +196,18 @@ export default function RelationshipProfilePage() {
       await setDoc(doc(db, "relationshipProfiles", user.uid), {
         uid: user.uid,
         ...form,
-        idealWeekend: form.idealWeekend.trim(),
-        whatMattersMost: form.whatMattersMost.trim(),
-        nonNegotiables: form.nonNegotiables.trim(),
+        // Keep the original text fields populated for backwards-compatible Atlas AI prompts.
+        idealWeekend: selectedText(form.weekendPreferences,weekendOptions),
+        whatMattersMost: selectedText(form.relationshipPriorities,priorityOptions),
+        nonNegotiables: selectedText(form.nonNegotiablePreferences,nonNegotiableOptions),
+        relationshipContext: form.relationshipContext.trim(),
         createdAt: createdAt ?? serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
       setMessage(form.consentForAiDiscovery
-        ? "Relationship profile saved. Deterministic compatibility and optional Atlas AI Discovery are enabled."
-        : "Relationship profile saved privately. Deterministic Atlas compatibility is enabled; AI Discovery remains off.");
+        ? "Atlas profile saved. Deterministic compatibility and optional AI Discovery are enabled."
+        : "Atlas profile saved. Deterministic compatibility is enabled; AI Discovery remains off.");
+      setJourneySaved(true);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to save your relationship profile.");
     } finally {
@@ -178,6 +228,8 @@ export default function RelationshipProfilePage() {
           <p className="lead">Go beyond a basic profile. These answers create structured compatibility dimensions. Atlas remains deterministic; optional AI can explain your saved answers only when you explicitly request it.</p>
         </div>
       </section>
+
+      <MemberJourney stage="atlas"/>
 
       <section className="section relationship-section">
         <div className="container relationship-layout">
@@ -206,11 +258,27 @@ export default function RelationshipProfilePage() {
             </div>
 
             <div className="profile-divider" />
-            <span className="privacy-kicker">IN YOUR OWN WORDS</span>
+            <span className="privacy-kicker">WHAT MATTERS TO YOU</span>
+            <p className="relationship-tiles-intro">Choose the words that feel most like you. Structured choices give Atlas clearer signals and make this quicker than writing an essay.</p>
+
             <div className="field"><label htmlFor="pace">Preferred relationship pace</label><select id="pace" value={form.relationshipPace} onChange={(e) => change("relationshipPace", e.target.value as RelationshipProfile["relationshipPace"])}><option value="slow">Slow and gradual</option><option value="balanced">Balanced</option><option value="intentional">Intentional and purposeful</option></select></div>
-            <div className="field"><label htmlFor="weekend">What does a great weekend look like to you?</label><textarea id="weekend" maxLength={400} rows={4} value={form.idealWeekend} onChange={(e) => change("idealWeekend", e.target.value)} placeholder="Quiet time, family, eating out, gym, travel, friends, exploring somewhere new…" /><small>{form.idealWeekend.length}/400</small></div>
-            <div className="field"><label htmlFor="matters">What matters most in a long-term relationship?</label><textarea id="matters" maxLength={500} rows={4} value={form.whatMattersMost} onChange={(e) => change("whatMattersMost", e.target.value)} placeholder="Describe the qualities and relationship dynamic that matter to you." /><small>{form.whatMattersMost.length}/500</small></div>
-            <div className="field"><label htmlFor="nonNegotiables">What are your relationship non-negotiables?</label><textarea id="nonNegotiables" maxLength={400} rows={4} value={form.nonNegotiables} onChange={(e) => change("nonNegotiables", e.target.value)} placeholder="Keep this focused on relationship expectations and lifestyle rather than sensitive personal data." /><small>{form.nonNegotiables.length}/400</small></div>
+
+            <div className="relationship-tile-question">
+              <div className="relationship-tile-head"><div><label>What does a great weekend look like to you?</label><small>Choose up to 4</small></div><strong>{form.weekendPreferences.length}/4</strong></div>
+              <div className="relationship-choice-grid">{weekendOptions.map(([value,label])=><button type="button" key={value} className={`relationship-choice ${form.weekendPreferences.includes(value)?"selected":""}`} onClick={()=>toggleSelection("weekendPreferences",value,4)}><span>{form.weekendPreferences.includes(value)?"✓":"+"}</span>{label}</button>)}</div>
+            </div>
+
+            <div className="relationship-tile-question">
+              <div className="relationship-tile-head"><div><label>What matters most in a long-term relationship?</label><small>Choose up to 5</small></div><strong>{form.relationshipPriorities.length}/5</strong></div>
+              <div className="relationship-choice-grid">{priorityOptions.map(([value,label])=><button type="button" key={value} className={`relationship-choice ${form.relationshipPriorities.includes(value)?"selected":""}`} onClick={()=>toggleSelection("relationshipPriorities",value,5)}><span>{form.relationshipPriorities.includes(value)?"✓":"+"}</span>{label}</button>)}</div>
+            </div>
+
+            <div className="relationship-tile-question">
+              <div className="relationship-tile-head"><div><label>What are your relationship non-negotiables?</label><small>Choose up to 5</small></div><strong>{form.nonNegotiablePreferences.length}/5</strong></div>
+              <div className="relationship-choice-grid">{nonNegotiableOptions.map(([value,label])=><button type="button" key={value} className={`relationship-choice ${form.nonNegotiablePreferences.includes(value)?"selected":""}`} onClick={()=>toggleSelection("nonNegotiablePreferences",value,5)}><span>{form.nonNegotiablePreferences.includes(value)?"✓":"+"}</span>{label}</button>)}</div>
+            </div>
+
+            <div className="field relationship-context-field"><label htmlFor="relationshipContext">Anything else you&apos;d like Atlas to understand? · optional</label><textarea id="relationshipContext" maxLength={350} rows={3} value={form.relationshipContext} onChange={(e) => change("relationshipContext", e.target.value)} placeholder="Add a little personal context if the choices above don't quite capture something important." /><small>{form.relationshipContext.length}/350</small></div>
 
             <label className="consent-card"><input type="checkbox" checked={form.consentForCompatibility} onChange={(e) => change("consentForCompatibility", e.target.checked)} /><span><b>Use these answers for compatibility recommendations</b><small>Your structured answers power the deterministic Atlas compatibility engine. You can change this permission later.</small></span></label>
 
@@ -223,7 +291,11 @@ export default function RelationshipProfilePage() {
             </label>
 
             {message && <p className="notice profile-message">{message}</p>}
-            <div className="profile-actions"><button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save relationship profile"}</button></div>
+            {journeySaved&&<div className="journey-complete-card">
+              <div><span className="privacy-kicker">ATLAS READY</span><h3>Atlas now understands your relationship outlook.</h3><p>One final setup step: tell AutoFace the practical preferences that should shape who Atlas considers for an introduction.</p></div>
+              <a className="btn btn-primary journey-next-button" href="/discovery-preferences">Set my preferences →</a>
+            </div>}
+            <div className="profile-actions"><button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save Atlas profile"}</button></div>
           </form>
 
           <aside className="relationship-side">

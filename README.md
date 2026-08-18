@@ -605,3 +605,39 @@ Adds a member journey for Waiting, Saved and Mutual Introductions, with clear pr
 
 ## v0.32.0 — Guided Onboarding & Readiness
 Reworks Getting Started into `My Journey`, with six-step onboarding, setup progress, next-best-action guidance and clear Discovery readiness.
+
+
+## v0.33.0 — Guided Profile-to-Discovery Journey
+Connects Profile → Atlas → Introduction Preferences → Discover into one explicit guided flow, with completion CTAs and a readiness-aware Discover screen.
+
+
+## v0.33.2 — My Journey Readability Polish
+Increases text size and spacing across the My Journey roadmap, summary cards and supporting copy for easier reading.
+
+
+## v0.33.3 — Discovery Resilience
+Skips orphaned candidate Auth records and distinguishes a missing requester Authentication account from ordinary onboarding/readiness failures.
+
+
+## v0.33.4 — My Introductions Readability Polish
+Improves summary-card and tab readability on My Introductions without changing matching behaviour.
+
+
+## v0.33.5 — Discovery Test Reset & Development Tools Readability
+Adds a safe reviewed-profile reset for repeated Discovery testing and improves readability across Development Tools.
+
+
+## v0.33.6 — Navigation Dropdown Fix
+Fixes sticky My AutoFace and Trust desktop dropdown behaviour.
+
+
+## v0.34.0 — Deterministic Test Environment
+Adds a clean local factory-reset workflow and validated deterministic seed community so Discovery testing can start from a known state.
+
+
+## v0.34.1 — Structured Atlas Relationship Choices
+Replaces large written Atlas questions with selectable tiles plus one optional context field, while retaining backwards-compatible text values.
+
+
+## v0.34.2 — Discover Readiness Readability
+Improves readability of the Discover readiness checklist without changing eligibility or matching behaviour.

@@ -180,9 +180,13 @@ async function seedCommunity() {
       socialEnergy:seed.social,careerPriority:seed.career,routineVsAdventure:seed.adventure,
       relocationFlexibility:seed.relocation,sharedInterestsImportance:seed.interests,
       independencePreference:seed.independence,relationshipPace:seed.pace,
-      idealWeekend:"A mix of family time, good food, something active and time to recharge.",
-      whatMattersMost:"A kind, honest partnership with shared direction and mutual respect.",
-      nonNegotiables:"Respect, honesty and serious intent.",
+      idealWeekend:"Family time, Travel, Sport / fitness, Quiet time",
+      whatMattersMost:"Trust, Family, Communication, Stability, Shared values",
+      nonNegotiables:"Honesty, Loyalty, Mutual respect, Good communication",
+      weekendPreferences:["family_time","travel","sport_fitness","quiet_time"],
+      relationshipPriorities:["trust","family","communication","stability","shared_values"],
+      nonNegotiablePreferences:["honesty","loyalty","mutual_respect","good_communication"],
+      relationshipContext:"",
       consentForCompatibility:true,consentForAiDiscovery:false,
       developmentSeed:true,updatedAt:FieldValue.serverTimestamp(),createdAt:FieldValue.serverTimestamp(),
     },{merge:true});
@@ -215,6 +219,95 @@ async function removeSeedCommunity() {
   }
 }
 
+async function clearDocumentsForUids(uids:string[]){
+  if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
+  const directCollections=[
+    "profiles","relationshipProfiles","identity","discoveryPreferences",
+    "notificationPreferences","demoProfiles","profilePhotos"
+  ];
+  for(const uid of uids){
+    await resetUserJourney(uid).catch(()=>{});
+    const batch=adminDb.batch();
+    for(const collection of directCollections){
+      batch.delete(adminDb.collection(collection).doc(uid));
+    }
+    await batch.commit().catch(()=>{});
+  }
+}
+
+async function factoryResetTestEnvironment(currentUid:string){
+  if(!adminDb||!adminAuth)throw new Error("SERVER_NOT_CONFIGURED");
+
+  const seedUids=seeds.map(seed=>seed.uid);
+  const affected=[currentUid,...seedUids];
+
+  // Clear all user-scoped AutoFace application state for the current tester and
+  // every deterministic synthetic member. Current Firebase login is preserved.
+  await clearDocumentsForUids(affected);
+
+  // Remove synthetic Authentication users so the next seed starts from a known state.
+  for(const uid of seedUids){
+    await adminAuth.deleteUser(uid).catch(()=>{});
+  }
+
+  // Re-establish only the local development marker for the current signed-in account.
+  await adminDb.collection("demoProfiles").doc(currentUid).set({
+    uid:currentUid,
+    isTestProfile:true,
+    developmentAccount:true,
+    factoryResetAt:FieldValue.serverTimestamp(),
+  },{merge:true});
+
+  return{
+    currentLoginPreserved:true,
+    syntheticAuthUsersRemoved:seedUids.length,
+    syntheticProfilesRemoved:seedUids.length,
+    message:"Test environment reset. Your Firebase login was preserved; your AutoFace journey and all deterministic synthetic member data were cleared."
+  };
+}
+
+async function validateSeedCommunity(){
+  if(!adminDb||!adminAuth)throw new Error("SERVER_NOT_CONFIGURED");
+  const results=[];
+  for(const seed of seeds){
+    const [profile,relationship,identity,demo,prefs]=await Promise.all([
+      adminDb.collection("profiles").doc(seed.uid).get(),
+      adminDb.collection("relationshipProfiles").doc(seed.uid).get(),
+      adminDb.collection("identity").doc(seed.uid).get(),
+      adminDb.collection("demoProfiles").doc(seed.uid).get(),
+      adminDb.collection("discoveryPreferences").doc(seed.uid).get(),
+    ]);
+    let auth=false;
+    try{await adminAuth.getUser(seed.uid);auth=true}catch{}
+    const profileData=profile.data()??{};
+    const relationshipData=relationship.data()??{};
+    const identityData=identity.data()??{};
+    const checks={
+      auth,
+      profile:profile.exists,
+      atlas:relationship.exists,
+      visible:profileData.visibility==="future_matches",
+      compatibility:relationshipData.consentForCompatibility===true,
+      authenticity:identityData.identityVerified===true&&identityData.livenessVerified===true,
+      testMarker:demo.data()?.isTestProfile===true,
+      preferences:prefs.exists,
+    };
+    results.push({
+      uid:seed.uid,
+      name:seed.firstName,
+      location:seed.location,
+      healthy:Object.values(checks).every(Boolean),
+      checks,
+    });
+  }
+  return{
+    total:results.length,
+    healthy:results.filter(item=>item.healthy).length,
+    unhealthy:results.filter(item=>!item.healthy).length,
+    profiles:results,
+  };
+}
+
 export async function POST(request: Request) {
   try {
     const user=await requireTestUser(request);
@@ -227,9 +320,31 @@ export async function POST(request: Request) {
       const result=await makeDiscoveryReady(user.uid);
       return NextResponse.json({ok:true,action:"make_discovery_ready",...result});
     }
+    if (body.action==="factory_reset") {
+      const result=await factoryResetTestEnvironment(user.uid);
+      return NextResponse.json({ok:true,action:"factory_reset",...result});
+    }
     if (body.action==="seed_community") {
       const count=await seedCommunity();
-      return NextResponse.json({ok:true,action:"seed_community",count,message:`Seeded ${count} synthetic Sikh test profiles.`});
+      const validation=await validateSeedCommunity();
+      return NextResponse.json({
+        ok:validation.healthy===validation.total,
+        action:"seed_community",
+        count,
+        validation,
+        message:validation.healthy===validation.total
+          ? `Seeded and validated ${validation.healthy} synthetic Sikh test profiles.`
+          : `Seeded ${count} profiles, but only ${validation.healthy} of ${validation.total} passed validation.`
+      });
+    }
+    if (body.action==="validate_community") {
+      const validation=await validateSeedCommunity();
+      return NextResponse.json({
+        ok:validation.healthy===validation.total,
+        action:"validate_community",
+        validation,
+        message:`${validation.healthy} of ${validation.total} synthetic profiles are healthy.`
+      });
     }
     if (body.action==="remove_seed_community") {
       await removeSeedCommunity();

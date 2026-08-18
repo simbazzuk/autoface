@@ -87,10 +87,20 @@ export default function Dashboard() {
   const [busy, setBusy] = useState(false);
   const [identitySignals, setIdentitySignals] = useState({ identityVerified: false, livenessVerified: false, photoVerified: false });
   const recaptcha = useRef<RecaptchaVerifier | null>(null);
+  const recaptchaAttempt = useRef(0);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
   }, [loading, user, router]);
+
+  useEffect(() => {
+    return () => {
+      recaptcha.current?.clear();
+      recaptcha.current = null;
+      const container = document.getElementById("recaptcha-container");
+      if (container) container.replaceChildren();
+    };
+  }, []);
 
   useEffect(() => {
     if (!db || !user) return;
@@ -134,16 +144,24 @@ export default function Dashboard() {
     try {
       setBusy(true);
       setMessage("");
-      if (!recaptcha.current) {
-        recaptcha.current = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-      }
+      // A Firebase reCAPTCHA widget may only be rendered once into a given DOM container.
+      // Dispose any previous verifier and empty the host before each new SMS attempt.
+      recaptcha.current?.clear();
+      recaptcha.current = null;
+      const container = document.getElementById("recaptcha-container");
+      if (!container) throw new Error("Phone verification is not ready. Please refresh and try again.");
+      container.replaceChildren();
+      recaptchaAttempt.current += 1;
+      recaptcha.current = new RecaptchaVerifier(auth, container, { size: "invisible" });
       const provider = new PhoneAuthProvider(auth);
-      const id = await provider.verifyPhoneNumber(phone, recaptcha.current);
+      const id = await provider.verifyPhoneNumber(phone.trim(), recaptcha.current);
       setVerificationId(id);
       setMessage("Verification code ready. For Firebase test numbers, use the code configured in the Firebase console.");
     } catch (e) {
       recaptcha.current?.clear();
       recaptcha.current = null;
+      const container = document.getElementById("recaptcha-container");
+      if (container) container.replaceChildren();
       setMessage(e instanceof Error ? e.message : "Unable to send verification code.");
     } finally {
       setBusy(false);
@@ -157,7 +175,7 @@ export default function Dashboard() {
       const credential = PhoneAuthProvider.credential(verificationId, code);
       await linkWithCredential(user, credential);
       await user.reload();
-      setMessage("Mobile number verified. Upintroductions your authenticity score…");
+      setMessage("Mobile number verified. Updating your authenticity score…");
       window.location.reload();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Unable to verify the code.");

@@ -8,6 +8,15 @@ export async function GET(request: Request) {
     return NextResponse.json(await buildDiscoveryFor(user.uid));
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : 500 });
+    if(message==="REQUESTER_AUTH_USER_MISSING"){
+      return NextResponse.json({
+        error:"Your signed-in session points to an AutoFace account that no longer exists in Firebase Authentication. Please sign out and sign in again.",
+        code:"ACCOUNT_RECORD_MISSING"
+      },{status:409});
+    }
+    return NextResponse.json(
+      { error: message, code:"DISCOVERY_ERROR" },
+      { status: message === "UNAUTHENTICATED" ? 401 : 500 }
+    );
   }
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { useAuth } from "@/components/AuthProvider";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
+import { MemberJourney } from "@/components/MemberJourney";
 import { db } from "@/lib/firebase";
 import { calculateRelationshipCompleteness, type RelationshipProfile } from "@/lib/relationship-profile";
 import {
@@ -51,6 +52,7 @@ export default function ProfilePage() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [journeySaved,setJourneySaved]=useState(false);
   const [relationshipProfile, setRelationshipProfile] = useState<Partial<RelationshipProfile> | null>(null);
   const [photoBusy,setPhotoBusy]=useState(false);
   const [photoMessage,setPhotoMessage]=useState("");
@@ -234,7 +236,8 @@ export default function ProfilePage() {
         createdAt: initialCreatedAt ?? serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      setMessage("Profile saved. It remains private until you choose otherwise.");
+      setMessage("Profile saved.");
+      setJourneySaved(true);
     } catch (error) {
       const detail=error instanceof Error ? error.message : "Unable to save your profile.";
       setMessage(detail.includes("Missing or insufficient permissions")
@@ -262,6 +265,8 @@ export default function ProfilePage() {
           <p className="lead">Shape the profile other members see, add a strong photo and give Atlas enough context to make considered introductions.</p>
         </div>
       </section>
+
+      <MemberJourney stage="profile"/>
 
       <section className="section profile-section">
         <div className="container">
@@ -382,6 +387,10 @@ export default function ProfilePage() {
             </section>
 
             {message && <p className="notice profile-message">{message}</p>}
+            {journeySaved&&<div className="journey-complete-card">
+              <div><span className="privacy-kicker">PROFILE COMPLETE</span><h3>Your profile is ready for the next step.</h3><p>Atlas now needs to understand the relationship values and expectations that matter to you before AutoFace can make considered recommendations.</p></div>
+              <a className="btn btn-primary journey-next-button" href="/relationship-profile">Continue to Atlas →</a>
+            </div>}
             <div className="profile-actions profile-actions-sticky"><div><small>Your profile remains under your control.</small><b>Save changes when you&apos;re ready.</b></div><button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save profile"}</button></div>
           </form>
 

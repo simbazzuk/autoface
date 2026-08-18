@@ -14,6 +14,10 @@ export type RelationshipProfile = {
   idealWeekend: string;
   whatMattersMost: string;
   nonNegotiables: string;
+  weekendPreferences?: string[];
+  relationshipPriorities?: string[];
+  nonNegotiablePreferences?: string[];
+  relationshipContext?: string;
   consentForCompatibility: boolean;
   consentForAiDiscovery?: boolean;
   createdAt?: unknown;
@@ -42,9 +46,9 @@ export function calculateRelationshipCompleteness(profile: Partial<RelationshipP
   const checks = [
     ...scaleFields.map((value) => Number(value) >= 1 && Number(value) <= 5),
     Boolean(profile.relationshipPace),
-    Boolean(profile.idealWeekend?.trim()),
-    Boolean(profile.whatMattersMost?.trim()),
-    Boolean(profile.nonNegotiables?.trim()),
+    (profile.weekendPreferences?.length ?? 0) > 0 || Boolean(profile.idealWeekend?.trim()),
+    (profile.relationshipPriorities?.length ?? 0) > 0 || Boolean(profile.whatMattersMost?.trim()),
+    (profile.nonNegotiablePreferences?.length ?? 0) > 0 || Boolean(profile.nonNegotiables?.trim()),
     profile.consentForCompatibility === true,
   ];
   const completed = checks.filter(Boolean).length;
