@@ -222,7 +222,7 @@ export function Header() {
           )}
 
           <details className="nav-group" ref={trustRef} onToggle={(event)=>handleNavGroupToggle("trust",event.currentTarget.open)}>
-            <summary>Trust <span aria-hidden="true">⌄</span></summary>
+            <summary>Safety & Privacy <span aria-hidden="true">⌄</span></summary>
             <div className="nav-group-menu trust-menu">
               <Link onClick={closeDesktopMenus} href="/how-it-works"><b>How it works</b><small>Understand the AutoFace journey</small></Link>
               <Link onClick={closeDesktopMenus} href="/pricing"><b>Pricing</b><small>Beta access and planned membership tiers</small></Link>

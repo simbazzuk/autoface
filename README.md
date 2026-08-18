@@ -649,3 +649,11 @@ Replaces the dead-end empty Discovery state with an active-profile message and a
 
 ## v0.34.4 — Blue Community Map
 Updates the landing-page community network map with a richer blue background while preserving the existing responsive map and labels.
+
+
+## v0.34.5 — Registration Experience
+Adds richer AutoFace blue/purple visual treatment to registration while preserving the existing account-creation flow.
+
+
+## v0.34.6 — Safety & Privacy Navigation Label
+Renames the main navigation item from Trust to Safety & Privacy while preserving the existing pages and routes.
