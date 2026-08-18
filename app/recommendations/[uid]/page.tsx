@@ -37,6 +37,13 @@ type Rec = {
   candidate: RecommendationCandidate;
   dimensions: Dimension[];
   summary: string;
+  intelligence: {
+    confidence: "HIGH" | "GOOD" | "LIMITED";
+    confidenceScore: number;
+    signalsUsed: number;
+    signalsAvailable: number;
+    notice: string;
+  };
   preferences: {
     minAge: number;
     maxAge: number;
@@ -147,11 +154,11 @@ export default function RecommendationPage() {
     <main>
       <section className="page-hero compact-hero recommendation-page-hero">
         <div className="container">
-          <span className="eyebrow">Atlas Recommendation</span>
-          <h1>Why {c.firstName} is being recommended.</h1>
+          <span className="eyebrow">Atlas Introduction Intelligence</span>
+          <h1>Here&apos;s why Atlas thinks {c.firstName} is worth considering.</h1>
           <p className="lead">
-            Atlas explains where your relationship preferences align — and where a conversation may be useful.
-            The recommendation remains deterministic and does not predict relationship success.
+            Not just a score. See the foundations behind this introduction, where you align and what may be worth exploring together.
+            Eligibility and compatibility remain deterministic — Atlas explains the reasoning.
           </p>
         </div>
       </section>
@@ -176,9 +183,38 @@ export default function RecommendationPage() {
               </div>
             </div>
 
+            <div className="card atlas-intelligence-overview">
+              <div className="atlas-intelligence-heading">
+                <div>
+                  <span className="privacy-kicker">WHY THIS INTRODUCTION</span>
+                  <h2>A considered introduction, with reasons.</h2>
+                  <p>AutoFace first applies your hard preferences, then calculates structured compatibility. Atlas adds an explanation layer so you can decide whether the introduction feels worth exploring.</p>
+                </div>
+                <div className={`atlas-confidence ${data.intelligence.confidence.toLowerCase()}`}>
+                  <small>ATLAS CONFIDENCE</small><strong>{data.intelligence.confidence}</strong>
+                  <span>{data.intelligence.signalsUsed}/{data.intelligence.signalsAvailable} relationship signals</span>
+                </div>
+              </div>
+              <div className="atlas-reason-grid">
+                {data.dimensions.slice().sort((a,b)=>b.score-a.score).slice(0,3).map((d,index)=>(
+                  <div className="atlas-reason-card" key={d.code}>
+                    <span>{index===0?"STRONG FOUNDATION":"ALIGNMENT"}</span><b>{d.label}</b>
+                    <p>{d.explanation}</p><small>{d.score}% structured alignment</small>
+                  </div>
+                ))}
+              </div>
+              <div className="atlas-confidence-note"><span>◎</span><p><b>{data.intelligence.confidence} confidence in the explanation.</b> {data.intelligence.notice} Confidence describes the amount of profile context available — not the likelihood of relationship success.</p></div>
+              <div className="atlas-intelligence-flow">
+                <span><b>1</b><small>ELIGIBILITY</small><strong>Hard preferences</strong></span><i>→</i>
+                <span><b>2</b><small>COMPATIBILITY</small><strong>Deterministic ranking</strong></span><i>→</i>
+                <span><b>3</b><small>ATLAS</small><strong>Explain the fit</strong></span><i>→</i>
+                <span><b>4</b><small>YOU</small><strong>Decide</strong></span>
+              </div>
+            </div>
+
             <div className="card recommendation-breakdown-card">
-              <span className="privacy-kicker">WHY ATLAS RECOMMENDS {c.firstName.toUpperCase()}</span>
-              <h2>Your compatibility breakdown</h2>
+              <span className="privacy-kicker">STRUCTURED COMPATIBILITY</span>
+              <h2>The foundations behind the introduction</h2>
               <p className="recommendation-summary">{data.summary}</p>
 
               <div className="recommendation-dimensions">
@@ -216,8 +252,8 @@ export default function RecommendationPage() {
             <div className="card ai-discovery-card">
               <div className="ai-discovery-title-row">
                 <div>
-                  <span className="privacy-kicker">ATLAS AI DISCOVERY</span>
-                  <h2>What might you have in common beyond the numbers?</h2>
+                  <span className="privacy-kicker">ATLAS SEMANTIC INSIGHT · OPTIONAL</span>
+                  <h2>What does Atlas notice beyond the structured scores?</h2>
                 </div>
                 <span className={`status-pill ${aiStatus?.available ? "ai-discovery-live" : "ai-off-pill"}`}>
                   {aiStatus?.available ? "GEMINI AVAILABLE" : "OPT-IN REQUIRED"}
@@ -225,8 +261,8 @@ export default function RecommendationPage() {
               </div>
 
               <p className="ai-discovery-intro">
-                Your official {c.compatibilityScore}% compatibility score remains deterministic. Atlas AI Discovery is a separate,
-                optional Gemini layer that looks for meaning and shared themes in the relationship answers you each wrote in your own words.
+                Your official {c.compatibilityScore}% compatibility score remains deterministic. When both members opt in, Gemini can help Atlas interpret
+                the meaning in your written relationship answers — surfacing shared themes and neutral differences that a numeric score cannot express.
               </p>
 
               {!aiStatus?.enabled ? (
@@ -249,7 +285,7 @@ export default function RecommendationPage() {
                 <div className="ai-discovery-output">
                   <div className="ai-discovery-headline">
                     <span className="ai-spark">✦</span>
-                    <div><small>ATLAS NOTICED SOMETHING</small><h3>{aiInsight.headline}</h3><p>{aiInsight.summary}</p></div>
+                    <div><small>ATLAS VIEW · WHY THIS MAY BE WORTH EXPLORING</small><h3>{aiInsight.headline}</h3><p>{aiInsight.summary}</p></div>
                   </div>
 
                   <div className="ai-theme-grid">
@@ -264,7 +300,7 @@ export default function RecommendationPage() {
 
                   {aiInsight.discussionPoints.length > 0 && (
                     <div className="ai-discussion">
-                      <small>WORTH TALKING ABOUT</small>
+                      <small>SOMETHING TO EXPLORE</small>
                       {aiInsight.discussionPoints.map((point) => (
                         <div key={point.theme}><b>{point.theme}</b><span>{point.explanation}</span></div>
                       ))}
@@ -285,7 +321,7 @@ export default function RecommendationPage() {
                     </span>
                   </label>
                   <button className="btn btn-primary ai-discovery-generate" disabled={!aiConsent || aiBusy} onClick={() => void generateAiDiscovery()}>
-                    {aiBusy ? "Atlas is looking for shared themes…" : "See what Gemini notices"}
+                    {aiBusy ? "Atlas is looking for shared themes…" : "Ask Atlas to explain the fit"}
                   </button>
                 </>
               )}

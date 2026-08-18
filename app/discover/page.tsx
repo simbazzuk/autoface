@@ -132,7 +132,7 @@ export default function DiscoverPage() {
           <div><span className="privacy-kicker">QUALITY OVER QUANTITY</span><h2>Atlas selected {data.candidates.length} introduction{data.candidates.length===1?"":"s"} for you.</h2><p>These are the highest-ranked eligible people currently available under your Discovery preferences. A high score is a reason to look closer — never a prediction of relationship success.</p></div>
           <div className="daily-count"><b>{data.candidates.length}</b><span>of 3 today</span></div>
         </div>
-        <div className="discovery-grid daily-discovery-grid">{data.candidates.map((c,index) => <article className="card discovery-card daily-discovery-card" key={c.uid}>
+        <div className="discovery-grid daily-discovery-grid discovery-grid-wide">{data.candidates.map((c,index) => <article className="card discovery-card daily-discovery-card discovery-card-wide" key={c.uid}>
           <div className="daily-rank"><span>ATLAS PICK</span><b>{index+1} of {data.candidates.length}</b></div>
           {c.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}<div className="candidate-identity"><ProfilePhoto uid={c.uid} name={c.firstName} className="discovery-profile-photo"/><div><h2>{c.firstName}{c.age ? `, ${c.age}` : ""}</h2><p>{[c.generalLocation,c.occupation].filter(Boolean).join(" · ") || "Limited profile details"}</p></div></div>
           <div className="trust-pair"><span><b>{c.authenticityScore}%</b><small>Authenticity</small></span><span><b>{c.compatibilityScore}%</b><small>Compatibility</small></span></div>
@@ -152,7 +152,11 @@ export default function DiscoverPage() {
             <span className="ai-teaser-orb">✦</span>
             <span><small>ATLAS AI DISCOVERY</small><b>Semantic insight not available</b><em>{c.firstName} has not opted in to Gemini comparison.</em></span>
           </div>}
-          <a className="recommendation-detail-link" href={`/recommendations/${c.uid}`}>View recommendation details →</a>
+          <a className="recommendation-detail-link recommendation-detail-button" href={`/recommendations/${c.uid}`}>
+            <span className="recommendation-detail-icon">✦</span>
+            <span className="recommendation-detail-copy"><small>ATLAS INTRODUCTION</small><b>View full recommendation</b></span>
+            <span className="recommendation-detail-arrow">→</span>
+          </a>
           <div className="discovery-actions thoughtful-actions">
             <button className="btn" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"pass")}>Not for me</button>
             <button className="btn save-later-button" disabled={Boolean(busyUid)} onClick={() => decide(c.uid,"saved")}>♡ Save for later</button>

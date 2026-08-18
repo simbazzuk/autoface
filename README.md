@@ -525,3 +525,15 @@ This patch removes Firebase Storage as a development-time dependency while prese
 - Strengthens the proof strip with no endless swiping, explainable compatibility, mutual introductions and private-by-design messaging.
 - Refreshes the Why AutoFace, journey, principle and final beta CTA copy to reinforce the same proposition.
 - No application logic, Firebase, matching, Atlas scoring, photo storage or environment changes.
+
+
+## v0.29 — Atlas Introduction Intelligence
+Recommendation details now lead with explainable foundations, deterministic Atlas Confidence, and a visible eligibility → compatibility → Atlas explanation → member decision flow.
+
+
+## v0.29.1 — Discover Card Layout Patch
+Atlas Daily Discovery now uses wider one/two-column recommendation cards with more room for profile, compatibility, Atlas explanation and decision controls. No recommendation logic changes.
+
+
+## v0.29.2 — Discover CTA + Readability
+Discover now uses a prominent full-width `View full recommendation` Atlas CTA and larger supporting card text for improved readability. No logic changes.
