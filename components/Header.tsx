@@ -24,8 +24,9 @@ export function Header() {
   const menuRef = useRef<HTMLDetailsElement>(null);
   const [identity, setIdentity] = useState<HeaderIdentity | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [developmentTools, setDevelopmentTools] = useState(false);
 
-  const isTestProfile = Boolean(user?.email?.endsWith("@autoface.test"));
+  const isTestProfile = Boolean(user?.email?.toLowerCase().endsWith("@autoface.test"));
 
   useEffect(() => {
     if (!user || !db) {
@@ -76,6 +77,24 @@ export function Header() {
       }
     })();
 
+    return () => { active = false; };
+  }, [user]);
+
+  useEffect(() => {
+    let active = true;
+    if (!user || process.env.NODE_ENV === "production") {
+      setDevelopmentTools(false);
+      return () => { active = false; };
+    }
+    (async () => {
+      try {
+        const token = await user.getIdToken();
+        const response = await fetch("/api/dev/status", {headers:{Authorization:`Bearer ${token}`}});
+        if (active) setDevelopmentTools(response.ok && Boolean((await response.json()).developmentTools));
+      } catch {
+        if (active) setDevelopmentTools(false);
+      }
+    })();
     return () => { active = false; };
   }, [user]);
 
@@ -171,6 +190,7 @@ export function Header() {
                 <Link href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
                 <Link href="/verify-photo"><b>Photo Verification</b><small>Profile-photo authenticity</small></Link>
                 <Link href="/account"><b>Privacy & Control</b><small>Discovery, data export and deletion</small></Link>
+                {developmentTools && <Link href="/development-tools"><b>Development Tools</b><small>Reset and seed synthetic test data</small></Link>}
                 <AdminLink />
               </div>
             </details>
@@ -235,6 +255,7 @@ export function Header() {
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
                 <Link href="/verify-photo" onClick={closeMobile}>Photo Verification</Link>
                 <Link href="/account" onClick={closeMobile}>Privacy & Control</Link>
+                {developmentTools && <Link href="/development-tools" onClick={closeMobile}>Development Tools</Link>}
                 <AdminLink mobile />
               </div>
             </>

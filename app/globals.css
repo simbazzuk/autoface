@@ -1598,3 +1598,227 @@ radial-gradient(circle at 20% 10%,rgba(124,92,255,.12),transparent 32%)}
     height:32px;
   }
 }
+
+/* AutoFace v0.30 — Sikh Community launch direction */
+.sikh-world-section{padding:76px 0 82px;position:relative;overflow:hidden}.sikh-world-head em{font-style:normal;background:linear-gradient(90deg,#ff779d,#8e79ff,#55b9ff);-webkit-background-clip:text;color:transparent}.sikh-world-card{margin-top:28px;border:1px solid rgba(126,102,255,.23);border-radius:24px;background:radial-gradient(circle at 48% 42%,rgba(103,76,220,.10),transparent 35%),linear-gradient(145deg,rgba(14,18,34,.92),rgba(8,12,24,.96));overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.18)}.sikh-map{padding:16px 30px 0}.sikh-map svg{display:block;width:100%;height:auto;max-height:430px}.map-land{fill:rgba(108,124,164,.12);stroke:rgba(135,150,188,.18);stroke-width:2}.map-link{fill:none;stroke:url(#none);stroke:#7765dc;stroke-width:1.5;stroke-dasharray:5 8;opacity:.38}.map-point circle{fill:#ff719d;stroke:#11172a;stroke-width:4}.map-point .pulse{fill:none;stroke:#806cff;stroke-width:2;opacity:.45}.map-point text{fill:#e8eafa;font-size:15px;font-weight:800}.map-point text.sub{fill:#8795ad;font-size:9px;font-weight:600}.map-point.uk circle:first-child{fill:#8d72ff}.sikh-world-footer{display:flex;justify-content:center;flex-wrap:wrap;gap:13px;padding:0 20px 13px;color:#d9dced;font-size:11px;font-weight:800}.sikh-world-footer i{color:#ff719d;font-style:normal}.sikh-world-note{max-width:620px;margin:0 auto;padding:0 24px 23px;text-align:center;color:#6f7d94;font-size:8px;line-height:1.5}
+@media(max-width:700px){.sikh-world-section{padding:52px 0}.sikh-map{padding:10px 4px 0}.map-point text{font-size:20px}.map-point text.sub{display:none}}
+
+/* AutoFace v0.30.1 — Sikh identity & lifestyle profile */
+.profile-edit-panel-sikh{background:linear-gradient(135deg,rgba(255,139,49,.055),rgba(124,92,255,.035),rgba(255,255,255,.012));border-color:rgba(255,144,66,.18)}
+.profile-edit-panel-sikh:before{background:linear-gradient(90deg,#ff944e,#8a72ff,transparent)}
+.profile-edit-panel-sikh .profile-edit-panel-title>span{color:#ffd0ac;border-color:rgba(255,148,78,.18);background:rgba(255,148,78,.07)}
+.sikh-profile-note{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;margin-top:14px;padding:12px 13px;border:1px solid rgba(113,204,174,.15);border-radius:13px;background:rgba(113,204,174,.028)}
+.sikh-profile-note>span{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:rgba(113,204,174,.08);color:#7ad7bb}
+.sikh-profile-note b,.sikh-profile-note small{display:block}.sikh-profile-note b{font-size:9px;color:#a8e4d2}.sikh-profile-note small{margin-top:3px;font-size:7.5px;line-height:1.5;color:#7f8ea2}
+
+
+/* AutoFace v0.30.2 — Homepage statement typography consistency */
+.experience-principle{
+  padding:64px 0 68px!important;
+}
+.experience-quote{
+  max-width:1000px!important;
+  margin:0 auto!important;
+  padding:52px 30px!important;
+  text-align:center!important;
+}
+.experience-quote blockquote,
+.experience-final h2{
+  max-width:960px!important;
+  margin:18px auto 12px!important;
+  font-size:clamp(44px,5vw,62px)!important;
+  line-height:1.06!important;
+  letter-spacing:-.045em!important;
+  font-weight:800!important;
+  text-align:center!important;
+}
+.experience-quote p,
+.experience-final p{
+  max-width:760px!important;
+  margin:0 auto!important;
+  color:#8d9aae!important;
+  font-size:14px!important;
+  line-height:1.6!important;
+  text-align:center!important;
+}
+.experience-quote .experience-section-label,
+.experience-final .experience-section-label{
+  display:block!important;
+  margin-bottom:16px!important;
+  font-size:9px!important;
+  letter-spacing:.16em!important;
+  font-weight:900!important;
+  text-align:center!important;
+}
+.experience-final{
+  padding:72px 0 88px!important;
+}
+.experience-final-inner{
+  max-width:1000px!important;
+  margin:0 auto!important;
+  text-align:center!important;
+}
+.experience-final .experience-actions{
+  justify-content:center!important;
+  margin-top:26px!important;
+}
+@media(max-width:700px){
+  .experience-principle{padding:48px 0 52px!important}
+  .experience-quote{padding:38px 14px!important}
+  .experience-quote blockquote,
+  .experience-final h2{
+    font-size:clamp(34px,10vw,46px)!important;
+    line-height:1.08!important;
+  }
+  .experience-quote p,
+  .experience-final p{
+    font-size:13px!important;
+  }
+  .experience-final{padding:56px 0 68px!important}
+}
+
+/* AutoFace v0.30.3 — Development Reset & Sikh Test Data */
+.dev-tools-layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}.dev-tools-card{padding:24px}.dev-tools-card h2{margin:6px 0 8px;font-size:27px}.dev-tools-card>p{color:#8c9aae;font-size:10px;line-height:1.6}.dev-reset-card{border-color:rgba(255,112,151,.18);background:linear-gradient(145deg,rgba(255,105,157,.045),rgba(255,255,255,.012))}.dev-seed-card{border-color:rgba(124,92,255,.22);background:linear-gradient(145deg,rgba(124,92,255,.055),rgba(61,169,255,.025))}
+.dev-reset-flow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:18px 0}.dev-reset-flow span{display:grid;grid-template-columns:45px 1fr;gap:7px;align-items:center;padding:9px;border:1px solid rgba(255,255,255,.065);border-radius:10px;font-size:8px;color:#9aa7b8}.dev-reset-flow b{font-size:6px;letter-spacing:.08em;color:#7bd6ba}.dev-reset-flow span:nth-child(n+3) b{color:#ff9db9}
+.dev-seed-people{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:17px 0}.dev-seed-people span{padding:9px 10px;border:1px solid rgba(124,92,255,.12);border-radius:10px;background:rgba(124,92,255,.035);font-size:8px;color:#aeb7ca}.dev-action-row{display:flex;gap:9px;flex-wrap:wrap}.dev-action{margin-top:4px}.dev-warning{grid-column:1/-1;display:grid;grid-template-columns:36px 1fr;gap:11px;align-items:center;padding:14px 16px;border-color:rgba(255,186,99,.17);background:rgba(255,186,99,.025)}.dev-warning>span{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(255,186,99,.07)}.dev-warning b{font-size:9px;color:#ffd19a}.dev-warning p{margin:3px 0 0;font-size:8px;line-height:1.5;color:#7f8da1}.dev-tools-message{grid-column:1/-1}.dev-denied{padding:28px}
+@media(max-width:800px){.dev-tools-layout{grid-template-columns:1fr}.dev-reset-flow,.dev-seed-people{grid-template-columns:1fr}}
+
+/* AutoFace v0.30.5 — Richer profiles + career preferences */
+.candidate-person-card{margin:14px 0;padding:15px;border:1px solid rgba(86,164,255,.13);border-radius:14px;background:linear-gradient(135deg,rgba(66,157,255,.035),rgba(124,92,255,.03))}
+.candidate-person-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:8px}.candidate-person-heading small{font-size:7px;letter-spacing:.1em;font-weight:900;color:#73b9ff}.candidate-person-heading b{font-size:8px;color:#9eacc0}
+.candidate-person-card .candidate-about{margin:0 0 12px!important;font-size:11px!important;line-height:1.65!important}.candidate-life-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.candidate-life-grid>span{display:grid;gap:2px;padding:10px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:rgba(5,9,19,.28)}.candidate-life-grid small{font-size:6.5px;letter-spacing:.09em;color:#7c8ba0;font-weight:900}.candidate-life-grid b{font-size:9px;color:#dce4f2}.candidate-life-grid em{font-size:7px;color:#8190a3;font-style:normal;text-transform:capitalize}
+.candidate-community-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.candidate-community-pills span{padding:6px 8px;border-radius:999px;border:1px solid rgba(124,92,255,.16);background:rgba(124,92,255,.045);font-size:7px;color:#b7b1df;font-weight:800}.candidate-community-pills .career-fit-pill{border-color:rgba(74,202,167,.20);background:rgba(74,202,167,.055);color:#93dcc8}
+.preference-career{margin:18px 0;padding:17px;border:1px solid rgba(91,157,255,.14);border-radius:14px;background:linear-gradient(135deg,rgba(66,157,255,.035),rgba(124,92,255,.025))}.preference-career h3{margin:5px 0 6px}.preference-career>p{font-size:9px;line-height:1.5}.preference-profession-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 14px}.compact-toggle{padding:8px!important;min-height:auto!important}.compact-toggle span b{font-size:8px!important}
+@media(max-width:620px){.candidate-life-grid,.preference-profession-grid{grid-template-columns:1fr}.candidate-person-heading{display:block}.candidate-person-heading b{display:block;margin-top:4px}}
+
+
+/* AutoFace v0.30.6 — Engaging Discover profile traits */
+.candidate-person-card-vivid{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(128,98,255,.22)!important;
+  background:linear-gradient(145deg,rgba(92,67,199,.08),rgba(20,27,47,.80) 44%,rgba(53,132,209,.045))!important;
+}
+.candidate-person-card-vivid:before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:3px;
+  background:linear-gradient(#885fff,#ff6eaa,#55b9ff);
+  opacity:.85;
+}
+.candidate-about-highlight{
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr);
+  gap:10px;
+  align-items:start;
+  margin:8px 0 15px;
+  padding:14px 15px;
+  border:1px solid rgba(255,103,169,.18);
+  border-radius:13px;
+  background:linear-gradient(110deg,rgba(255,98,164,.08),rgba(124,92,255,.07),rgba(52,176,255,.045));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.candidate-about-highlight>svg{
+  margin-top:2px;
+  padding:6px;
+  width:28px;height:28px;
+  color:#ff8ab6;
+  border-radius:9px;
+  background:rgba(255,105,157,.09);
+}
+.candidate-about-highlight .candidate-about{
+  margin:0!important;
+  color:#f0f3fb!important;
+  font-size:11.5px!important;
+  line-height:1.7!important;
+  font-weight:600;
+}
+.candidate-trait-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:2px 0 9px;
+}
+.candidate-trait-title small{
+  font-size:7px;
+  letter-spacing:.11em;
+  font-weight:900;
+  color:#8f7cff;
+}
+.candidate-trait-title span{
+  font-size:7px;
+  color:#718096;
+}
+.candidate-trait-icons{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+  margin-bottom:12px;
+}
+.trait-icon-card{
+  min-width:0;
+  min-height:96px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:9px 6px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;
+  background:rgba(7,12,24,.38);
+}
+.trait-icon-card>span{
+  width:35px;height:35px;
+  display:grid;
+  place-items:center;
+  margin-bottom:2px;
+  border-radius:11px;
+}
+.trait-icon-card b{
+  max-width:100%;
+  font-size:8px;
+  line-height:1.2;
+  color:#e5eaf4;
+  overflow-wrap:anywhere;
+}
+.trait-icon-card small{
+  max-width:100%;
+  font-size:6.5px;
+  line-height:1.25;
+  color:#7f8da2;
+  text-transform:capitalize;
+  overflow-wrap:anywhere;
+}
+.trait-education{border-color:rgba(144,107,255,.19)}.trait-education>span{background:rgba(135,99,255,.10);color:#a48cff}
+.trait-profession{border-color:rgba(63,161,255,.19)}.trait-profession>span{background:rgba(63,161,255,.10);color:#67b8ff}
+.trait-appearance{border-color:rgba(49,211,197,.17)}.trait-appearance>span{background:rgba(49,211,197,.09);color:#61d7cc}
+.trait-diet{border-color:rgba(105,202,107,.17)}.trait-diet>span{background:rgba(105,202,107,.09);color:#83d77d}
+.trait-practice{border-color:rgba(255,182,64,.18)}.trait-practice>span{background:rgba(255,182,64,.09);color:#ffc15c}
+@media(max-width:900px){
+  .candidate-trait-icons{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .candidate-trait-icons{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* AutoFace v0.30.7 — Lifestyle & Introduction Preferences */
+.profile-hobbies{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)}.profile-hobbies-title{display:flex;justify-content:space-between;align-items:end;margin-bottom:10px}.profile-hobbies-title small{font-size:7px;letter-spacing:.11em;color:#ff9b58;font-weight:900}.profile-hobbies-title h4{margin:3px 0 0;font-size:14px}.profile-hobbies-title>span{font-size:7px;color:#718096}.hobby-chip-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.hobby-chip{border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(7,12,24,.35);color:#9ca9bc;padding:9px 5px;display:flex;min-height:64px;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}.hobby-chip span{font-size:18px}.hobby-chip b{font-size:7.5px}.hobby-chip.selected,.preference-interest-chip.selected{border-color:rgba(130,98,255,.48);background:linear-gradient(135deg,rgba(124,92,255,.17),rgba(62,168,255,.09));color:#eeeaff}.preference-lifestyle{margin:18px 0;padding:17px;border:1px solid rgba(255,145,73,.15);border-radius:14px;background:linear-gradient(135deg,rgba(255,139,49,.035),rgba(124,92,255,.025))}.preference-lifestyle h3{margin:5px 0 6px}.preference-lifestyle>p{font-size:9px}.preference-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}.preference-interest-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0 14px}.preference-interest-chip{border:1px solid rgba(255,255,255,.07);border-radius:10px;background:rgba(7,12,24,.35);color:#9ca9bc;padding:9px 6px;font-size:7.5px;cursor:pointer}.preference-interest-chip span{font-size:13px;margin-right:5px}@media(max-width:700px){.hobby-chip-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.preference-interest-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.preference-two-col{grid-template-columns:1fr}}
+
+
+/* AutoFace v0.30.8 — Atlas Profile Intelligence */
+.atlas-profile-intelligence{padding:24px;border-color:rgba(71,180,255,.19);background:linear-gradient(145deg,rgba(52,162,255,.055),rgba(124,92,255,.055) 48%,rgba(255,101,157,.025));overflow:hidden}
+.profile-intelligence-heading{display:flex;justify-content:space-between;align-items:start;gap:20px}.profile-intelligence-heading h2{margin:6px 0 7px;font-size:25px}.profile-intelligence-heading p{max-width:650px;margin:0;color:#93a2b6;font-size:10px;line-height:1.6}.profile-context-pill{flex:0 0 auto;padding:7px 9px;border:1px solid rgba(86,174,255,.16);border-radius:999px;background:rgba(70,164,255,.05);font-size:6.5px;letter-spacing:.08em;font-weight:900;color:#81bded}
+.profile-alignment-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:17px}.profile-alignment-card{min-width:0;padding:13px 11px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(6,11,22,.37)}.profile-alignment-top{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-bottom:11px}.profile-alignment-top>small{font-size:6px;letter-spacing:.08em;font-weight:900;color:#8290a4}.profile-alignment-dots{display:flex;gap:3px}.profile-alignment-dots i{width:6px;height:6px;border-radius:50%;background:#283248}.profile-alignment-dots i.filled{background:#8070ff;box-shadow:0 0 8px rgba(128,112,255,.25)}.profile-alignment-card.strong .profile-alignment-dots i.filled{background:#65d7b4}.profile-alignment-card.explore .profile-alignment-dots i.filled{background:#ff9b75}.profile-alignment-card>b{display:block;font-size:10px;color:#e7eaf3;margin-bottom:6px}.profile-alignment-card>p{min-height:58px;margin:0 0 8px;font-size:7.7px;line-height:1.5;color:#8c9bae}.profile-evidence{display:block;padding-top:7px;border-top:1px solid rgba(255,255,255,.05);font-size:6.5px;line-height:1.4;color:#6f8097}
+.profile-intelligence-details{display:grid;grid-template-columns:1fr auto;gap:14px;margin-top:14px;padding:14px;border:1px solid rgba(255,255,255,.06);border-radius:13px;background:rgba(6,11,22,.25)}.profile-intelligence-details small{font-size:6.5px;letter-spacing:.09em;font-weight:900;color:#75869e}.profile-context-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.profile-context-chips span{padding:5px 7px;border-radius:999px;border:1px solid rgba(128,97,255,.14);background:rgba(128,97,255,.045);font-size:6.5px;color:#aca5d3;text-transform:capitalize}.profile-height-context{max-width:240px;padding-left:14px;border-left:1px solid rgba(255,255,255,.07)}.profile-height-context p{margin:5px 0 0;font-size:7.5px;line-height:1.45;color:#92a0b2}.profile-intelligence-notice{margin-top:13px!important}
+@media(max-width:950px){.profile-alignment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-alignment-grid .profile-alignment-card:last-child{grid-column:1/-1}.profile-intelligence-details{grid-template-columns:1fr}.profile-height-context{max-width:none;padding-left:0;padding-top:11px;border-left:0;border-top:1px solid rgba(255,255,255,.07)}}
+@media(max-width:620px){.profile-intelligence-heading{display:block}.profile-context-pill{display:inline-block;margin-top:10px}.profile-alignment-grid{grid-template-columns:1fr}.profile-alignment-grid .profile-alignment-card:last-child{grid-column:auto}.profile-alignment-card>p{min-height:0}}
+
+/* AutoFace v0.30.8.3 — Profile Identity & Test Readiness */
+.dev-readiness-card{grid-column:1/-1;padding:21px;border-color:rgba(73,190,160,.17);background:linear-gradient(135deg,rgba(73,190,160,.035),rgba(70,143,255,.025),rgba(124,92,255,.025))}
+.dev-readiness-heading{display:flex;justify-content:space-between;gap:16px;align-items:start}.dev-readiness-heading h2{margin:5px 0 0;font-size:23px}.dev-readiness-card>p{font-size:9px;line-height:1.55;color:#8391a5}.ready-pill{color:#82d9bd!important;border-color:rgba(73,190,160,.22)!important}.attention-pill{color:#ffc27d!important;border-color:rgba(255,176,85,.20)!important}.dev-readiness-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:14px 0}.dev-readiness-grid>span{display:grid;grid-template-columns:24px 1fr;gap:6px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:rgba(6,11,22,.28)}.dev-readiness-grid b{width:22px;height:22px;display:grid;place-items:center;border-radius:7px;font-size:9px}.dev-readiness-grid em{font-style:normal;font-size:7.5px;line-height:1.3;color:#97a5b7}.dev-readiness-grid .ok b{background:rgba(73,190,160,.09);color:#76d7ba}.dev-readiness-grid .bad b{background:rgba(255,146,103,.09);color:#ff9b76}.dev-readiness-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.dev-readiness-note{display:block;margin-top:11px;font-size:7px;line-height:1.45;color:#6f7f94}
+@media(max-width:900px){.dev-readiness-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.dev-readiness-grid{grid-template-columns:1fr}.dev-readiness-heading{display:block}.dev-readiness-heading>.status-pill{display:inline-block;margin-top:8px}}

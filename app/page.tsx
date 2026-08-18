@@ -14,9 +14,9 @@ export default function Home() {
       <div className="experience-glow experience-glow-two" />
       <div className="container experience-hero-grid">
         <div className="experience-hero-copy">
-          <span className="experience-kicker"><Sparkles size={14}/> Considered introductions, explained by Atlas</span>
-          <h1>Dating shouldn&apos;t feel like searching.<br/><em>It should feel like being introduced.</em></h1>
-          <p>Tell Atlas who you are. AutoFace recommends a small number of people who make sense — and explains why each introduction may be worth getting to know.</p>
+          <span className="experience-kicker"><Sparkles size={14}/> A modern introduction community for Sikhs</span>
+          <h1>A modern way for Sikhs to meet.<br/><em>Beyond traditional introductions.</em></h1>
+          <p>AutoFace uses compatibility, shared values and Atlas AI to help Sikhs discover people worth being introduced to — with fewer profiles, clearer reasons and mutual choice.</p>
           <div className="experience-actions">
             <Link className="experience-primary" href="/register">Join the beta <ArrowRight size={17}/></Link>
             <Link className="experience-secondary" href="/how-it-works">See how Atlas works</Link>
@@ -35,7 +35,7 @@ export default function Home() {
             <div className="experience-card-top">
               <div>
                 <span className="experience-card-label">ATLAS INTRODUCTION</span>
-                <h2>Maya, 36</h2>
+                <h2>Profile A, 36</h2>
                 <p>Leeds · Healthcare</p>
               </div>
               <span className="experience-auth-chip"><BadgeCheck size={13}/> Strong authenticity</span>
@@ -58,7 +58,7 @@ export default function Home() {
             </div>
 
             <div className="experience-card-footer">
-              <span>Why Atlas recommended Maya</span>
+              <span>Why Atlas recommended Profile A</span>
               <ArrowRight size={16}/>
             </div>
           </article>
@@ -68,9 +68,33 @@ export default function Home() {
 
     <section className="experience-statement">
       <div className="container">
-        <span className="experience-section-label">WHY AUTOFACE</span>
+        <span className="experience-section-label">A NEW DIRECTION FOR SIKH INTRODUCTIONS</span>
         <h2>Fewer profiles.<br/><em>Better reasons to meet.</em></h2>
         <p>AutoFace is not trying to predict love. Atlas helps narrow the noise, explains the compatibility signals and leaves the decision with you.</p>
+      </div>
+    </section>
+
+    <section className="sikh-world-section">
+      <div className="container">
+        <div className="experience-section-head sikh-world-head">
+          <div><span className="experience-section-label">THE SIKH COMMUNITY, CONNECTED</span><h2>Connecting Sikhs.<br/><em>Wherever life has taken us.</em></h2></div>
+          <p>Designed to create considered introductions across Sikh communities around the world — starting with the UK and connecting people across established global communities.</p>
+        </div>
+        <div className="sikh-world-card">
+          <div className="sikh-map" aria-label="AutoFace global Sikh community network">
+            <svg viewBox="0 0 1000 440" role="img" aria-label="Stylised world map showing AutoFace community locations">
+              <path className="map-land" d="M75 120l70-50 93 12 60 42-24 42-62 8-32 51-65-20-43-44zm245 20 62-48 87-7 42 37-28 31-56 5-27 44-51-8-37-30zm188 70 40-41 49 5 35 42-15 74-42 81-48-22-25-82zm135-93 88-54 132 23 67 55-27 40-75 2-40 38-52-11-31 42-68-24-32-51zm153 177 48-24 63 13 30 35-28 34-72 5-42-28z"/>
+              <path className="map-link" d="M456 127 Q540 35 716 128"/><path className="map-link" d="M456 127 Q640 170 835 318"/><path className="map-link" d="M456 127 Q490 220 552 282"/><path className="map-link" d="M456 127 Q410 82 382 122"/>
+              <g className="map-point uk"><circle cx="456" cy="127" r="9"/><circle className="pulse" cx="456" cy="127" r="17"/><text x="472" y="120">UK</text><text className="sub" x="472" y="137">Launch community</text></g>
+              <g className="map-point europe"><circle cx="520" cy="135" r="7"/><text x="533" y="132">Europe</text></g>
+              <g className="map-point canada"><circle cx="218" cy="116" r="7"/><text x="232" y="112">Canada</text></g>
+              <g className="map-point kenya"><circle cx="552" cy="282" r="7"/><text x="566" y="279">Kenya</text></g>
+              <g className="map-point australia"><circle cx="835" cy="318" r="7"/><text x="850" y="315">Australia</text></g>
+            </svg>
+          </div>
+          <div className="sikh-world-footer"><span>UK</span><i>•</i><span>Europe</span><i>•</i><span>Canada</span><i>•</i><span>Australia</span><i>•</i><span>Kenya</span></div>
+          <p className="sikh-world-note">AutoFace is building toward these communities. Locations shown describe the intended community network, not current member numbers.</p>
+        </div>
       </div>
     </section>
 
@@ -136,7 +160,7 @@ export default function Home() {
       <div className="container experience-final-inner">
         <span className="experience-section-label">CONTROLLED BETA</span>
         <h2>Ready to be introduced, not overwhelmed?</h2>
-        <p>Join the controlled beta and help shape a dating experience built around fewer, more considered introductions.</p>
+        <p>Join the controlled beta and help shape a modern Sikh introduction experience built around fewer, more considered introductions.</p>
         <div className="experience-actions final-actions">
           <Link className="experience-primary" href="/register">Create your AutoFace account <ArrowRight size={17}/></Link>
           <Link className="experience-secondary" href="/early-access">Join the waiting list</Link>

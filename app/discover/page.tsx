@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { relationshipIntentLabels } from "@/lib/profile";
+import { BriefcaseBusiness, CircleUserRound, GraduationCap, HandHeart, Leaf, Sparkles } from "lucide-react";
 import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
 
 type DiscoveryResponse = { eligible: boolean; candidates: SafeDiscoveryProfile[]; preferences?: unknown; curation?: {mode:"daily";limit:number;available:number}; error?: string };
@@ -137,7 +138,32 @@ export default function DiscoverPage() {
           {c.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}<div className="candidate-identity"><ProfilePhoto uid={c.uid} name={c.firstName} className="discovery-profile-photo"/><div><h2>{c.firstName}{c.age ? `, ${c.age}` : ""}</h2><p>{[c.generalLocation,c.occupation].filter(Boolean).join(" · ") || "Limited profile details"}</p></div></div>
           <div className="trust-pair"><span><b>{c.authenticityScore}%</b><small>Authenticity</small></span><span><b>{c.compatibilityScore}%</b><small>Compatibility</small></span></div>
           <div className="candidate-badges"><span>{c.authenticityLevel}</span><span>{c.compatibilityLevel} alignment</span><span>{relationshipIntentLabels[c.relationshipIntent]}</span></div>
-          <p className="candidate-about">{c.aboutMe}</p>
+          <div className="candidate-person-card candidate-person-card-vivid">
+            <div className="candidate-person-heading"><small>ABOUT {c.firstName.toUpperCase()}</small><b>Who they are, not just the score.</b></div>
+            <div className="candidate-about-highlight">
+              <Sparkles size={15} aria-hidden="true"/>
+              <p className="candidate-about">{c.aboutMe}</p>
+            </div>
+
+            <div className="candidate-trait-title"><small>AT A GLANCE</small><span>Profile characteristics</span></div>
+            <div className="candidate-trait-icons">
+              {c.educationLevel&&<div className="trait-icon-card trait-education"><span><GraduationCap size={19}/></span><b>{["postgraduate","doctorate","professional_qualification"].includes(c.educationLevel)?"Highly educated":"Educated"}</b><small>{c.educationLevel.replaceAll("_"," ")}</small></div>}
+              {(c.occupation||c.professionArea)&&<div className="trait-icon-card trait-profession"><span><BriefcaseBusiness size={19}/></span><b>Professional</b><small>{c.occupation||c.professionArea?.replaceAll("_"," ")}</small></div>}
+              {c.sikhAppearance&&c.sikhAppearance!=="prefer_not_to_say"&&c.sikhAppearance!=="not_applicable"&&<div className="trait-icon-card trait-appearance"><span><CircleUserRound size={19}/></span><b>{c.sikhAppearance==="turbaned"?"Turbaned":"Non-turbaned"}</b><small>Appearance</small></div>}
+              {c.diet&&c.diet!=="prefer_not_to_say"&&<div className="trait-icon-card trait-diet"><span><Leaf size={19}/></span><b>{c.diet==="non_vegetarian"?"Non-vegetarian":c.diet.charAt(0).toUpperCase()+c.diet.slice(1)}</b><small>Diet</small></div>}
+              {c.sikhPractice&&c.sikhPractice!=="prefer_not_to_say"&&<div className="trait-icon-card trait-practice"><span><HandHeart size={19}/></span><b>{c.sikhPractice==="cultural_not_religious"?"Cultural":c.sikhPractice.charAt(0).toUpperCase()+c.sikhPractice.slice(1)}</b><small>Sikh practice</small></div>}
+            </div>
+
+            <div className="candidate-life-grid">
+              {(c.occupation||c.professionArea)&&<span><small>PROFESSION</small><b>{c.occupation||"Professional"}</b><em>{c.professionArea?c.professionArea.replaceAll("_"," "):""}</em></span>}
+              {c.educationLevel&&<span><small>EDUCATION</small><b>{c.educationLevel.replaceAll("_"," ")}</b><em>{c.educationField||c.educationInstitution||""}</em></span>}
+            </div>
+            <div className="candidate-community-pills">
+              {c.caste&&<span>{c.caste}</span>}
+              {c.careerPreferenceFit==="preferred"&&<span className="career-fit-pill">Preferred profession area</span>}
+              {c.careerPreferenceFit==="similar_outlook"&&<span className="career-fit-pill">Similar career outlook</span>}
+            </div>
+          </div>
           <div className="discovery-insights"><div><small>STRONG ALIGNMENTS</small><p>{c.strongestAlignments.length ? c.strongestAlignments.join(" · ") : "No dominant alignment"}</p></div><div><small>WORTH DISCUSSING</small><p>{c.conversationPoints.length ? c.conversationPoints.join(" · ") : "No major structured differences"}</p></div></div>
           <div className="why-atlas-card">
             <span className="why-atlas-icon">✦</span>

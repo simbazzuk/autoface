@@ -16,13 +16,21 @@ service cloud.firestore {
       allow create, update: if signedInAs(uid)
         && request.resource.data.uid == uid
         && request.resource.data.keys().hasOnly([
-          'uid','firstName','age','generalLocation','heightCm','occupation',
-          'education','relationshipIntent','aboutMe','visibility','showAge',
+          'uid','firstName','surname','preferredName','age','generalLocation','heightCm','occupation',
+          'professionArea','employmentType','careerImportance',
+          'education','educationLevel','educationField','educationInstitution',
+          'caste','sikhAppearance','sikhPractice','diet','hobbies',
+          'relationshipIntent','aboutMe','visibility','showAge',
           'showLocation','showOccupation','createdAt','updatedAt'
         ])
         && request.resource.data.firstName is string
         && request.resource.data.firstName.size() > 0
         && request.resource.data.firstName.size() <= 50
+        && request.resource.data.surname is string
+        && request.resource.data.surname.size() > 0
+        && request.resource.data.surname.size() <= 60
+        && request.resource.data.preferredName is string
+        && request.resource.data.preferredName.size() <= 50
         && request.resource.data.age is int
         && request.resource.data.age >= 18
         && request.resource.data.age <= 100
@@ -34,6 +42,21 @@ service cloud.firestore {
         && request.resource.data.occupation.size() <= 100
         && request.resource.data.education is string
         && request.resource.data.education.size() <= 120
+        && request.resource.data.professionArea in ['','healthcare','technology','finance','engineering','education','legal','business','public_sector','creative','skilled_trades','other']
+        && request.resource.data.employmentType in ['','employed','self_employed','business_owner','student','other']
+        && request.resource.data.careerImportance in ['','low','moderate','important','very_important']
+        && request.resource.data.educationLevel in ['school_college','undergraduate','postgraduate','doctorate','professional_qualification','other']
+        && request.resource.data.educationField is string
+        && request.resource.data.educationField.size() <= 120
+        && request.resource.data.educationInstitution is string
+        && request.resource.data.educationInstitution.size() <= 160
+        && request.resource.data.caste is string
+        && request.resource.data.caste.size() <= 80
+        && request.resource.data.sikhAppearance in ['prefer_not_to_say','turbaned','clean_shaven','not_applicable']
+        && request.resource.data.sikhPractice in ['prefer_not_to_say','amritdhari','practising','moderate','cultural_not_religious']
+        && request.resource.data.diet in ['prefer_not_to_say','vegetarian','non_vegetarian','vegan']
+        && request.resource.data.hobbies is list
+        && request.resource.data.hobbies.size() <= 20
         && request.resource.data.relationshipIntent in ['marriage','long_term_relationship','serious_relationship']
         && request.resource.data.aboutMe is string
         && request.resource.data.aboutMe.size() > 0

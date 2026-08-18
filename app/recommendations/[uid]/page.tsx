@@ -11,6 +11,15 @@ type RecommendationCandidate = {
   age: number | null;
   generalLocation: string | null;
   occupation: string | null;
+  heightCm: number | null;
+  professionArea: string | null;
+  careerImportance: string | null;
+  educationLevel: string | null;
+  educationField: string | null;
+  sikhAppearance: string | null;
+  sikhPractice: string | null;
+  diet: string | null;
+  hobbies: string[];
   relationshipIntent: RelationshipIntent;
   compatibilityScore: number;
   compatibilityLevel: string;
@@ -44,11 +53,24 @@ type Rec = {
     signalsAvailable: number;
     notice: string;
   };
+  profileIntelligence: {
+    headline: string;
+    indicators: Array<{key:string;label:string;score:number;status:"STRONG"|"GOOD"|"NEUTRAL"|"EXPLORE";explanation:string;evidence:string[]}>;
+    heightEvidence: string[];
+    strongestProfileSignals: string[];
+    thingsToExplore: string[];
+    notice: string;
+  };
   preferences: {
     minAge: number;
     maxAge: number;
     locationPreference: string;
     requireRelocationOpen: boolean;
+    professionPreferenceMode: string;
+    educationPreference: string;
+    heightPreferenceImportance: string;
+    introductionLocation: string;
+    sharedInterestPreference: string;
   };
 };
 
@@ -210,6 +232,48 @@ export default function RecommendationPage() {
                 <span><b>3</b><small>ATLAS</small><strong>Explain the fit</strong></span><i>→</i>
                 <span><b>4</b><small>YOU</small><strong>Decide</strong></span>
               </div>
+            </div>
+
+            <div className="card atlas-profile-intelligence">
+              <div className="profile-intelligence-heading">
+                <div>
+                  <span className="privacy-kicker">ATLAS PROFILE INTELLIGENCE</span>
+                  <h2>How your profiles align beyond the relationship score.</h2>
+                  <p>{data.profileIntelligence.headline}</p>
+                </div>
+                <span className="profile-context-pill">CONTEXT · NOT A SCORE</span>
+              </div>
+
+              <div className="profile-alignment-grid">
+                {data.profileIntelligence.indicators.map((item)=>(
+                  <div className={`profile-alignment-card ${item.status.toLowerCase()}`} key={item.key}>
+                    <div className="profile-alignment-top">
+                      <span className="profile-alignment-dots">{[1,2,3,4,5].map(n=><i key={n} className={n<=item.score?"filled":""}/>)}</span>
+                      <small>{item.status}</small>
+                    </div>
+                    <b>{item.label}</b>
+                    <p>{item.explanation}</p>
+                    {item.evidence.length>0&&<span className="profile-evidence">{item.evidence[0]}</span>}
+                  </div>
+                ))}
+              </div>
+
+              <div className="profile-intelligence-details">
+                <div>
+                  <small>PROFILE SIGNALS AT A GLANCE</small>
+                  <div className="profile-context-chips">
+                    {c.professionArea&&<span>{c.professionArea.replaceAll("_"," ")}</span>}
+                    {c.educationLevel&&<span>{c.educationLevel.replaceAll("_"," ")}</span>}
+                    {c.sikhPractice&&c.sikhPractice!=="prefer_not_to_say"&&<span>{c.sikhPractice.replaceAll("_"," ")}</span>}
+                    {c.diet&&c.diet!=="prefer_not_to_say"&&<span>{c.diet.replaceAll("_"," ")}</span>}
+                    {c.sikhAppearance&&c.sikhAppearance!=="prefer_not_to_say"&&c.sikhAppearance!=="not_applicable"&&<span>{c.sikhAppearance==="clean_shaven"?"clean shaven / non-turbaned":c.sikhAppearance}</span>}
+                    {c.hobbies?.slice(0,5).map(h=><span key={h}>{h.replaceAll("_"," ")}</span>)}
+                  </div>
+                </div>
+                {data.profileIntelligence.heightEvidence.length>0&&<div className="profile-height-context"><small>HEIGHT PREFERENCE</small><p>{data.profileIntelligence.heightEvidence[0]}</p></div>}
+              </div>
+
+              <p className="atlas-disclaimer profile-intelligence-notice">{data.profileIntelligence.notice} Caste is not used to create these indicators.</p>
             </div>
 
             <div className="card recommendation-breakdown-card">

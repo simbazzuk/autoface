@@ -213,7 +213,7 @@ Focuses on controlled-beta launch rather than adding matching features.
 
 A complete public landing-page repositioning focused on what makes AutoFace different.
 
-- New proposition: dating should be more than a first impression.
+- New proposition: introductions should be more than a first impression.
 - Hero centres an example Atlas introduction with visible compatibility and authenticity.
 - Reframes AutoFace around understanding, discovery and mutual introduction rather than a feature inventory.
 - Clearly separates Atlas compatibility from authenticity evidence.
@@ -294,7 +294,7 @@ Adds an optional Gemini-powered conversation-coaching layer after a mutual intro
 - Requires the existing Atlas AI configuration and both members' explicit `consentForAiDiscovery` opt-in.
 - The signed-in member provides an additional per-generation confirmation before Gemini is called.
 - Gemini returns structured, editable conversation starters grounded in the two opted-in relationship profiles and published deterministic compatibility dimensions.
-- Prompts prohibit sensitive-trait inference, private/contact-data requests, relationship-success predictions and prescriptive dating decisions.
+- Prompts prohibit sensitive-trait inference, private/contact-data requests, relationship-success predictions and prescriptive introductions decisions.
 - `Use this question` copies a starter into the message composer; it never sends automatically.
 - Generated starters are not persisted to Firestore.
 - Existing messaging, moderation, blocking, reporting, matching and deterministic compatibility logic is unchanged.
@@ -519,8 +519,8 @@ This patch removes Firebase Storage as a development-time dependency while prese
 
 ## v0.28.3 — Landing Message Patch
 
-- Sharpens the landing-page proposition around considered introductions rather than generic AI dating.
-- New hero: “Dating shouldn’t feel like searching. It should feel like being introduced.”
+- Sharpens the landing-page proposition around considered introductions rather than generic AI introductions.
+- New hero: “Introductions shouldn’t feel like searching. It should feel like being introduced.”
 - Positions Atlas as the reason behind recommendations: fewer people, with an explanation of why each may be worth getting to know.
 - Strengthens the proof strip with no endless swiping, explainable compatibility, mutual introductions and private-by-design messaging.
 - Refreshes the Why AutoFace, journey, principle and final beta CTA copy to reinforce the same proposition.
@@ -537,3 +537,59 @@ Atlas Daily Discovery now uses wider one/two-column recommendation cards with mo
 
 ## v0.29.2 — Discover CTA + Readability
 Discover now uses a prominent full-width `View full recommendation` Atlas CTA and larger supporting card text for improved readability. No logic changes.
+
+
+## v0.29.3 — Introduction Language Patch
+User-facing brand copy moves away from `dating` terminology and positions AutoFace around considered introductions, compatibility and mutual interest.
+
+
+## v0.30 — Sikh Community Direction
+AutoFace launches a Sikh-community-first proposition, adds a global Sikh community network map and an optional self-described caste/community profile field. Caste is not inferred or automatically weighted by Atlas.
+
+
+## v0.30.1 — Sikh Identity & Lifestyle Profile
+Adds optional Sikh appearance, practice and diet fields alongside caste/community. All are self-described and are not automatically weighted by Atlas.
+
+
+## v0.30.2 — Homepage Typography Consistency
+Standardises the major homepage statement sections so the Atlas Principle and Controlled Beta areas use the same heading scale, line-height, alignment and spacing.
+
+
+## v0.30.3 — Development Reset & Sikh Test Data
+Adds local-only Development Tools for resetting a test user's AutoFace journey without deleting Firebase Auth, plus seeding/removing eight synthetic Sikh test profiles for Discovery and compatibility testing.
+
+
+## v0.30.5 — Richer Profiles & Career Preferences
+Adds structured profession/education profile data, richer Discover cards, and soft career/education preferences. Career preferences do not exclude candidates or alter the official compatibility score in this release.
+
+
+## v0.30.6 — Engaging Discover Profile Traits
+Discover cards now use a colourful About Me highlight and an icon-based At a Glance row for education, profession, Sikh appearance, diet and Sikh practice. No ranking or data-model changes.
+
+
+## v0.30.7 — Lifestyle & Introduction Preferences
+Adds visual hobbies plus height, location and shared-interest introduction preferences. Soft preferences only in this release.
+
+
+## v0.30.7.1 — TypeScript Build Fix
+Fixes strict typing in the Discovery Preferences API introduced in v0.30.7.
+
+
+## v0.30.8 — Atlas Profile Intelligence
+Recommendation details now include deterministic profile-alignment context for lifestyle, career/education, Sikh lifestyle, shared interests and location. The official compatibility score remains unchanged, and caste is not used in these indicators.
+
+
+## v0.30.8.1 — Profile Permissions & Development Tools
+Updates Firestore profile field validation and makes Development Tools available to authenticated local-development accounts without requiring an @autoface.test email.
+
+
+## v0.30.8.2 — Firestore Profile Enum Fix
+Synchronises Firestore profile validation with the current Sikh practice and education UI values.
+
+
+## v0.30.8.3 — Profile Identity & Test Readiness
+Adds private surname + optional preferred name and a Development Tools Discovery-readiness panel for testing seeded profiles.
+
+
+## v0.30.8.4 — Neutral Homepage Demo Labels
+Public landing-page examples now use neutral `Profile A/B/C` labels rather than realistic personal names.

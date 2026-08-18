@@ -157,7 +157,7 @@ export default function Dashboard() {
       const credential = PhoneAuthProvider.credential(verificationId, code);
       await linkWithCredential(user, credential);
       await user.reload();
-      setMessage("Mobile number verified. Updating your authenticity score…");
+      setMessage("Mobile number verified. Upintroductions your authenticity score…");
       window.location.reload();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Unable to verify the code.");
