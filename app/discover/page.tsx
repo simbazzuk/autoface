@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { MemberJourney } from "@/components/MemberJourney";
+import { WhileYouWait } from "@/components/WhileYouWait";
 import { relationshipIntentLabels } from "@/lib/profile";
 import { BriefcaseBusiness, CircleUserRound, GraduationCap, HandHeart, Leaf, Sparkles } from "lucide-react";
 import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
@@ -165,7 +166,28 @@ export default function DiscoverPage() {
         {setup&&<div className="discover-readiness-list">{setup.steps.map(step=><a href={step.href} key={step.id} className={step.complete?"complete":""}><span>{step.complete?"✓":"○"}</span><b>{step.title}</b><small>{step.complete?"Complete":"Needs attention"}</small></a>)}</div>}
         <div className="hero-actions left-actions">{setup?.steps.find(step=>!step.complete)?<a className="btn btn-primary" href={setup.steps.find(step=>!step.complete)!.href}>Continue: {setup.steps.find(step=>!step.complete)!.title}</a>:<a className="btn btn-primary" href="/get-started">Open My Journey</a>}<a className="btn" href="/get-started">View setup</a></div>
       </div>
-      : data.candidates.length === 0 ? <div className="card discovery-empty"><span className="privacy-kicker">YOU’RE READY</span><h2>No new introductions yet</h2><p>Your profile is eligible for Discovery. AutoFace found no other eligible members that you have not already reviewed.</p><div className="discovery-empty-actions"><a className="btn btn-primary" href="/recommendations/history">View reviewed recommendations</a><a className="btn" href="/compatibility">Open Compatibility Lab</a>{(isTestProfile||developmentTools)&&<button className="btn demo-reset-button" disabled={resetBusy} onClick={()=>void resetDemoRecommendations()}>{resetBusy?"Resetting…":"Reset reviewed profiles"}</button>}</div>{(isTestProfile||developmentTools)&&<p className="demo-reset-note">Development testing: reset clears your non-mutual Interested, Saved and Not for me decisions so synthetic profiles can appear in Discovery again. Existing mutual introductions are preserved.</p>}</div>
+      : data.candidates.length === 0 ? <div className="discovery-waiting-experience">
+        <div className="card discovery-empty discovery-live-state">
+          <div className="discovery-live-orb"><span>✦</span></div>
+          <span className="privacy-kicker">YOUR PROFILE IS LIVE</span>
+          <h2>Atlas is looking for the right introductions.</h2>
+          <p>You&apos;re ready and visible. AutoFace doesn&apos;t show people simply to keep this page full — we&apos;ll surface an introduction when someone eligible fits the preferences and relationship signals that matter to you.</p>
+          <div className="discovery-live-checks">
+            <span><b>✓</b><small>Profile active</small></span>
+            <span><b>✓</b><small>Atlas ready</small></span>
+            <span><b>✓</b><small>Visible for introductions</small></span>
+          </div>
+          <div className="discovery-wait-actions">
+            <a className="btn btn-primary" href="/discovery-preferences">Review my preferences</a>
+            <a className="btn" href="/introductions">My introductions</a>
+            <a className="btn" href="/recommendations/history">Reviewed profiles</a>
+            {(isTestProfile||developmentTools)&&<button className="btn demo-reset-button" disabled={resetBusy} onClick={()=>void resetDemoRecommendations()}>{resetBusy?"Resetting…":"Reset reviewed profiles"}</button>}
+          </div>
+          <div className="discovery-no-filler"><Sparkles size={14}/><span><b>No filler profiles.</b> A quiet Discover page means Atlas has not found someone worth presenting right now — not that the app has stopped working.</span></div>
+          {(isTestProfile||developmentTools)&&<p className="demo-reset-note">Development testing: reset clears your non-mutual Interested, Saved and Not for me decisions so synthetic profiles can appear in Discovery again. Existing mutual introductions are preserved.</p>}
+        </div>
+        <WhileYouWait/>
+      </div>
       : <div>
         {Boolean(data.curation?.skippedStaleProfiles)&&isTestProfile&&<p className="notice stale-profile-notice">Development note: {data.curation?.skippedStaleProfiles} stale test profile record(s) were ignored because they are no longer eligible or no longer have an Authentication account.</p>}
         <div className="daily-discovery-intro">

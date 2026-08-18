@@ -641,3 +641,7 @@ Replaces large written Atlas questions with selectable tiles plus one optional c
 
 ## v0.34.2 — Discover Readiness Readability
 Improves readability of the Discover readiness checklist without changing eligibility or matching behaviour.
+
+
+## v0.34.3 — Engaging Empty Discovery
+Replaces the dead-end empty Discovery state with an active-profile message and a browser-only This or That activity while Atlas waits for a suitable introduction.
