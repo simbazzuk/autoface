@@ -665,3 +665,7 @@ Makes the homepage Profile-to-Introduction illustration larger, clearer and more
 
 ## v0.34.8 — Refined Community Map Background
 Replaces the bright map panel with a deeper navy/indigo treatment that better matches the AutoFace visual language.
+
+
+## v0.34.9 — Mobile Journey Fix
+Fixes the homepage Profile-to-Introduction illustration on mobile by using a full-width vertical journey with readable cards and downward connectors.
