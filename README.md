@@ -657,3 +657,11 @@ Adds richer AutoFace blue/purple visual treatment to registration while preservi
 
 ## v0.34.6 — Safety & Privacy Navigation Label
 Renames the main navigation item from Trust to Safety & Privacy while preserving the existing pages and routes.
+
+
+## v0.34.7 — Colourful Journey Readability
+Makes the homepage Profile-to-Introduction illustration larger, clearer and more colourful without changing product logic.
+
+
+## v0.34.8 — Refined Community Map Background
+Replaces the bright map panel with a deeper navy/indigo treatment that better matches the AutoFace visual language.

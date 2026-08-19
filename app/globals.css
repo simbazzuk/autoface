@@ -2485,3 +2485,170 @@ radial-gradient(circle at 20% 10%,rgba(124,92,255,.12),transparent 32%)}
   .launch-consent-vivid{grid-template-columns:28px 18px 1fr;padding:12px}
   .launch-next-card,.launch-trust-note-vivid{padding:19px}
 }
+
+
+/* AutoFace v0.34.7 — colourful, readable homepage journey */
+.autoface-how-flow{
+  background:
+    radial-gradient(circle at 10% 20%,rgba(44,137,255,.055),transparent 27%),
+    radial-gradient(circle at 88% 50%,rgba(255,78,147,.045),transparent 28%),
+    radial-gradient(circle at 50% 70%,rgba(126,91,255,.055),transparent 30%);
+}
+.autoface-flow-line{gap:14px}
+.autoface-flow-step{
+  min-height:224px;
+  padding:22px 20px;
+  border-width:1px;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.autoface-flow-step:hover{transform:translateY(-2px)}
+.autoface-flow-step:nth-of-type(1){
+  border-color:rgba(70,164,255,.22);
+  background:linear-gradient(145deg,rgba(34,122,220,.10),rgba(8,15,29,.91));
+  box-shadow:inset 0 0 35px rgba(43,137,255,.035);
+}
+.autoface-flow-step:nth-of-type(2){
+  border-color:rgba(145,105,255,.24);
+  background:linear-gradient(145deg,rgba(119,77,225,.11),rgba(9,14,29,.91));
+  box-shadow:inset 0 0 35px rgba(128,88,255,.04);
+}
+.autoface-flow-step:nth-of-type(3){
+  border-color:rgba(64,205,183,.22);
+  background:linear-gradient(145deg,rgba(42,177,157,.095),rgba(8,16,28,.91));
+  box-shadow:inset 0 0 35px rgba(46,194,171,.035);
+}
+.autoface-flow-step:nth-of-type(4){
+  border-color:rgba(255,99,157,.23);
+  background:linear-gradient(145deg,rgba(220,57,119,.10),rgba(10,14,28,.91));
+  box-shadow:inset 0 0 35px rgba(255,82,147,.035);
+}
+.flow-number{
+  min-width:32px;height:23px;padding:0 8px;
+  font-size:7.5px;
+  border-color:rgba(145,116,255,.30);
+  background:rgba(128,94,255,.11);
+  color:#b4a6ff;
+}
+.flow-icon{
+  width:52px;height:52px;
+  margin:17px 0 13px;
+  border-radius:15px;
+}
+.flow-profile{color:#6bc1ff;background:linear-gradient(135deg,rgba(48,156,255,.18),rgba(48,156,255,.06));border-color:rgba(75,172,255,.18);box-shadow:0 9px 30px rgba(38,128,220,.10)}
+.flow-atlas{color:#b495ff;background:linear-gradient(135deg,rgba(143,96,255,.20),rgba(111,79,229,.07));border-color:rgba(153,113,255,.20);box-shadow:0 9px 30px rgba(113,75,220,.10)}
+.flow-discover{color:#6ee3cd;background:linear-gradient(135deg,rgba(49,205,178,.18),rgba(41,175,155,.06));border-color:rgba(74,211,188,.18);box-shadow:0 9px 30px rgba(42,166,145,.09)}
+.flow-interest{color:#ff8caf;background:linear-gradient(135deg,rgba(255,82,145,.18),rgba(220,59,118,.06));border-color:rgba(255,104,158,.19);box-shadow:0 9px 30px rgba(218,55,115,.09)}
+.autoface-flow-step h3{font-size:20px;margin-bottom:4px;color:#f4f5f8}
+.autoface-flow-step b{font-size:10px;line-height:1.35;color:#d0d7e3}
+.autoface-flow-step p{margin-top:9px;font-size:10px;line-height:1.58;color:#93a1b5}
+.flow-connector{color:#7185a7}
+.flow-connector svg{opacity:.95;filter:drop-shadow(0 0 8px rgba(100,139,210,.18))}
+
+.autoface-mutual-stage{
+  margin-top:38px;
+  min-height:205px;
+  padding:28px 30px;
+  border-color:rgba(245,91,151,.28);
+  background:
+    radial-gradient(circle at 50% 48%,rgba(137,89,255,.19),transparent 29%),
+    radial-gradient(circle at 10% 50%,rgba(255,73,143,.07),transparent 25%),
+    radial-gradient(circle at 90% 50%,rgba(74,147,255,.07),transparent 25%),
+    linear-gradient(145deg,rgba(32,18,48,.56),rgba(8,15,30,.93));
+  box-shadow:inset 0 0 65px rgba(123,74,214,.035),0 20px 60px rgba(0,0,0,.10);
+}
+.mutual-side{
+  min-height:66px;
+  padding:14px 15px;
+  border-color:rgba(255,106,160,.18);
+  background:linear-gradient(135deg,rgba(255,83,146,.07),rgba(13,21,38,.75));
+}
+.mutual-side span{font-size:7.5px;color:#91a0b5}
+.mutual-side svg{width:20px;height:20px;color:#ff759f;filter:drop-shadow(0 0 8px rgba(255,86,145,.25))}
+.mutual-side b{font-size:10px;color:#eef1f6}
+.mutual-path i{height:2px;background:linear-gradient(90deg,rgba(255,91,150,.20),rgba(139,97,255,.95));box-shadow:0 0 9px rgba(132,94,255,.16)}
+.mutual-path-right i{background:linear-gradient(90deg,rgba(139,97,255,.95),rgba(255,91,150,.20))}
+.mutual-centre .flow-number{margin-bottom:4px}
+.mutual-centre .flow-icon{width:56px;height:56px;margin:10px auto 9px}
+.flow-mutual{
+  color:#ff9cbd;
+  background:linear-gradient(135deg,rgba(255,76,143,.25),rgba(127,85,255,.22));
+  border-color:rgba(255,118,171,.23);
+  box-shadow:0 0 38px rgba(143,86,255,.18);
+}
+.mutual-centre h3{font-size:22px;color:#fff}
+.mutual-centre p{max-width:300px;font-size:10px;line-height:1.55;color:#a0aec0}
+
+.autoface-introduction-finish{padding-top:34px}
+.finish-line{height:34px;width:2px;background:linear-gradient(#8c64ff,#ff6f9f);box-shadow:0 0 10px rgba(144,94,255,.22)}
+.autoface-introduction-finish article{
+  max-width:760px;
+  grid-template-columns:44px 58px 1fr;
+  gap:15px;
+  padding:22px 24px;
+  border-color:rgba(255,110,164,.30);
+  background:
+    radial-gradient(circle at 8% 50%,rgba(255,86,148,.11),transparent 23%),
+    linear-gradient(110deg,rgba(255,82,145,.10),rgba(126,83,255,.14),rgba(45,151,255,.09));
+  box-shadow:0 22px 65px rgba(38,26,96,.13),inset 0 0 35px rgba(114,83,255,.025);
+}
+.autoface-introduction-finish .flow-icon{width:54px;height:54px}
+.flow-message{color:#ffa1c1;background:linear-gradient(135deg,rgba(255,88,150,.20),rgba(124,89,255,.12));border-color:rgba(255,111,165,.22)}
+.autoface-introduction-finish h3{font-size:21px;margin-bottom:3px}
+.autoface-introduction-finish b{font-size:10.5px;color:#e1e5ed}
+.autoface-introduction-finish p{margin-top:6px;font-size:9.5px;line-height:1.55;color:#96a5b9}
+.autoface-flow-principle{
+  max-width:850px;
+  margin-top:25px;
+  padding:14px 18px;
+  border:1px solid rgba(78,207,174,.10);
+  border-radius:12px;
+  background:rgba(55,186,157,.025);
+  font-size:9.5px;
+  line-height:1.5;
+  color:#9cabbc;
+}
+.autoface-flow-principle svg{width:20px;height:20px;color:#68d7b6}
+.autoface-flow-principle b{color:#e0e5ec}
+
+@media(max-width:760px){
+  .autoface-flow-step{min-height:auto;padding:20px}
+  .autoface-flow-step h3{font-size:19px}
+  .autoface-flow-step b,.autoface-flow-step p{font-size:10px}
+  .autoface-mutual-stage{padding:22px 18px}
+  .mutual-side{max-width:260px}
+  .autoface-introduction-finish article{grid-template-columns:38px 52px 1fr;padding:18px}
+}
+
+
+/* AutoFace v0.34.8 — refined community map background */
+.sikh-world-card{
+  background:
+    radial-gradient(circle at 48% 30%,rgba(68,111,220,.18),transparent 34%),
+    radial-gradient(circle at 78% 68%,rgba(96,72,190,.08),transparent 32%),
+    linear-gradient(145deg,#09111f 0%,#102448 48%,#0a1324 100%) !important;
+  border-color:rgba(77,115,186,.24) !important;
+  box-shadow:
+    inset 0 0 65px rgba(48,87,162,.09),
+    0 24px 70px rgba(0,17,45,.14);
+}
+.sikh-map{
+  background:
+    radial-gradient(circle at 46% 34%,rgba(79,115,225,.10),transparent 24%) !important;
+}
+.sikh-map .map-land{
+  fill:rgba(55,83,135,.22) !important;
+  stroke:rgba(104,138,205,.30) !important;
+}
+.sikh-map .map-link{
+  stroke:rgba(122,113,219,.42) !important;
+}
+.sikh-map .map-point.uk .pulse{
+  stroke:rgba(132,103,255,.56) !important;
+  filter:drop-shadow(0 0 8px rgba(124,92,255,.30));
+}
+.sikh-world-footer{
+  color:#aebbd0;
+}
+.sikh-world-note{
+  color:#718198;
+}
