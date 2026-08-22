@@ -3594,3 +3594,175 @@ body{
   .discovery-section .discovery-toolbar,
   .discovery-section .daily-discovery-intro{padding:15px 16px}
 }
+
+/* v0.35.6.3 — Atlas Relationship Profile Colour & Readability
+   Bring the relationship-profile page into the same coloured-surface language as Profile, Discover and Introductions. */
+.relationship-section .relationship-form{
+  background:linear-gradient(155deg,rgba(16,25,48,.97),rgba(12,18,36,.98));
+  border-color:rgba(123,110,255,.26);
+  box-shadow:0 22px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+/* Compatibility questions — alternating coloured surfaces rather than one flat dark block. */
+.relationship-section .relationship-questions{
+  border-top:0;
+  gap:12px;
+}
+.relationship-section .relationship-question{
+  position:relative;
+  overflow:hidden;
+  padding:20px 18px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  box-shadow:0 12px 28px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.02);
+}
+.relationship-section .relationship-question:nth-child(4n+1){
+  background:linear-gradient(140deg,rgba(25,78,138,.42),rgba(20,38,82,.58) 55%,rgba(18,25,52,.94));
+  border-color:rgba(72,164,255,.32);
+}
+.relationship-section .relationship-question:nth-child(4n+2){
+  background:linear-gradient(140deg,rgba(73,48,139,.44),rgba(44,39,99,.52) 55%,rgba(24,25,58,.94));
+  border-color:rgba(139,109,255,.36);
+}
+.relationship-section .relationship-question:nth-child(4n+3){
+  background:linear-gradient(140deg,rgba(112,34,82,.40),rgba(70,32,84,.46) 55%,rgba(27,25,57,.94));
+  border-color:rgba(255,102,166,.32);
+}
+.relationship-section .relationship-question:nth-child(4n+4){
+  background:linear-gradient(140deg,rgba(21,93,105,.34),rgba(30,58,85,.48) 55%,rgba(18,27,52,.95));
+  border-color:rgba(65,205,218,.28);
+}
+.relationship-section .question-number{
+  background:rgba(7,13,29,.52);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  padding:8px 6px;
+  align-self:start;
+  text-align:center;
+}
+.relationship-section .question-body h3{font-size:17px;line-height:1.35}
+.relationship-section .question-body p{font-size:14px;line-height:1.6;color:#b7c4d6}
+.relationship-section .scale-meta{font-size:12px;color:#aebbd0}
+.relationship-section .scale-meta strong{font-size:13px;color:#f3f6ff}
+
+/* WHAT MATTERS TO YOU — deliberately larger and easier to scan. */
+.relationship-section .relationship-tiles-intro{
+  max-width:780px;
+  margin:10px 0 22px;
+  font-size:15px;
+  line-height:1.65;
+  color:#c0ccdc;
+}
+.relationship-section .relationship-tile-question{
+  margin:22px 0 26px;
+  padding:20px;
+  border-width:1px;
+  box-shadow:0 14px 34px rgba(0,0,0,.17),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.relationship-section .relationship-tile-question:nth-of-type(1){
+  background:linear-gradient(140deg,rgba(25,78,138,.42),rgba(20,38,82,.58) 55%,rgba(18,25,52,.94));
+  border-color:rgba(72,164,255,.34);
+}
+.relationship-section .relationship-tile-question:nth-of-type(2){
+  background:linear-gradient(140deg,rgba(73,48,139,.44),rgba(44,39,99,.52) 55%,rgba(24,25,58,.94));
+  border-color:rgba(139,109,255,.36);
+}
+.relationship-section .relationship-tile-question:nth-of-type(3){
+  background:linear-gradient(140deg,rgba(112,34,82,.40),rgba(70,32,84,.46) 55%,rgba(27,25,57,.94));
+  border-color:rgba(255,102,166,.32);
+}
+.relationship-section .relationship-tile-head label{
+  font-size:17px;
+  line-height:1.4;
+  font-weight:800;
+  color:#f7f8ff;
+}
+.relationship-section .relationship-tile-head small{
+  font-size:12px;
+  line-height:1.45;
+  color:#a9b8cb;
+}
+.relationship-section .relationship-tile-head>strong{
+  min-width:44px;
+  padding:7px 10px;
+  font-size:12px;
+  color:#d5ccff;
+  background:rgba(8,14,31,.52);
+  border-color:rgba(160,135,255,.28);
+}
+.relationship-section .relationship-choice-grid{gap:10px}
+.relationship-section .relationship-choice{
+  min-height:45px;
+  padding:11px 15px;
+  background:rgba(6,12,27,.68);
+  border-color:rgba(190,205,238,.16);
+  color:#d4deec;
+  font-size:14.5px;
+  line-height:1.3;
+}
+.relationship-section .relationship-choice>span{
+  width:22px;
+  height:22px;
+  font-size:11px;
+  background:rgba(255,255,255,.07);
+}
+.relationship-section .relationship-choice.selected{
+  border-color:rgba(132,111,255,.48);
+  background:linear-gradient(135deg,rgba(126,99,255,.22),rgba(67,161,255,.12));
+  color:#fff;
+}
+.relationship-section .field label,
+.relationship-section .relationship-context-field label{font-size:14px;line-height:1.45}
+.relationship-section .field small,
+.relationship-section .relationship-context-field small{font-size:11.5px;color:#9eacc0}
+.relationship-section .field input,
+.relationship-section .field select,
+.relationship-section .field textarea{
+  background:rgba(6,12,27,.72);
+  border-color:rgba(162,181,222,.22);
+  color:#f7f9ff;
+  font-size:15px;
+}
+.relationship-section .field input:focus,
+.relationship-section .field select:focus,
+.relationship-section .field textarea:focus{
+  border-color:#806dff;
+  box-shadow:0 0 0 3px rgba(124,92,255,.14);
+  outline:none;
+}
+
+/* Consent and side panels use the same coloured card family. */
+.relationship-section .consent-card{
+  background:linear-gradient(140deg,rgba(25,78,138,.26),rgba(44,39,99,.34),rgba(18,25,52,.86));
+  border-color:rgba(96,151,255,.25);
+}
+.relationship-section .consent-card b{font-size:14px}
+.relationship-section .consent-card small{font-size:12px;line-height:1.55}
+.relationship-side .atlas-card{
+  background:linear-gradient(145deg,rgba(26,76,136,.42),rgba(19,42,88,.55) 55%,rgba(17,24,50,.95));
+  border-color:rgba(73,163,255,.32);
+}
+.relationship-side .atlas-ai-card{
+  background:linear-gradient(145deg,rgba(81,46,145,.42),rgba(47,39,101,.54) 55%,rgba(23,25,57,.95));
+  border-color:rgba(151,113,255,.34);
+}
+.relationship-side .completeness-card{
+  background:linear-gradient(145deg,rgba(21,93,105,.32),rgba(30,58,85,.46) 55%,rgba(18,27,52,.95));
+  border-color:rgba(65,205,218,.28);
+}
+.relationship-side .minimisation-card{
+  background:linear-gradient(145deg,rgba(112,34,82,.34),rgba(70,35,86,.44) 55%,rgba(25,25,57,.95));
+  border-color:rgba(255,103,166,.28);
+}
+.relationship-side .card p{font-size:14px;line-height:1.6}
+.relationship-side .card h3{font-size:18px;line-height:1.4}
+
+@media(max-width:760px){
+  .relationship-section .relationship-question{padding:17px 15px}
+  .relationship-section .question-body h3{font-size:16px}
+  .relationship-section .question-body p{font-size:13.5px}
+  .relationship-section .relationship-tiles-intro{font-size:14.5px}
+  .relationship-section .relationship-tile-question{padding:16px}
+  .relationship-section .relationship-tile-head label{font-size:16px}
+  .relationship-section .relationship-choice{font-size:14px;padding:10px 12px}
+}
