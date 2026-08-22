@@ -14,9 +14,9 @@ export default function Home() {
       <div className="experience-glow experience-glow-two" />
       <div className="container experience-hero-grid">
         <div className="experience-hero-copy">
-          <span className="experience-kicker"><Sparkles size={14}/> A modern introduction community for Sikhs</span>
+          <span className="experience-kicker"><Sparkles size={14}/> Where technology meets matrimony</span>
           <h1>A modern way for Sikhs to meet.<br/><em>Beyond traditional introductions.</em></h1>
-          <p>AutoFace uses compatibility, shared values and Atlas AI to help Sikhs discover people worth being introduced to — with fewer profiles, clearer reasons and mutual choice.</p>
+          <p>AutoFace brings modern technology to matrimony — using compatibility, shared values, Atlas AI and authenticity signals to help Sikhs discover people worth being introduced to, with fewer profiles, clearer reasons and mutual choice.</p>
           <div className="experience-actions">
             <Link className="experience-primary" href="/register">Join the beta <ArrowRight size={17}/></Link>
             <Link className="experience-secondary" href="/how-it-works">See how Atlas works</Link>

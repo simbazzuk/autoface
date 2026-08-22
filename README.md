@@ -669,3 +669,11 @@ Replaces the bright map panel with a deeper navy/indigo treatment that better ma
 
 ## v0.34.9 — Mobile Journey Fix
 Fixes the homepage Profile-to-Introduction illustration on mobile by using a full-width vertical journey with readable cards and downward connectors.
+
+## v0.34.10 — Technology Meets Matrimony Positioning
+
+- Adds the homepage brand line **“Where technology meets matrimony”** above the main hero message.
+- Strengthens the hero copy to explain AutoFace as a technology-led matrimonial experience using compatibility, Atlas AI and authenticity signals.
+- Keeps the existing Sikh-community positioning and considered-introduction model unchanged.
+- No authentication, discovery, Firebase or recommendation logic has been changed.
+
