@@ -2905,3 +2905,692 @@ radial-gradient(circle at 20% 10%,rgba(124,92,255,.12),transparent 32%)}
 .face-retry-btn{border-color:rgba(251,113,133,.55);color:#fecdd3}
 .face-retry-btn:hover{background:rgba(244,63,94,.09)}
 @media(max-width:700px){.face-failure-hero{padding:18px;gap:12px}.face-failure-icon{flex-basis:42px;width:42px;height:42px}.face-failure-metrics{grid-template-columns:1fr}.face-failure-tips{display:grid;gap:7px}}
+
+/* v0.35.5 — Colour & Visual Depth
+   Keep AutoFace dark and premium, but give every page a more colourful atmosphere. */
+:root{
+  --bg:#07101d;
+  --panel:#0d1729;
+  --panel-2:#121f35;
+  --page-blue:rgba(38,132,255,.16);
+  --page-violet:rgba(129,76,255,.15);
+  --page-pink:rgba(244,63,143,.09);
+  --page-cyan:rgba(34,211,238,.07);
+}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(900px 620px at -8% -4%,rgba(54,138,255,.23),transparent 62%),
+    radial-gradient(820px 560px at 106% 8%,rgba(148,75,255,.19),transparent 62%),
+    radial-gradient(760px 520px at 74% 72%,rgba(236,72,153,.09),transparent 65%),
+    radial-gradient(680px 480px at 12% 88%,rgba(34,211,238,.075),transparent 64%),
+    linear-gradient(155deg,#07101d 0%,#090d1b 42%,#0a1020 72%,#07101d 100%);
+  background-attachment:fixed;
+}
+
+/* A soft coloured atmosphere behind content without making cards bright. */
+body::before{
+  content:"";
+  position:fixed;
+  inset:72px 0 0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 24% 18%,rgba(59,130,246,.085),transparent 28%),
+    radial-gradient(circle at 80% 34%,rgba(168,85,247,.07),transparent 27%),
+    radial-gradient(circle at 48% 82%,rgba(236,72,153,.045),transparent 30%);
+}
+
+.nav{
+  background:linear-gradient(90deg,rgba(7,16,29,.88),rgba(15,12,35,.88),rgba(7,18,32,.88));
+  border-bottom-color:rgba(116,143,255,.14);
+  box-shadow:0 10px 40px rgba(2,6,23,.16);
+}
+
+/* General cards gain subtle blue/violet depth rather than flat black. */
+.card,
+.form,
+.step,
+.otp-panel{
+  border-color:rgba(144,164,220,.12);
+  box-shadow:0 18px 45px rgba(1,7,20,.15),0 1px 0 rgba(121,147,255,.035) inset;
+}
+.card{
+  background:
+    linear-gradient(145deg,rgba(19,31,53,.82),rgba(11,18,34,.88)),
+    linear-gradient(135deg,rgba(92,119,255,.04),rgba(187,79,255,.025));
+}
+.form{
+  background:linear-gradient(150deg,rgba(16,29,50,.94),rgba(10,18,34,.96));
+}
+
+/* Alternate page sections pick up very restrained colour washes. */
+.section:nth-of-type(3n+1),
+.dashboard-section:nth-of-type(3n+1){
+  background:linear-gradient(180deg,transparent,rgba(45,122,255,.025),transparent);
+}
+.section:nth-of-type(3n+2),
+.dashboard-section:nth-of-type(3n+2){
+  background:linear-gradient(180deg,transparent,rgba(139,76,255,.025),transparent);
+}
+.section:nth-of-type(3n),
+.dashboard-section:nth-of-type(3n){
+  background:linear-gradient(180deg,transparent,rgba(225,70,145,.018),transparent);
+}
+
+.page-hero{
+  position:relative;
+}
+.page-hero::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:-100px;
+  width:min(880px,92vw);
+  height:360px;
+  transform:translateX(-50%);
+  pointer-events:none;
+  z-index:-1;
+  background:radial-gradient(ellipse,rgba(88,96,255,.10),rgba(55,160,255,.04) 46%,transparent 72%);
+  filter:blur(8px);
+}
+
+/* Make common informational surfaces feel intentionally colour-coded. */
+.notice{
+  background:linear-gradient(135deg,rgba(52,211,153,.10),rgba(34,211,238,.055));
+  border-color:rgba(79,220,182,.28);
+}
+.next-step{
+  background:linear-gradient(135deg,rgba(48,155,255,.08),rgba(126,91,255,.045));
+}
+.status-pill{
+  background:linear-gradient(135deg,rgba(124,92,255,.13),rgba(58,167,255,.08));
+}
+
+/* Homepage sections previously using flat #070b14 now retain colour continuity. */
+.experience-statement{
+  background:
+    radial-gradient(circle at 18% 30%,rgba(65,132,255,.075),transparent 35%),
+    radial-gradient(circle at 82% 70%,rgba(156,83,255,.065),transparent 34%),
+    linear-gradient(180deg,rgba(7,11,20,.35),rgba(8,15,28,.72));
+}
+.experience-dual{
+  background:
+    radial-gradient(circle at 84% 42%,rgba(128,79,255,.085),transparent 34%),
+    radial-gradient(circle at 18% 64%,rgba(38,167,220,.05),transparent 32%),
+    linear-gradient(180deg,rgba(7,13,24,.68),rgba(9,13,25,.74));
+}
+.experience-principle{
+  background:
+    radial-gradient(circle at 50% 20%,rgba(236,72,153,.055),transparent 38%),
+    linear-gradient(180deg,rgba(9,13,25,.74),rgba(7,16,29,.52));
+}
+.sikh-world-section{
+  background:
+    radial-gradient(circle at 48% 30%,rgba(42,145,255,.055),transparent 40%),
+    radial-gradient(circle at 76% 70%,rgba(147,82,255,.045),transparent 35%);
+}
+.autoface-how-flow{
+  background:
+    radial-gradient(circle at 15% 25%,rgba(53,164,255,.055),transparent 30%),
+    radial-gradient(circle at 86% 58%,rgba(255,93,156,.04),transparent 32%),
+    linear-gradient(180deg,transparent,rgba(75,62,155,.035),transparent);
+}
+
+/* Small visual accents help long product pages feel less monochrome. */
+.card:nth-child(4n+1){border-top-color:rgba(82,160,255,.26)}
+.card:nth-child(4n+2){border-top-color:rgba(150,104,255,.25)}
+.card:nth-child(4n+3){border-top-color:rgba(68,205,184,.22)}
+.card:nth-child(4n){border-top-color:rgba(255,105,158,.20)}
+
+.footer{
+  background:linear-gradient(180deg,rgba(7,11,20,0),rgba(5,12,24,.72));
+  border-top-color:rgba(116,143,255,.11);
+}
+
+@media(max-width:800px){
+  body{
+    background:
+      radial-gradient(560px 440px at -18% 0%,rgba(54,138,255,.19),transparent 62%),
+      radial-gradient(520px 420px at 112% 14%,rgba(148,75,255,.16),transparent 62%),
+      radial-gradient(460px 380px at 50% 82%,rgba(236,72,153,.055),transparent 65%),
+      linear-gradient(160deg,#07101d,#090d1b 55%,#07101d);
+    background-attachment:scroll;
+  }
+  .page-hero::after{height:280px;top:-70px}
+  .card{box-shadow:0 12px 30px rgba(1,7,20,.13)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body{background-attachment:scroll}
+}
+
+/* v0.35.5.1 — Stronger Colour Canvas
+   Explicitly targets page sections that previously painted over the global body background. */
+.experience-home{
+  background:
+    radial-gradient(900px 640px at 4% 8%,rgba(39,132,255,.18),transparent 60%),
+    radial-gradient(900px 620px at 96% 12%,rgba(137,76,255,.20),transparent 62%),
+    linear-gradient(155deg,#071221 0%,#0b1026 48%,#07101d 100%);
+}
+.experience-hero{
+  background:
+    radial-gradient(720px 560px at 8% 35%,rgba(47,143,255,.22),transparent 62%),
+    radial-gradient(720px 520px at 91% 39%,rgba(145,76,255,.24),transparent 62%),
+    radial-gradient(520px 400px at 55% 92%,rgba(236,72,153,.10),transparent 66%),
+    linear-gradient(150deg,#07111f 0%,#10102a 52%,#07111f 100%) !important;
+}
+.experience-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(115deg,rgba(56,189,248,.035),transparent 35%,rgba(192,132,252,.045) 72%,transparent);
+}
+.experience-statement{
+  background:
+    radial-gradient(650px 420px at 20% 35%,rgba(59,130,246,.13),transparent 62%),
+    radial-gradient(640px 420px at 82% 55%,rgba(168,85,247,.12),transparent 62%),
+    linear-gradient(180deg,#081323,#0b1022) !important;
+}
+.experience-journey{
+  background:
+    radial-gradient(620px 440px at 82% 18%,rgba(34,211,238,.08),transparent 64%),
+    radial-gradient(650px 440px at 12% 75%,rgba(124,92,255,.12),transparent 64%),
+    linear-gradient(180deg,#091326,#08101f) !important;
+}
+.experience-dual{
+  background:
+    radial-gradient(700px 480px at 80% 45%,rgba(168,85,247,.15),transparent 64%),
+    radial-gradient(620px 460px at 15% 62%,rgba(37,150,255,.10),transparent 64%),
+    linear-gradient(180deg,#08101f,#0b1125) !important;
+}
+.experience-principle,
+.experience-final{
+  background:
+    radial-gradient(620px 430px at 50% 25%,rgba(236,72,153,.09),transparent 64%),
+    radial-gradient(650px 460px at 82% 80%,rgba(94,92,255,.10),transparent 64%),
+    linear-gradient(180deg,#0a1022,#07101d) !important;
+}
+.sikh-world-section{
+  background:
+    radial-gradient(760px 500px at 18% 30%,rgba(38,143,255,.13),transparent 62%),
+    radial-gradient(720px 480px at 82% 60%,rgba(137,82,255,.13),transparent 62%),
+    linear-gradient(180deg,#081423,#0b1024) !important;
+}
+.autoface-how-flow{
+  background:
+    radial-gradient(720px 500px at 8% 30%,rgba(34,211,238,.09),transparent 62%),
+    radial-gradient(740px 500px at 90% 58%,rgba(244,63,143,.09),transparent 62%),
+    linear-gradient(180deg,#091225,#08101e) !important;
+}
+.page-shell,
+.dashboard-page{
+  background-image:
+    radial-gradient(720px 520px at 5% 8%,rgba(40,133,255,.10),transparent 62%),
+    radial-gradient(700px 500px at 96% 18%,rgba(151,78,255,.10),transparent 62%);
+}
+@media(max-width:800px){
+  .experience-hero{
+    background:
+      radial-gradient(520px 430px at -8% 20%,rgba(47,143,255,.20),transparent 62%),
+      radial-gradient(520px 430px at 108% 38%,rgba(145,76,255,.20),transparent 62%),
+      linear-gradient(160deg,#07111f,#0e1028 55%,#07111f) !important;
+  }
+}
+
+/* v0.35.5.2 — Visible Colour System
+   Strong, intentionally visible colour across every AutoFace page. */
+body{
+  background:
+    radial-gradient(1000px 760px at -5% 5%,rgba(22,132,255,.30),transparent 58%),
+    radial-gradient(980px 720px at 105% 8%,rgba(139,68,255,.30),transparent 58%),
+    radial-gradient(900px 700px at 50% 100%,rgba(236,72,153,.15),transparent 62%),
+    linear-gradient(145deg,#061525 0%,#0c1230 46%,#160d31 72%,#071421 100%);
+  background-attachment:fixed;
+}
+
+/* Every standard inner page gets a visible coloured header canvas. */
+.page-hero,
+.compact-hero{
+  position:relative;
+  isolation:isolate;
+  background:
+    radial-gradient(700px 360px at 8% 25%,rgba(24,145,255,.28),transparent 62%),
+    radial-gradient(720px 380px at 92% 30%,rgba(153,74,255,.27),transparent 62%),
+    linear-gradient(115deg,rgba(9,34,59,.74),rgba(25,18,61,.70));
+  border-bottom:1px solid rgba(132,116,255,.14);
+}
+.page-hero::after{
+  z-index:-1;
+  opacity:.9;
+}
+
+/* Product/content sections: alternate obvious blue, violet and rose atmosphere. */
+.section,
+.dashboard-section,
+.discovery-section,
+.message-section{
+  position:relative;
+  isolation:isolate;
+}
+.section:nth-of-type(3n+1),
+.dashboard-section:nth-of-type(3n+1){
+  background:
+    radial-gradient(760px 520px at 0% 35%,rgba(20,133,255,.18),transparent 62%),
+    linear-gradient(90deg,rgba(7,27,48,.48),rgba(8,15,31,.18));
+}
+.section:nth-of-type(3n+2),
+.dashboard-section:nth-of-type(3n+2){
+  background:
+    radial-gradient(760px 520px at 100% 35%,rgba(145,68,255,.19),transparent 62%),
+    linear-gradient(270deg,rgba(30,17,64,.48),rgba(8,15,31,.18));
+}
+.section:nth-of-type(3n),
+.dashboard-section:nth-of-type(3n){
+  background:
+    radial-gradient(760px 520px at 12% 55%,rgba(236,72,153,.12),transparent 62%),
+    radial-gradient(700px 480px at 92% 35%,rgba(37,180,220,.10),transparent 62%);
+}
+
+/* Sections with dedicated class names that aren't always .section. */
+.discovery-section,
+.message-section{
+  background:
+    radial-gradient(820px 560px at 4% 10%,rgba(23,139,255,.17),transparent 62%),
+    radial-gradient(780px 540px at 98% 30%,rgba(145,69,255,.17),transparent 62%);
+}
+
+/* Cards remain dark, but now sit visibly above the colourful canvas. */
+.card,
+.form,
+.step,
+.discovery-card,
+.chat-card{
+  background:linear-gradient(150deg,rgba(14,25,45,.94),rgba(12,16,34,.95));
+  border-color:rgba(139,159,224,.17);
+  box-shadow:0 20px 55px rgba(0,5,18,.28),0 1px 0 rgba(139,159,255,.05) inset;
+}
+
+/* Landing page: substantially more visible than v0.35.5.1. */
+.experience-hero{
+  background:
+    radial-gradient(900px 700px at -5% 35%,rgba(20,140,255,.34),transparent 61%),
+    radial-gradient(900px 700px at 105% 35%,rgba(145,65,255,.38),transparent 61%),
+    radial-gradient(700px 520px at 55% 100%,rgba(236,72,153,.18),transparent 66%),
+    linear-gradient(135deg,#07192c 0%,#111237 50%,#211043 76%,#081526 100%) !important;
+}
+.experience-statement{
+  background:linear-gradient(120deg,#08223a 0%,#101b3d 48%,#26133e 100%) !important;
+}
+.experience-journey{
+  background:linear-gradient(120deg,#0a1c35 0%,#15163b 52%,#112a3a 100%) !important;
+}
+.experience-dual{
+  background:linear-gradient(120deg,#0a2038 0%,#17163d 48%,#29133f 100%) !important;
+}
+.experience-principle,
+.experience-final{
+  background:linear-gradient(120deg,#101b35 0%,#25143c 52%,#0a2034 100%) !important;
+}
+.sikh-world-section{
+  background:linear-gradient(120deg,#08243b 0%,#131b3d 50%,#24163e 100%) !important;
+}
+.autoface-how-flow{
+  background:linear-gradient(120deg,#0a2138 0%,#17163a 50%,#28143d 100%) !important;
+}
+
+@media(max-width:800px){
+  body{background-attachment:scroll}
+  .page-hero,.compact-hero{
+    background:
+      radial-gradient(520px 360px at -10% 15%,rgba(24,145,255,.26),transparent 62%),
+      radial-gradient(520px 360px at 110% 25%,rgba(153,74,255,.25),transparent 62%),
+      linear-gradient(135deg,#081b30,#171039);
+  }
+}
+
+/* v0.35.6 — Card Readability & Typography
+   Improve scanability on Discover, Profile and My Introductions without changing layout or logic. */
+
+/* Discover cards */
+.discovery-card,
+.daily-discovery-card{
+  font-size:15px;
+}
+.discovery-card .candidate-identity h2,
+.daily-discovery-card .candidate-identity h2{
+  font-size:24px;
+  line-height:1.15;
+}
+.discovery-card .candidate-identity p,
+.daily-discovery-card .candidate-identity p{
+  font-size:15px;
+  line-height:1.5;
+  color:#aeb9ca;
+}
+.discovery-card .candidate-about,
+.daily-discovery-card .candidate-about{
+  font-size:15px!important;
+  line-height:1.65!important;
+}
+.discovery-card .candidate-badges span,
+.daily-discovery-card .candidate-badges span{
+  font-size:12px;
+  padding:7px 10px;
+}
+.discovery-card .trait-icon-card b,
+.daily-discovery-card .trait-icon-card b{
+  font-size:14px;
+  line-height:1.25;
+}
+.discovery-card .trait-icon-card small,
+.daily-discovery-card .trait-icon-card small{
+  font-size:12px;
+  line-height:1.35;
+}
+.discovery-card .discovery-insights small,
+.daily-discovery-card .discovery-insights small{
+  font-size:11px;
+}
+.discovery-card .discovery-insights p,
+.daily-discovery-card .discovery-insights p{
+  font-size:14px!important;
+  line-height:1.55!important;
+}
+.discovery-card .why-atlas-card small,
+.daily-discovery-card .why-atlas-card small{
+  font-size:10px;
+}
+.discovery-card .why-atlas-card p,
+.daily-discovery-card .why-atlas-card p{
+  font-size:13px!important;
+  line-height:1.55!important;
+}
+.daily-rank span{font-size:10px}.daily-rank b{font-size:11px}
+.daily-discovery-intro p{font-size:14px;line-height:1.6}
+.daily-count span{font-size:10px}
+.daily-discovery-footer span{font-size:14px}
+.daily-discovery-footer p{font-size:13px;line-height:1.5}
+
+/* Profile cards and panels */
+.profile-section .card p,
+.profile-side .card p,
+.profile-preview-card p,
+.profile-edit-panel p,
+.profile-form-refreshed p{
+  font-size:14px;
+  line-height:1.6;
+}
+.profile-section .card small,
+.profile-side .card small,
+.profile-preview-card small,
+.profile-edit-panel small{
+  font-size:11px;
+  line-height:1.45;
+}
+.profile-identity-copy p{font-size:15px;line-height:1.5}
+.profile-identity-badges span{font-size:11px;padding:7px 10px}
+.profile-identity-score span{font-size:10px}
+.profile-form-heading p{font-size:14px;line-height:1.55}
+.profile-edit-panel-title small{font-size:10px}
+.profile-edit-panel-title h3{font-size:20px}
+.photo-manager-copy p{font-size:14px;line-height:1.6}
+.photo-safety-note b{font-size:12px}
+.photo-safety-note span,
+.photo-rules{font-size:11px;line-height:1.55}
+.profile-section label{font-size:13px}
+.profile-section input,
+.profile-section select,
+.profile-section textarea{font-size:15px}
+
+/* My Introductions cards */
+.intro-journey-card{
+  font-size:14px;
+}
+.introduction-identity h2,
+.intro-journey-card .candidate-identity h2{
+  font-size:22px;
+  line-height:1.2;
+}
+.introduction-identity p,
+.intro-journey-card .candidate-identity p{
+  font-size:14px;
+  line-height:1.5;
+  color:#a7b3c5;
+}
+.intro-card-status small{font-size:10px}
+.intro-card-status b{font-size:13px;line-height:1.35}
+.intro-mini-signals b{font-size:16px}
+.intro-mini-signals small{font-size:10px;line-height:1.35}
+.intro-progress small{font-size:9px;line-height:1.3}
+.intro-reassurance{font-size:12px;line-height:1.55}
+.intro-empty-state p{font-size:14px;line-height:1.6}
+.intro-principle small{font-size:9px}
+.intro-principle h3{font-size:17px}
+.intro-principle p{font-size:13px;line-height:1.55}
+.intro-summary-strip small{font-size:10px}
+.intro-tabs button{font-size:12px;padding:10px 14px}
+.intro-tabs button span{font-size:9px}
+
+/* Protect readability on small screens — do not shrink these cards back down. */
+@media(max-width:760px){
+  .discovery-card .candidate-identity h2,
+  .daily-discovery-card .candidate-identity h2{font-size:22px}
+  .discovery-card .candidate-about,
+  .daily-discovery-card .candidate-about{font-size:15px!important}
+  .profile-section .card p,
+  .profile-side .card p,
+  .profile-preview-card p,
+  .profile-edit-panel p{font-size:14px}
+  .intro-progress small{font-size:8.5px}
+  .intro-journey-card{padding:18px}
+}
+
+/* v0.35.6.1 — Profile Form Colour
+   Give editable profile sections distinct, readable colour surfaces while preserving the AutoFace dark theme. */
+.profile-page .profile-form,
+.profile-form-refreshed{
+  background:linear-gradient(155deg,rgba(16,25,48,.97),rgba(12,18,36,.98));
+  border-color:rgba(123,110,255,.24);
+  box-shadow:0 22px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.profile-form-refreshed .profile-edit-panel{
+  border-width:1px;
+  box-shadow:0 14px 34px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.profile-form-refreshed .profile-edit-panel-blue{
+  background:linear-gradient(140deg,rgba(25,78,138,.42),rgba(20,38,82,.58) 55%,rgba(18,25,52,.94));
+  border-color:rgba(72,164,255,.34);
+}
+.profile-form-refreshed .profile-edit-panel-sikh{
+  background:linear-gradient(140deg,rgba(126,72,22,.36),rgba(76,45,66,.42) 52%,rgba(29,27,58,.94));
+  border-color:rgba(255,154,76,.34);
+}
+.profile-form-refreshed .profile-edit-panel-pink{
+  background:linear-gradient(140deg,rgba(112,34,82,.40),rgba(70,32,84,.46) 55%,rgba(27,25,57,.94));
+  border-color:rgba(255,102,166,.34);
+}
+.profile-form-refreshed .profile-edit-panel-purple{
+  background:linear-gradient(140deg,rgba(73,48,139,.44),rgba(44,39,99,.52) 55%,rgba(24,25,58,.94));
+  border-color:rgba(139,109,255,.38);
+}
+.profile-form-refreshed .profile-edit-panel:before{height:3px;opacity:1}
+.profile-form-refreshed .profile-edit-panel-blue:before{background:linear-gradient(90deg,#3aa7ff,#63d4ff,transparent)}
+.profile-form-refreshed .profile-edit-panel-sikh:before{background:linear-gradient(90deg,#ff9948,#ff6fa7,#8b72ff,transparent)}
+.profile-form-refreshed .profile-edit-panel-pink:before{background:linear-gradient(90deg,#ff6b9f,#d974ff,transparent)}
+.profile-form-refreshed .profile-edit-panel-purple:before{background:linear-gradient(90deg,#8066ff,#b56cff,transparent)}
+.profile-form-refreshed .profile-edit-panel-title>span{
+  background:rgba(9,15,32,.58);
+  border-color:rgba(255,255,255,.13);
+  box-shadow:0 5px 14px rgba(0,0,0,.20);
+}
+.profile-form-refreshed .profile-edit-panel .field input,
+.profile-form-refreshed .profile-edit-panel .field select,
+.profile-form-refreshed .profile-edit-panel .field textarea{
+  background:rgba(6,12,27,.72);
+  border-color:rgba(162,181,222,.22);
+  color:#f7f9ff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+}
+.profile-form-refreshed .profile-edit-panel .field input:focus,
+.profile-form-refreshed .profile-edit-panel .field select:focus,
+.profile-form-refreshed .profile-edit-panel .field textarea:focus{
+  border-color:#6db6ff;
+  box-shadow:0 0 0 3px rgba(80,168,255,.14),inset 0 1px 0 rgba(255,255,255,.02);
+  outline:none;
+}
+.profile-form-refreshed .profile-edit-panel-pink .field input:focus,
+.profile-form-refreshed .profile-edit-panel-pink .field select:focus,
+.profile-form-refreshed .profile-edit-panel-pink .field textarea:focus{
+  border-color:#ff78ad;
+  box-shadow:0 0 0 3px rgba(255,105,157,.12);
+}
+.profile-form-refreshed .profile-edit-panel-purple .field input:focus,
+.profile-form-refreshed .profile-edit-panel-purple .field select:focus,
+.profile-form-refreshed .profile-edit-panel-purple .field textarea:focus{
+  border-color:#967cff;
+  box-shadow:0 0 0 3px rgba(124,92,255,.14);
+}
+.profile-form-refreshed .profile-edit-panel-sikh .field input:focus,
+.profile-form-refreshed .profile-edit-panel-sikh .field select:focus,
+.profile-form-refreshed .profile-edit-panel-sikh .field textarea:focus{
+  border-color:#ffae68;
+  box-shadow:0 0 0 3px rgba(255,148,78,.12);
+}
+.profile-form-refreshed .profile-hobbies,
+.profile-form-refreshed .sikh-profile-note{
+  background:rgba(7,13,29,.42);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+}
+@media(max-width:800px){
+  .profile-form-refreshed .profile-edit-panel{padding:17px}
+}
+
+/* v0.35.6.2 — Discover & Introductions Colour Cards
+   Extend the Profile page's coloured-surface language to recommendation and introduction cards. */
+
+/* Discover — coloured recommendation surfaces while preserving readability. */
+.discovery-section .discovery-toolbar,
+.discovery-section .daily-discovery-intro{
+  background:linear-gradient(145deg,rgba(27,64,116,.36),rgba(31,30,78,.38),rgba(15,22,44,.82));
+  border:1px solid rgba(86,157,255,.22);
+  border-radius:18px;
+  padding:18px 20px;
+  box-shadow:0 14px 34px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.discovery-grid .discovery-card{
+  position:relative;
+  overflow:hidden;
+  border-width:1px;
+  box-shadow:0 18px 42px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.discovery-grid .discovery-card::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;
+  height:3px;
+  pointer-events:none;
+}
+.discovery-grid .discovery-card:nth-child(4n+1){
+  background:linear-gradient(145deg,rgba(26,76,136,.44),rgba(19,42,88,.57) 55%,rgba(17,24,50,.95));
+  border-color:rgba(73,163,255,.34);
+}
+.discovery-grid .discovery-card:nth-child(4n+1)::before{background:linear-gradient(90deg,#3aa7ff,#68d6ff,transparent)}
+.discovery-grid .discovery-card:nth-child(4n+2){
+  background:linear-gradient(145deg,rgba(81,46,145,.44),rgba(47,39,101,.56) 55%,rgba(23,25,57,.95));
+  border-color:rgba(151,113,255,.36);
+}
+.discovery-grid .discovery-card:nth-child(4n+2)::before{background:linear-gradient(90deg,#8b72ff,#c36cff,transparent)}
+.discovery-grid .discovery-card:nth-child(4n+3){
+  background:linear-gradient(145deg,rgba(114,38,84,.38),rgba(70,35,86,.48) 55%,rgba(25,25,57,.95));
+  border-color:rgba(255,103,166,.32);
+}
+.discovery-grid .discovery-card:nth-child(4n+3)::before{background:linear-gradient(90deg,#ff6fa7,#d977ff,transparent)}
+.discovery-grid .discovery-card:nth-child(4n+4){
+  background:linear-gradient(145deg,rgba(21,93,105,.34),rgba(30,58,85,.48) 55%,rgba(18,27,52,.95));
+  border-color:rgba(65,205,218,.30);
+}
+.discovery-grid .discovery-card:nth-child(4n+4)::before{background:linear-gradient(90deg,#38d9d0,#55b7ff,transparent)}
+.discovery-card .trait-icon-card,
+.discovery-card .discovery-insights>div,
+.discovery-card .why-atlas-card,
+.discovery-card .ai-discovery-teaser{
+  background:rgba(6,12,27,.48);
+  border-color:rgba(191,205,238,.13);
+}
+.discovery-card .candidate-badges span{
+  background:rgba(7,13,29,.50);
+  border-color:rgba(255,255,255,.12);
+}
+.discovery-privacy{
+  background:linear-gradient(145deg,rgba(24,87,99,.32),rgba(29,45,78,.48),rgba(15,22,44,.92));
+  border-color:rgba(67,205,198,.28);
+}
+
+/* Introductions — use the same blue/purple/pink/cyan family as Profile and Discover. */
+.introductions-section .intro-journey-card{
+  position:relative;
+  overflow:hidden;
+  border-width:1px;
+  box-shadow:0 18px 42px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.introductions-section .intro-journey-card::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;
+  height:3px;
+  pointer-events:none;
+}
+.introductions-section .intro-journey-card:nth-child(4n+1){
+  background:linear-gradient(145deg,rgba(26,76,136,.44),rgba(19,42,88,.57) 55%,rgba(17,24,50,.95));
+  border-color:rgba(73,163,255,.34);
+}
+.introductions-section .intro-journey-card:nth-child(4n+1)::before{background:linear-gradient(90deg,#3aa7ff,#68d6ff,transparent)}
+.introductions-section .intro-journey-card:nth-child(4n+2){
+  background:linear-gradient(145deg,rgba(81,46,145,.44),rgba(47,39,101,.56) 55%,rgba(23,25,57,.95));
+  border-color:rgba(151,113,255,.36);
+}
+.introductions-section .intro-journey-card:nth-child(4n+2)::before{background:linear-gradient(90deg,#8b72ff,#c36cff,transparent)}
+.introductions-section .intro-journey-card:nth-child(4n+3){
+  background:linear-gradient(145deg,rgba(114,38,84,.38),rgba(70,35,86,.48) 55%,rgba(25,25,57,.95));
+  border-color:rgba(255,103,166,.32);
+}
+.introductions-section .intro-journey-card:nth-child(4n+3)::before{background:linear-gradient(90deg,#ff6fa7,#d977ff,transparent)}
+.introductions-section .intro-journey-card:nth-child(4n+4){
+  background:linear-gradient(145deg,rgba(21,93,105,.34),rgba(30,58,85,.48) 55%,rgba(18,27,52,.95));
+  border-color:rgba(65,205,218,.30);
+}
+.introductions-section .intro-journey-card:nth-child(4n+4)::before{background:linear-gradient(90deg,#38d9d0,#55b7ff,transparent)}
+.intro-card-status,
+.intro-mini-signals>div,
+.intro-progress,
+.intro-reassurance{
+  background:rgba(6,12,27,.48);
+  border-color:rgba(191,205,238,.13);
+}
+.intro-summary-strip{
+  background:linear-gradient(145deg,rgba(35,68,119,.32),rgba(60,39,105,.35),rgba(15,22,44,.78));
+  border-color:rgba(131,122,255,.22);
+}
+.intro-tabs{
+  background:rgba(8,14,30,.55);
+  border:1px solid rgba(145,157,214,.14);
+  border-radius:16px;
+  padding:6px;
+}
+.intro-principle{
+  background:linear-gradient(145deg,rgba(74,44,128,.36),rgba(72,34,83,.35),rgba(16,22,45,.90));
+  border-color:rgba(190,111,255,.28);
+}
+.intro-empty-state{
+  background:linear-gradient(145deg,rgba(24,72,122,.35),rgba(51,38,96,.38),rgba(16,22,45,.92));
+  border-color:rgba(100,151,255,.25);
+}
+
+@media(max-width:760px){
+  .discovery-section .discovery-toolbar,
+  .discovery-section .daily-discovery-intro{padding:15px 16px}
+}

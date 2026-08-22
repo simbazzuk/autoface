@@ -684,3 +684,11 @@ Fixes the homepage Profile-to-Introduction illustration on mobile by using a ful
 
 ## v0.35.4.1
 Improves failed face-verification messaging and readability with colour-coded liveness/match results and retry guidance.
+
+## v0.35.5
+
+Colour & Visual Depth refresh. AutoFace remains dark-first but now uses a richer blue/violet/pink/cyan ambient page background, subtle section colour washes, stronger card depth and a more colourful navigation/footer treatment across the application. This is a presentation-only release; application behaviour remains unchanged from v0.35.4.1.
+
+
+## v0.35.6 — Card Readability & Typography
+Larger, more readable card typography on Discover, Profile and My Introductions. Existing colour, verification and matching behaviour is unchanged.
