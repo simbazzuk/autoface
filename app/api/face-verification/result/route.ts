@@ -1,4 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { compareFaceImages, getFaceLivenessResult } from "@/lib/server/aws-rekognition";
@@ -39,6 +40,20 @@ export async function POST(request: Request) {
     }
 
     const profileBytes = await getProfilePhotoBytes(user.uid);
+    const currentPhotoSha256 = createHash("sha256").update(profileBytes).digest("hex");
+    const sessionPhotoSha256 = String(session.data()?.profilePhotoSha256 ?? "");
+    if (!sessionPhotoSha256 || currentPhotoSha256 !== sessionPhotoSha256) {
+      await sessionRef.set({
+        status: "profile_photo_changed",
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+      return NextResponse.json({
+        verified: false,
+        status: "PROFILE_PHOTO_CHANGED",
+        error: "PROFILE_PHOTO_CHANGED",
+      }, { status: 409 });
+    }
+
     const comparison = await compareFaceImages(profileBytes, referenceBytes);
     const similarity = Math.max(0, ...(comparison.FaceMatches ?? []).map((match) => Number(match.Similarity ?? 0)));
     const verified = similarity >= matchThreshold;
@@ -58,6 +73,12 @@ export async function POST(request: Request) {
         livenessVerified: true,
         faceVerificationProvider: "aws-rekognition",
         faceVerifiedAt: FieldValue.serverTimestamp(),
+        photoVerifiedAt: FieldValue.serverTimestamp(),
+        livenessVerifiedAt: FieldValue.serverTimestamp(),
+        verifiedPhotoSha256: currentPhotoSha256,
+        verifiedPhotoVersion: Number(session.data()?.profilePhotoVersion ?? 1),
+        faceVerificationInvalidatedAt: null,
+        faceVerificationInvalidationReason: null,
       }, { merge: true });
     }
 

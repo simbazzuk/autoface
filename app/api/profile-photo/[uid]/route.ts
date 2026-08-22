@@ -1,4 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { createHash } from "node:crypto";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
@@ -159,14 +160,20 @@ export async function POST(
     }
 
     const bytes = Buffer.from(await upload.arrayBuffer());
+    const photoSha256 = createHash("sha256").update(bytes).digest("hex");
     const detected = imageType(bytes);
     if (!detected) {
       return NextResponse.json({ error: "PHOTO_TYPE_NOT_ALLOWED", message: "Use a JPEG, PNG or WebP image." }, { status: 400 });
     }
 
     const previous = await adminDb.collection("profilePhotos").doc(uid).get();
-    const previousPath = String(previous.data()?.storagePath ?? "");
-    const previousProvider = String(previous.data()?.storageProvider ?? "firebase");
+    const previousData = previous.data() ?? {};
+    const previousPath = String(previousData.storagePath ?? "");
+    const previousProvider = String(previousData.storageProvider ?? "firebase");
+    const previousSha256 = String(previousData.sha256 ?? "");
+    const previousVersion = Number(previousData.photoVersion ?? (previous.exists ? 1 : 0));
+    const photoChanged = previous.exists && (!previousSha256 || previousSha256 !== photoSha256);
+    const photoVersion = previous.exists ? previousVersion + (photoChanged ? 1 : 0) : 1;
 
     // Clean up the previous object before switching provider/path.
     if (previousPath) {
@@ -187,19 +194,51 @@ export async function POST(
       storageProvider: stored.storageProvider,
       contentType: detected.contentType,
       sizeBytes: bytes.length,
+      sha256: photoSha256,
+      photoVersion,
       active: true,
       updatedAt: FieldValue.serverTimestamp(),
       createdAt: previous.exists ? previous.data()?.createdAt ?? FieldValue.serverTimestamp() : FieldValue.serverTimestamp(),
     }, { merge: true });
 
+    const identityRef = adminDb.collection("identity").doc(uid);
+    const identity = await identityRef.get();
+    const identityData = identity.data() ?? {};
+    const currentlyVerified = identityData.faceVerified === true || identityData.photoVerified === true;
+    const verifiedPhotoSha256 = String(identityData.verifiedPhotoSha256 ?? "");
+    const verificationReset = currentlyVerified && verifiedPhotoSha256 !== photoSha256;
+
+    if (verificationReset) {
+      await identityRef.set({
+        faceVerified: false,
+        photoVerified: false,
+        livenessVerified: false,
+        faceVerificationInvalidatedAt: FieldValue.serverTimestamp(),
+        faceVerificationInvalidationReason: "primary_photo_changed",
+      }, { merge: true });
+    }
+
     await adminDb.collection("securityEvents").add({
       uid,
       eventType: previous.exists ? "profile_photo_replaced" : "profile_photo_uploaded",
       riskLevel: "info",
+      photoVersion,
+      verificationReset,
       createdAt: FieldValue.serverTimestamp(),
     });
 
-    return NextResponse.json({ ok: true, active: true });
+    if (verificationReset) {
+      await adminDb.collection("securityEvents").add({
+        uid,
+        eventType: "face_verification_invalidated",
+        riskLevel: "info",
+        reason: "primary_photo_changed",
+        photoVersion,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
+
+    return NextResponse.json({ ok: true, active: true, photoVersion, verificationReset });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json({ error: message }, {
@@ -225,14 +264,29 @@ export async function DELETE(
     if (storagePath) await deletePhotoBytes(uid, storageProvider, storagePath);
     await ref.delete();
 
+    const identityRef = adminDb.collection("identity").doc(uid);
+    const identity = await identityRef.get();
+    const identityData = identity.data() ?? {};
+    const verificationReset = identityData.faceVerified === true || identityData.photoVerified === true;
+    if (verificationReset) {
+      await identityRef.set({
+        faceVerified: false,
+        photoVerified: false,
+        livenessVerified: false,
+        faceVerificationInvalidatedAt: FieldValue.serverTimestamp(),
+        faceVerificationInvalidationReason: "primary_photo_removed",
+      }, { merge: true });
+    }
+
     await adminDb.collection("securityEvents").add({
       uid,
       eventType: "profile_photo_removed",
       riskLevel: "info",
+      verificationReset,
       createdAt: FieldValue.serverTimestamp(),
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, verificationReset });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : 500 });

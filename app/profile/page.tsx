@@ -163,7 +163,9 @@ export default function ProfilePage() {
       const result=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(result.message??result.error??"Unable to upload profile photo.");
       setPhotoRefresh(v=>v+1);
-      setPhotoMessage("Profile photo updated.");
+      setPhotoMessage(result.verificationReset
+        ? "Profile photo updated. Your previous Face Verified status has been reset — please verify the new primary photo."
+        : "Profile photo updated.");
     } catch(error) {
       setPhotoMessage(error instanceof Error?error.message:"Unable to upload profile photo.");
     } finally { setPhotoBusy(false); }
@@ -180,7 +182,9 @@ export default function ProfilePage() {
       const result=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(result.error??"Unable to remove profile photo.");
       setPhotoRefresh(v=>v+1);
-      setPhotoMessage("Profile photo removed.");
+      setPhotoMessage(result.verificationReset
+        ? "Profile photo removed. Face Verified has been reset because the verified reference photo is no longer present."
+        : "Profile photo removed.");
     }catch(error){
       setPhotoMessage(error instanceof Error?error.message:"Unable to remove profile photo.");
     }finally{setPhotoBusy(false)}

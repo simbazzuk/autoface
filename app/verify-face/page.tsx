@@ -86,6 +86,7 @@ export default function VerifyFacePage() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState<Result | null>(null);
   const [cameraDiagnostic, setCameraDiagnostic] = useState<CameraDiagnostic>({ status: "idle" });
+  const [biometricConsent, setBiometricConsent] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
@@ -173,6 +174,10 @@ export default function VerifyFacePage() {
 
   async function startVerification() {
     if (!user || busy) return;
+    if (!biometricConsent) {
+      setMessage("Please confirm your biometric verification consent before continuing.");
+      return;
+    }
     try {
       setBusy(true);
       setMessage("");
@@ -189,7 +194,8 @@ export default function VerifyFacePage() {
       const token = await user.getIdToken();
       const response = await fetch("/api/face-verification/start", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ biometricConsent: true, consentVersion: "2026-08-v1" }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error ?? "Unable to start face verification.");
@@ -228,7 +234,10 @@ export default function VerifyFacePage() {
       setMessage("");
       setSessionId("");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to read verification result.");
+      const raw = error instanceof Error ? error.message : "Unable to read verification result.";
+      setMessage(raw === "PROFILE_PHOTO_CHANGED"
+        ? "Your primary profile photo changed during verification. Start a new face check so AutoFace can verify the current photo."
+        : raw);
     } finally {
       setBusy(false);
     }
@@ -257,11 +266,51 @@ export default function VerifyFacePage() {
 
           {!browserReady && <div className="notice verification-warning"><b>AWS browser setup required:</b> add <code>NEXT_PUBLIC_AWS_COGNITO_IDENTITY_POOL_ID</code>. This Identity Pool is only used to sign the Rekognition liveness stream; Firebase remains the AutoFace login system.</div>}
 
+          <div className="biometric-privacy-panel">
+            <div className="biometric-privacy-heading">
+              <span className="biometric-privacy-shield" aria-hidden="true">✓</span>
+              <div>
+                <span className="privacy-kicker">YOUR FACE DATA & PRIVACY</span>
+                <h3>How AutoFace uses your photo and live face check</h3>
+                <p>We are transparent about how your photo and face verification are used.</p>
+              </div>
+            </div>
+
+            <div className="biometric-privacy-grid">
+              <div className="biometric-info-row info-blue">
+                <span className="biometric-info-icon" aria-hidden="true">◉</span>
+                <div><strong>Profile photo</strong><p>Your profile photo is stored with your AutoFace profile and is used only as the reference photo for this one-to-one verification.</p></div>
+              </div>
+              <div className="biometric-info-row info-green">
+                <span className="biometric-info-icon" aria-hidden="true">✓</span>
+                <div><strong>Live face check</strong><p>Amazon Rekognition performs a short liveness check to confirm that a real person is present in front of the camera.</p></div>
+              </div>
+              <div className="biometric-info-row info-purple">
+                <span className="biometric-info-icon" aria-hidden="true">⌁</span>
+                <div><strong>Face match</strong><p>The resulting live reference image is compared one-to-one with your profile photo. AutoFace does not search your face against other members or create an AWS face collection for member identification.</p></div>
+              </div>
+              <div className="biometric-info-row info-orange">
+                <span className="biometric-info-icon" aria-hidden="true">▣</span>
+                <div><strong>What AutoFace records</strong><p>AutoFace records the verification outcome, provider, date and security event information needed to operate the trust feature. Face verification is separate from compatibility scoring.</p></div>
+              </div>
+              <div className="biometric-info-row info-teal">
+                <span className="biometric-info-icon" aria-hidden="true">i</span>
+                <div><strong>Your privacy rights</strong><p>Biometric verification involves processing facial biometric data. You can choose not to verify. Read the <Link href="/privacy#biometric-verification">Biometric Verification privacy information</Link> before continuing.</p></div>
+              </div>
+            </div>
+
+            <label className={`biometric-consent ${biometricConsent ? "consent-selected" : ""}`}>
+              <input type="checkbox" checked={biometricConsent} onChange={(event) => setBiometricConsent(event.target.checked)} />
+              <span className="biometric-consent-icon" aria-hidden="true">✓</span>
+              <span><strong>I explicitly consent to AutoFace processing my biometric data for face verification.</strong><small>I understand that I can choose not to verify my face and can withdraw consent for future biometric processing through AutoFace privacy controls.</small></span>
+            </label>
+          </div>
+
           <div className="camera-diagnostic-actions">
             <button className="btn" disabled={busy} onClick={runCameraDiagnostic}>
               {cameraDiagnostic.status === "checking" ? "Testing camera…" : "Test camera"}
             </button>
-            <button className="btn btn-primary" disabled={busy || !browserReady} onClick={startVerification}>{busy ? "Starting…" : "Verify my face"}</button>
+            <button className="btn btn-primary" disabled={busy || !browserReady || !biometricConsent} onClick={startVerification}>{busy ? "Starting…" : "Verify my face"}</button>
           </div>
 
           {cameraDiagnostic.status !== "idle" && <div className={`camera-diagnostic ${cameraDiagnostic.status}`}>
@@ -292,24 +341,56 @@ export default function VerifyFacePage() {
           </ThemeProvider>
         </div>}
 
-        {result && <div className={`face-result ${result.verified ? "success" : "failed"}`}>
-          <span className="face-result-icon">{result.verified ? "✓" : "!"}</span>
+        {result && result.verified && <div className="face-result success">
+          <span className="face-result-icon">✓</span>
           <div>
-            <h3>{result.verified ? "Face Verified" : "We couldn't verify this attempt"}</h3>
-            <p>{result.verified ? "Your live check passed and matched your AutoFace profile photo." : "No badge has been added. You can retry when you're ready."}</p>
+            <h3>Face Verified</h3>
+            <p>Your live check passed and matched your AutoFace profile photo.</p>
             {typeof result.livenessConfidence === "number" && <small>Liveness confidence: {result.livenessConfidence.toFixed(1)}%</small>}
             {typeof result.faceSimilarity === "number" && <small>Face similarity: {result.faceSimilarity.toFixed(1)}%</small>}
           </div>
         </div>}
 
+        {result && !result.verified && <div className="face-failure-wrap">
+          <div className="face-failure-hero">
+            <span className="face-failure-icon" aria-hidden="true">×</span>
+            <div>
+              <h3>We couldn't verify this attempt</h3>
+              <p>Your live check did not match your profile photo closely enough, so no Face Verified badge has been added.</p>
+              <strong>You can try again.</strong>
+              <span>Use a clear, front-facing profile photo and make sure your face is well lit and fully visible to the camera.</span>
+            </div>
+          </div>
+
+          <div className="face-failure-details">
+            <h4>What happened</h4>
+            <div className="face-failure-metrics">
+              {typeof result.livenessConfidence === "number" && <div className="face-metric metric-live">
+                <span className="metric-icon" aria-hidden="true">✓</span>
+                <div><small>Liveness confidence</small><strong>{result.livenessConfidence.toFixed(1)}%</strong><em>{result.livenessConfidence >= 90 ? "Passed" : "Needs another check"}</em><p>{result.livenessConfidence >= 90 ? "We detected a real person in front of the camera." : "The live-person check did not meet the verification threshold."}</p></div>
+              </div>}
+              {typeof result.faceSimilarity === "number" && <div className="face-metric metric-match">
+                <span className="metric-icon" aria-hidden="true">⌁</span>
+                <div><small>Face similarity</small><strong>{result.faceSimilarity.toFixed(1)}%</strong><em>{result.faceSimilarity >= 90 ? "Matched" : "Too low"}</em><p>{result.faceSimilarity >= 90 ? "The live reference image matched your profile photo." : "Your live face did not match the current profile photo closely enough."}</p></div>
+              </div>}
+            </div>
+            <div className="face-failure-tips">
+              <strong>Tips to improve your next attempt</strong>
+              <span>✓ Use a recent, clear, front-facing profile photo</span>
+              <span>✓ Face the camera directly in good lighting</span>
+              <span>✓ Remove sunglasses, hats or heavy filters</span>
+            </div>
+          </div>
+        </div>}
+
         {message && <p className="notice status-message">{message}</p>}
-        {result && <div className="face-result-actions"><Link className="btn btn-primary" href="/dashboard">Back to Authenticity Centre</Link>{!result.verified && <button className="btn" onClick={() => setResult(null)}>Try again</button>}</div>}
+        {result && <div className="face-result-actions"><Link className="btn btn-primary" href="/dashboard">Back to Authenticity Centre</Link>{!result.verified && <button className="btn face-retry-btn" onClick={() => setResult(null)}>↻ Try again</button>}</div>}
       </div>
 
       <aside className="card verification-sidecard">
         <span className="privacy-kicker">PRIVACY BY DESIGN</span>
         <h3>Verification, not a searchable face database.</h3>
-        <p>v0.35.2 uses Rekognition as a one-to-one verification step and validates the webcam against AWS Face Liveness resolution and frame-rate requirements before starting the session. AutoFace does not create an AWS face collection for member discovery or identification.</p>
+        <p>v0.35.3 uses Rekognition as a one-to-one verification step and validates the webcam against AWS Face Liveness resolution and frame-rate requirements before starting the session. AutoFace does not create an AWS face collection for member discovery or identification.</p>
         <div className="no-store-list">
           <span>✓ Firebase remains your account identity</span>
           <span>✓ Only the verification outcome is trusted by AutoFace</span>

@@ -1,3 +1,7 @@
+# AutoFace v0.35.4
+
+Verified Photo Integrity: Face Verified is now cryptographically bound to the exact primary profile photo used during AWS verification. Changing/removing that photo invalidates verification and requires a new live face check.
+
 # AutoFace v0.8 — Safe Messaging
 
 AutoFace v0.8 adds server-enforced messaging for mutual introductions only.
@@ -677,3 +681,6 @@ Fixes the homepage Profile-to-Introduction illustration on mobile by using a ful
 - Keeps the existing Sikh-community positioning and considered-introduction model unchanged.
 - No authentication, discovery, Firebase or recommendation logic has been changed.
 
+
+## v0.35.4.1
+Improves failed face-verification messaging and readability with colour-coded liveness/match results and retry guidance.
