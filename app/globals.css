@@ -3766,3 +3766,170 @@ body{
   .relationship-section .relationship-tile-head label{font-size:16px}
   .relationship-section .relationship-choice{font-size:14px;padding:10px 12px}
 }
+
+/* v0.35.7 — Homepage Product Story */
+.product-story-section{padding:112px 0;background:radial-gradient(900px 600px at 5% 20%,rgba(37,99,235,.15),transparent 65%),radial-gradient(900px 620px at 95% 68%,rgba(168,85,247,.15),transparent 65%),linear-gradient(180deg,#081322,#0a1022)}
+.product-story-intro{max-width:900px;margin:0 auto 72px;text-align:center}.product-story-intro h2{font-size:clamp(38px,5vw,66px);line-height:1.04;margin:16px 0 20px}.product-story-intro h2 em{font-style:normal;color:#a78bfa}.product-story-intro p{font-size:18px;line-height:1.7;color:#b9c5d8;max-width:760px;margin:auto}
+.product-story-row{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:72px;align-items:center;padding:78px 0;border-top:1px solid rgba(148,163,184,.14)}.product-story-row:nth-of-type(3){direction:rtl}.product-story-row:nth-of-type(3)>*{direction:ltr}.product-story-copy{max-width:510px}.story-number{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;background:rgba(99,102,241,.15);border:1px solid rgba(129,140,248,.35);font-weight:800;color:#c4b5fd;margin-right:12px}.story-kicker{font-size:12px;font-weight:800;letter-spacing:.16em;color:#8fb6ff}.product-story-copy h3{font-size:clamp(32px,4vw,52px);line-height:1.05;margin:20px 0 16px}.product-story-copy p{font-size:17px;line-height:1.72;color:#b9c5d8}.product-story-copy a{display:inline-flex;gap:8px;align-items:center;margin-top:18px;color:#c4b5fd;font-weight:750;text-decoration:none}
+.story-visual{position:relative;border:1px solid rgba(148,163,184,.2);border-radius:26px;padding:28px;background:linear-gradient(145deg,rgba(23,32,59,.94),rgba(12,18,38,.96));box-shadow:0 28px 80px rgba(0,0,0,.32),0 0 70px rgba(99,102,241,.08)}.story-understand .story-visual{border-color:rgba(59,130,246,.32)}.story-discover .story-visual{border-color:rgba(168,85,247,.34)}.story-trust .story-visual{border-color:rgba(34,211,238,.30)}.story-window-head{display:flex;justify-content:space-between;align-items:center;color:#9fb7db;font-size:12px;font-weight:800;letter-spacing:.13em;padding-bottom:20px;border-bottom:1px solid rgba(148,163,184,.15)}
+.story-profile-score{display:flex;align-items:end;justify-content:space-between;padding:25px 0}.story-profile-score strong{font-size:30px}.story-profile-score span{color:#a8b6ca}.story-signal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.story-signal-grid span{padding:17px;border-radius:15px;background:rgba(59,130,246,.08);border:1px solid rgba(96,165,250,.18)}.story-signal-grid b,.story-signal-grid i{display:block}.story-signal-grid i{font-style:normal;color:#91a5c1;font-size:13px;margin-top:4px}.story-insight{display:flex;gap:12px;margin-top:18px;padding:17px;border-radius:15px;background:rgba(139,92,246,.10);border:1px solid rgba(167,139,250,.2);color:#cbd5e1}.story-insight p{margin:0;font-size:14px;line-height:1.55}
+.discover-person{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:24px 0}.discover-avatar{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#7c3aed,#2563eb);font-size:22px;font-weight:800}.discover-person>div:nth-child(2) strong,.discover-person>div:nth-child(2) span{display:block}.discover-person>div:nth-child(2) strong{font-size:19px}.discover-person>div:nth-child(2) span{font-size:14px;color:#9aa9bd;margin-top:4px}.discover-score{text-align:right}.discover-score b,.discover-score small{display:block}.discover-score b{font-size:30px;color:#c4b5fd}.discover-score small{font-size:10px;letter-spacing:.13em;color:#91a5c1}.story-bars{display:grid;gap:13px}.story-bars span{display:grid;grid-template-columns:82px 1fr 45px;gap:12px;align-items:center;font-size:13px}.story-bars i{height:7px;border-radius:20px;background:#202a41;overflow:hidden}.story-bars em{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3b82f6,#a855f7)}.story-bars strong{text-align:right;color:#dbeafe}
+.trust-visual{text-align:center;padding:38px}.trust-shield{width:68px;height:68px;margin:0 auto 16px;display:grid;place-items:center;border-radius:22px;background:rgba(34,211,238,.10);border:1px solid rgba(34,211,238,.28);color:#67e8f9}.trust-title{display:flex;justify-content:center;align-items:center;gap:8px;color:#86efac;font-size:14px;font-weight:850;letter-spacing:.08em}.trust-checks{display:grid;gap:11px;margin:26px 0;text-align:left}.trust-checks span{display:flex;align-items:center;gap:12px;padding:15px 17px;border-radius:14px;background:rgba(16,185,129,.07);border:1px solid rgba(52,211,153,.18);color:#d7f8e9}.trust-checks svg{color:#6ee7b7}.trust-visual>p{font-size:13px;color:#91a5c1;margin:0}
+@media(max-width:800px){.product-story-section{padding:78px 0}.product-story-intro{margin-bottom:42px;text-align:left}.product-story-row,.product-story-row:nth-of-type(3){grid-template-columns:1fr;gap:30px;padding:52px 0;direction:ltr}.product-story-copy{max-width:none}.story-visual{padding:20px;border-radius:20px}.story-signal-grid{grid-template-columns:1fr}.story-bars span{grid-template-columns:70px 1fr 42px}}
+
+
+/* v0.35.7.2 — Discover Card Readability + Relationship Preference Colour */
+/* Discover card lower sections: larger type, better contrast and spacing. */
+.discovery-grid-wide .why-atlas-card,
+.discovery-grid-wide .ai-discovery-teaser,
+.discovery-grid-wide .recommendation-detail-button {
+  padding: 16px !important;
+}
+.discovery-grid-wide .why-atlas-card {
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  gap: 13px !important;
+}
+.discovery-grid-wide .why-atlas-icon {
+  width: 40px !important;
+  height: 40px !important;
+}
+.discovery-grid-wide .why-atlas-card small,
+.discovery-grid-wide .ai-discovery-teaser small,
+.discovery-grid-wide .recommendation-detail-copy small {
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  letter-spacing: .08em !important;
+}
+.discovery-grid-wide .why-atlas-card p {
+  margin-top: 6px !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  color: #c0ccdc !important;
+}
+.discovery-grid-wide .ai-discovery-teaser b {
+  font-size: 15px !important;
+  line-height: 1.4 !important;
+  color: #f5f7ff !important;
+}
+.discovery-grid-wide .ai-discovery-teaser em,
+.discovery-grid-wide .ai-discovery-teaser p {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: #aebbd0 !important;
+}
+.discovery-grid-wide .recommendation-detail-button {
+  min-height: 62px !important;
+  margin-top: 16px !important;
+}
+.discovery-grid-wide .recommendation-detail-copy b {
+  font-size: 15px !important;
+  line-height: 1.35 !important;
+}
+.discovery-grid-wide .thoughtful-actions {
+  gap: 10px !important;
+  margin-top: 16px !important;
+}
+.discovery-grid-wide .thoughtful-actions .btn {
+  min-height: 52px !important;
+  padding: 12px 14px !important;
+  font-size: 13px !important;
+  letter-spacing: .01em !important;
+  font-weight: 800 !important;
+}
+.discovery-grid-wide .decision-reassurance {
+  margin-top: 10px !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+  color: #9eacc0 !important;
+}
+
+/* Relationship Profile: explicit colour cards matching the profile-page visual system. */
+.relationship-section .relationship-tile-question {
+  position: relative;
+  overflow: hidden;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-radius: 18px !important;
+  padding: 22px !important;
+}
+.relationship-section .relationship-tile-question::after {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 180px;
+  right: -110px;
+  bottom: -105px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: .62;
+}
+.relationship-section .relationship-tile-weekend {
+  background: radial-gradient(520px 250px at 8% 0%, rgba(41,153,255,.28), transparent 70%), linear-gradient(140deg, rgba(10,67,130,.88), rgba(14,37,84,.92) 58%, rgba(13,24,57,.98)) !important;
+  border-color: rgba(55,165,255,.50) !important;
+  box-shadow: 0 18px 45px rgba(0,81,180,.18), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+.relationship-section .relationship-tile-weekend::after {
+  background: radial-gradient(ellipse, rgba(33,126,255,.30), transparent 70%);
+}
+.relationship-section .relationship-tile-priorities {
+  background: radial-gradient(520px 250px at 8% 0%, rgba(151,88,255,.30), transparent 70%), linear-gradient(140deg, rgba(66,42,145,.90), rgba(45,31,102,.94) 58%, rgba(24,24,65,.98)) !important;
+  border-color: rgba(159,106,255,.52) !important;
+  box-shadow: 0 18px 45px rgba(91,48,190,.20), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+.relationship-section .relationship-tile-priorities::after {
+  background: radial-gradient(ellipse, rgba(180,76,255,.28), transparent 70%);
+}
+.relationship-section .relationship-tile-nonnegotiables {
+  background: radial-gradient(520px 250px at 8% 0%, rgba(255,75,145,.27), transparent 70%), linear-gradient(140deg, rgba(122,34,83,.90), rgba(75,27,79,.94) 58%, rgba(33,22,60,.98)) !important;
+  border-color: rgba(255,88,153,.50) !important;
+  box-shadow: 0 18px 45px rgba(184,42,99,.18), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+.relationship-section .relationship-tile-nonnegotiables::after {
+  background: radial-gradient(ellipse, rgba(255,72,151,.27), transparent 70%);
+}
+.relationship-section .relationship-tile-head,
+.relationship-section .relationship-choice-grid {
+  position: relative;
+  z-index: 1;
+}
+.relationship-section .relationship-tile-head label {
+  font-size: 18px !important;
+}
+.relationship-section .relationship-tile-head small {
+  font-size: 13px !important;
+}
+.relationship-section .relationship-tile-head > strong {
+  font-size: 13px !important;
+  min-width: 48px !important;
+}
+.relationship-section .relationship-choice {
+  min-height: 47px !important;
+  font-size: 15px !important;
+  background: rgba(5,12,29,.68) !important;
+  border-color: rgba(194,210,240,.20) !important;
+}
+.relationship-section .relationship-tile-weekend .relationship-choice.selected {
+  background: linear-gradient(135deg, rgba(30,116,255,.78), rgba(96,77,230,.82)) !important;
+  border-color: rgba(88,186,255,.70) !important;
+  color: #fff !important;
+}
+.relationship-section .relationship-tile-priorities .relationship-choice.selected {
+  background: linear-gradient(135deg, rgba(108,77,232,.80), rgba(178,69,238,.82)) !important;
+  border-color: rgba(190,121,255,.72) !important;
+  color: #fff !important;
+}
+.relationship-section .relationship-tile-nonnegotiables .relationship-choice.selected {
+  background: linear-gradient(135deg, rgba(206,54,125,.82), rgba(255,91,129,.84)) !important;
+  border-color: rgba(255,126,166,.72) !important;
+  color: #fff !important;
+}
+
+@media (max-width: 620px) {
+  .discovery-grid-wide .why-atlas-card p { font-size: 13.5px !important; }
+  .discovery-grid-wide .ai-discovery-teaser b { font-size: 14px !important; }
+  .discovery-grid-wide .ai-discovery-teaser em { font-size: 12.5px !important; }
+  .discovery-grid-wide .thoughtful-actions .btn { font-size: 13px !important; }
+  .relationship-section .relationship-tile-question { padding: 17px !important; }
+  .relationship-section .relationship-tile-head label { font-size: 17px !important; }
+  .relationship-section .relationship-choice { font-size: 14.5px !important; }
+}

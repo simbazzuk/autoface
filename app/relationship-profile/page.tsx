@@ -263,17 +263,17 @@ export default function RelationshipProfilePage() {
 
             <div className="field"><label htmlFor="pace">Preferred relationship pace</label><select id="pace" value={form.relationshipPace} onChange={(e) => change("relationshipPace", e.target.value as RelationshipProfile["relationshipPace"])}><option value="slow">Slow and gradual</option><option value="balanced">Balanced</option><option value="intentional">Intentional and purposeful</option></select></div>
 
-            <div className="relationship-tile-question">
+            <div className="relationship-tile-question relationship-tile-weekend">
               <div className="relationship-tile-head"><div><label>What does a great weekend look like to you?</label><small>Choose up to 4</small></div><strong>{form.weekendPreferences.length}/4</strong></div>
               <div className="relationship-choice-grid">{weekendOptions.map(([value,label])=><button type="button" key={value} className={`relationship-choice ${form.weekendPreferences.includes(value)?"selected":""}`} onClick={()=>toggleSelection("weekendPreferences",value,4)}><span>{form.weekendPreferences.includes(value)?"✓":"+"}</span>{label}</button>)}</div>
             </div>
 
-            <div className="relationship-tile-question">
+            <div className="relationship-tile-question relationship-tile-priorities">
               <div className="relationship-tile-head"><div><label>What matters most in a long-term relationship?</label><small>Choose up to 5</small></div><strong>{form.relationshipPriorities.length}/5</strong></div>
               <div className="relationship-choice-grid">{priorityOptions.map(([value,label])=><button type="button" key={value} className={`relationship-choice ${form.relationshipPriorities.includes(value)?"selected":""}`} onClick={()=>toggleSelection("relationshipPriorities",value,5)}><span>{form.relationshipPriorities.includes(value)?"✓":"+"}</span>{label}</button>)}</div>
             </div>
 
-            <div className="relationship-tile-question">
+            <div className="relationship-tile-question relationship-tile-nonnegotiables">
               <div className="relationship-tile-head"><div><label>What are your relationship non-negotiables?</label><small>Choose up to 5</small></div><strong>{form.nonNegotiablePreferences.length}/5</strong></div>
               <div className="relationship-choice-grid">{nonNegotiableOptions.map(([value,label])=><button type="button" key={value} className={`relationship-choice ${form.nonNegotiablePreferences.includes(value)?"selected":""}`} onClick={()=>toggleSelection("nonNegotiablePreferences",value,5)}><span>{form.nonNegotiablePreferences.includes(value)?"✓":"+"}</span>{label}</button>)}</div>
             </div>

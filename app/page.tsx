@@ -74,131 +74,28 @@ export default function Home() {
       </div>
     </section>
 
-    <section className="sikh-world-section">
+    <section className="product-story-section">
       <div className="container">
-        <div className="experience-section-head sikh-world-head">
-          <div><span className="experience-section-label">THE SIKH COMMUNITY, CONNECTED</span><h2>Connecting Sikhs.<br/><em>Wherever life has taken us.</em></h2></div>
-          <p>Designed to create considered introductions across Sikh communities around the world — starting with the UK and connecting people across established global communities.</p>
-        </div>
-        <div className="sikh-world-card">
-          <div className="sikh-map" aria-label="AutoFace global Sikh community network">
-            <svg viewBox="0 0 1000 440" role="img" aria-label="Stylised world map showing AutoFace community locations">
-              <path className="map-land" d="M75 120l70-50 93 12 60 42-24 42-62 8-32 51-65-20-43-44zm245 20 62-48 87-7 42 37-28 31-56 5-27 44-51-8-37-30zm188 70 40-41 49 5 35 42-15 74-42 81-48-22-25-82zm135-93 88-54 132 23 67 55-27 40-75 2-40 38-52-11-31 42-68-24-32-51zm153 177 48-24 63 13 30 35-28 34-72 5-42-28z"/>
-              <path className="map-link" d="M456 127 Q540 35 716 128"/><path className="map-link" d="M456 127 Q640 170 835 318"/><path className="map-link" d="M456 127 Q490 220 552 282"/><path className="map-link" d="M456 127 Q410 82 382 122"/>
-              <g className="map-point uk"><circle cx="456" cy="127" r="9"/><circle className="pulse" cx="456" cy="127" r="17"/><text x="472" y="120">UK</text><text className="sub" x="472" y="137">Launch community</text></g>
-              <g className="map-point europe"><circle cx="520" cy="135" r="7"/><text x="533" y="132">Europe</text></g>
-              <g className="map-point canada"><circle cx="218" cy="116" r="7"/><text x="232" y="112">Canada</text></g>
-              <g className="map-point kenya"><circle cx="552" cy="282" r="7"/><text x="566" y="279">Kenya</text></g>
-              <g className="map-point australia"><circle cx="835" cy="318" r="7"/><text x="850" y="315">Australia</text></g>
-            </svg>
-          </div>
-          <div className="sikh-world-footer"><span>UK</span><i>•</i><span>Europe</span><i>•</i><span>Canada</span><i>•</i><span>Australia</span><i>•</i><span>Kenya</span></div>
-          <p className="sikh-world-note">AutoFace is building toward these communities. Locations shown describe the intended community network, not current member numbers.</p>
-        </div>
-      </div>
-    </section>
-
-    <section className="autoface-how-flow">
-      <div className="container">
-        <div className="experience-section-head autoface-how-head">
-          <div><span className="experience-section-label">FROM PROFILE TO INTRODUCTION</span><h2>A considered way to meet someone.<br/><em>One step at a time.</em></h2></div>
-          <p>AutoFace keeps the journey clear: understand yourself, discover a few people, choose privately, and only open a conversation when interest is mutual.</p>
+        <div className="product-story-intro">
+          <span className="experience-section-label">A DIFFERENT KIND OF MATRIMONIAL PLATFORM</span>
+          <h2>Technology that helps you understand <em>who may be worth meeting.</em></h2>
+          <p>Traditional matchmaking starts with a profile. AutoFace goes further — helping you understand compatibility, make considered choices and build confidence before an introduction begins.</p>
         </div>
 
-        <div className="autoface-flow-line">
-          <article className="autoface-flow-step">
-            <span className="flow-number">01</span>
-            <div className="flow-icon flow-profile"><UserRound size={22}/></div>
-            <h3>Create</h3>
-            <b>Build your profile</b>
-            <p>Share who you are, your lifestyle, values and what matters in an introduction.</p>
-          </article>
+        <article className="product-story-row story-understand">
+          <div className="product-story-copy"><span className="story-number">01</span><span className="story-kicker">UNDERSTAND</span><h3>More than a biodata.</h3><p>Atlas learns what matters to you — values, personality, lifestyle, ambitions and relationship priorities — and turns those signals into a relationship profile designed around real compatibility.</p><Link href="/relationship-profile">Build your relationship profile <ArrowRight size={16}/></Link></div>
+          <div className="story-visual atlas-profile-visual"><div className="story-window-head"><span>ATLAS RELATIONSHIP PROFILE</span><Sparkles size={16}/></div><div className="story-profile-score"><strong>YOU</strong><span>What matters to you</span></div><div className="story-signal-grid"><span><b>Values</b><i>High priority</i></span><span><b>Family outlook</b><i>Important</i></span><span><b>Lifestyle</b><i>Balanced</i></span><span><b>Communication</b><i>Very important</i></span></div><div className="story-insight"><Sparkles size={16}/><p><b>Atlas insight</b><br/>You value shared direction, open communication and a strong sense of family.</p></div></div>
+        </article>
 
-          <span className="flow-connector"><ArrowRight size={18}/></span>
+        <article className="product-story-row story-discover">
+          <div className="product-story-copy"><span className="story-number">02</span><span className="story-kicker">DISCOVER</span><h3>Fewer profiles. Better reasons.</h3><p>No endless catalogue of people. AutoFace surfaces considered profiles around your preferences and relationship profile — then Atlas explains the signals behind the recommendation.</p><Link href="/discover">Explore discovery <ArrowRight size={16}/></Link></div>
+          <div className="story-visual discover-visual"><div className="story-window-head"><span>ATLAS RECOMMENDATION</span><BadgeCheck size={16}/></div><div className="discover-person"><div className="discover-avatar">P</div><div><strong>Priya, 34</strong><span>London · Healthcare</span></div><div className="discover-score"><b>87%</b><small>MATCH</small></div></div><div className="story-bars"><span><b>Values</b><i><em style={{width:'92%'}}/></i><strong>92%</strong></span><span><b>Family</b><i><em style={{width:'89%'}}/></i><strong>89%</strong></span><span><b>Lifestyle</b><i><em style={{width:'84%'}}/></i><strong>84%</strong></span></div><div className="story-insight"><Sparkles size={16}/><p><b>Why Atlas recommends Priya</b><br/>Strong alignment across family outlook, communication and lifestyle rhythm.</p></div></div>
+        </article>
 
-          <article className="autoface-flow-step">
-            <span className="flow-number">02</span>
-            <div className="flow-icon flow-atlas"><Sparkles size={22}/></div>
-            <h3>Atlas</h3>
-            <b>Understand compatibility</b>
-            <p>Atlas builds a relationship profile and explains the signals behind each recommendation.</p>
-          </article>
-
-          <span className="flow-connector"><ArrowRight size={18}/></span>
-
-          <article className="autoface-flow-step">
-            <span className="flow-number">03</span>
-            <div className="flow-icon flow-discover"><Search size={22}/></div>
-            <h3>Discover</h3>
-            <b>Meet considered people</b>
-            <p>See a small number of profiles chosen around compatibility, preferences and authenticity.</p>
-          </article>
-
-          <span className="flow-connector"><ArrowRight size={18}/></span>
-
-          <article className="autoface-flow-step">
-            <span className="flow-number">04</span>
-            <div className="flow-icon flow-interest"><Heart size={22}/></div>
-            <h3>Interest</h3>
-            <b>Choose privately</b>
-            <p>Interested, save for later, or simply say not for me. Nobody is pressured into a conversation.</p>
-          </article>
-        </div>
-
-        <div className="autoface-mutual-stage">
-          <div className="mutual-side mutual-you"><span>YOU</span><Heart size={16}/><b>Interested</b></div>
-          <div className="mutual-path"><i/><i/></div>
-          <div className="mutual-centre">
-            <span className="flow-number">05</span>
-            <div className="flow-icon flow-mutual"><HeartHandshake size={24}/></div>
-            <h3>Mutual interest</h3>
-            <p>When you both independently choose each other, AutoFace creates an introduction.</p>
-          </div>
-          <div className="mutual-path mutual-path-right"><i/><i/></div>
-          <div className="mutual-side mutual-them"><span>THEM</span><Heart size={16}/><b>Interested</b></div>
-        </div>
-
-        <div className="autoface-introduction-finish">
-          <span className="finish-line"/>
-          <article>
-            <span className="flow-number">06</span>
-            <div className="flow-icon flow-message"><MessageCircle size={23}/></div>
-            <div><h3>Introduced</h3><b>Start a conversation when you&apos;re both ready.</b><p>Messaging opens only after mutual interest — with Atlas available to help you understand the connection along the way.</p></div>
-          </article>
-        </div>
-
-        <div className="autoface-flow-principle">
-          <ShieldCheck size={17}/>
-          <span><b>No endless swiping. No popularity contest. No pressure.</b> Considered introductions, mutual choice and explainable recommendations.</span>
-        </div>
-      </div>
-    </section>
-
-    <section className="experience-dual">
-      <div className="container experience-dual-grid">
-        <div className="experience-dual-copy">
-          <span className="experience-section-label">TWO DIFFERENT QUESTIONS</span>
-          <h2>Compatibility is only half the story.</h2>
-          <p>AutoFace deliberately separates whether two people may fit from whether a profile has stronger evidence of authenticity.</p>
-          <Link href="/trust" className="experience-inline-link">Explore the trust model <ArrowRight size={15}/></Link>
-        </div>
-        <div className="experience-dual-visual">
-          <div className="experience-orbit">
-            <div className="experience-orbit-centre">AUTOFACE</div>
-            <div className="experience-orbit-card orbit-atlas"><span>ATLAS</span><b>Do we fit?</b><small>Compatibility</small></div>
-            <div className="experience-orbit-card orbit-auth"><span>AUTHENTICITY</span><b>Are they real?</b><small>Trust evidence</small></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section className="experience-principle">
-      <div className="container">
-        <div className="experience-quote">
-          <span className="experience-section-label">THE AUTOFACE PRINCIPLE</span>
-          <blockquote>“Atlas doesn&apos;t just show you people. It explains why you might work.”</blockquote>
-          <p>Atlas explains compatibility. Authenticity builds confidence. You remain the person making the decision.</p>
-        </div>
+        <article className="product-story-row story-trust">
+          <div className="product-story-copy"><span className="story-number">03</span><span className="story-kicker">TRUST</span><h3>Know there is a real person behind the profile.</h3><p>Face verification, verified-photo integrity and authenticity signals help create a community where people can approach an introduction with greater confidence.</p><Link href="/trust">See how AutoFace builds trust <ArrowRight size={16}/></Link></div>
+          <div className="story-visual trust-visual"><div className="trust-shield"><ShieldCheck size={30}/></div><span className="trust-title"><BadgeCheck size={17}/> FACE VERIFIED</span><div className="trust-checks"><span><Check size={16}/><b>Live person confirmed</b></span><span><Check size={16}/><b>Profile photo matched</b></span><span><Check size={16}/><b>Verified photo protected</b></span></div><p>Verification strengthens confidence without replacing your own judgement.</p></div>
+        </article>
       </div>
     </section>
 
