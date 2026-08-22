@@ -36,6 +36,48 @@ type Result = {
   error?: string;
 };
 
+type CameraDiagnostic = {
+  status: "idle" | "checking" | "passed" | "failed";
+  message?: string;
+  deviceLabel?: string;
+  width?: number;
+  height?: number;
+  frameRate?: number;
+  errorName?: string;
+  awsCompatible?: boolean;
+};
+
+const AWS_MIN_SHORT_EDGE = 480;
+const AWS_MIN_LONG_EDGE = 640;
+const AWS_MIN_FPS = 15;
+
+function isAwsCompatible(width?: number, height?: number, frameRate?: number) {
+  if (!width || !height) return false;
+  const shortEdge = Math.min(width, height);
+  const longEdge = Math.max(width, height);
+  const fpsOk = !frameRate || frameRate >= AWS_MIN_FPS;
+  return shortEdge >= AWS_MIN_SHORT_EDGE && longEdge >= AWS_MIN_LONG_EDGE && fpsOk;
+}
+
+function cameraFailureMessage(error: unknown) {
+  const name = error instanceof DOMException ? error.name : error instanceof Error ? error.name : "CameraError";
+  const raw = error instanceof Error ? error.message : "The browser could not open the camera.";
+
+  const guidance: Record<string, string> = {
+    NotAllowedError: "Camera access was blocked by Chrome or Windows. Allow the camera for this site and enable Windows camera access for desktop apps.",
+    PermissionDeniedError: "Camera access was blocked by Chrome or Windows. Allow the camera for this site and enable Windows camera access for desktop apps.",
+    NotFoundError: "No usable camera was found. Check that the webcam is connected and enabled in Windows.",
+    DevicesNotFoundError: "No usable camera was found. Check that the webcam is connected and enabled in Windows.",
+    NotReadableError: "The camera exists but could not be opened. Close Teams, Zoom, Camera, OBS and other apps using the webcam, then retry.",
+    TrackStartError: "The camera exists but could not be opened. Close Teams, Zoom, Camera, OBS and other apps using the webcam, then retry.",
+    OverconstrainedError: "The selected camera could not satisfy the requested video settings. Try another physical webcam in Chrome camera settings.",
+    SecurityError: "The browser blocked camera access for security reasons. Use the HTTPS Vercel/AutoFace URL rather than an insecure page.",
+    AbortError: "The camera start was interrupted. Close other camera apps and retry.",
+  };
+
+  return { name, message: guidance[name] ?? raw };
+}
+
 export default function VerifyFacePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -43,6 +85,7 @@ export default function VerifyFacePage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [result, setResult] = useState<Result | null>(null);
+  const [cameraDiagnostic, setCameraDiagnostic] = useState<CameraDiagnostic>({ status: "idle" });
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
@@ -50,12 +93,98 @@ export default function VerifyFacePage() {
 
   const browserReady = useMemo(() => Boolean(identityPoolId), []);
 
+  async function runCameraDiagnostic() {
+    if (typeof window === "undefined" || !window.isSecureContext) {
+      const diagnostic: CameraDiagnostic = {
+        status: "failed",
+        errorName: "SecurityError",
+        message: "Camera access requires a secure HTTPS page. Open the deployed AutoFace HTTPS URL and retry.",
+      };
+      setCameraDiagnostic(diagnostic);
+      return false;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      const diagnostic: CameraDiagnostic = {
+        status: "failed",
+        errorName: "MediaDevicesUnavailable",
+        message: "This browser does not expose camera access to AutoFace. Update Chrome or try a supported device/browser.",
+      };
+      setCameraDiagnostic(diagnostic);
+      return false;
+    }
+
+    setCameraDiagnostic({ status: "checking", message: "Opening your camera for a quick pre-flight check…" });
+
+    let stream: MediaStream | null = null;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { min: 640, ideal: 1280 },
+          height: { min: 480, ideal: 720 },
+          frameRate: { min: AWS_MIN_FPS, ideal: 30 },
+        },
+        audio: false,
+      });
+      const [track] = stream.getVideoTracks();
+      if (!track) throw new DOMException("No video track was returned by the selected camera.", "NotFoundError");
+
+      // Ask the browser to favour an AWS-compatible capture mode even when the
+      // camera's default mode is a very low resolution such as 160x120.
+      try {
+        await track.applyConstraints({
+          width: { min: 640, ideal: 1280 },
+          height: { min: 480, ideal: 720 },
+          frameRate: { min: AWS_MIN_FPS, ideal: 30 },
+        });
+      } catch {
+        // getUserMedia already negotiated the best available stream. The
+        // compatibility check below will explain if the result is insufficient.
+      }
+
+      const settings = track.getSettings();
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const selectedDevice = devices.find((device) => device.kind === "videoinput" && device.deviceId === settings.deviceId);
+      const label = track.label || selectedDevice?.label || "Physical camera detected";
+      const compatible = isAwsCompatible(settings.width, settings.height, settings.frameRate);
+
+      setCameraDiagnostic({
+        status: compatible ? "passed" : "failed",
+        message: compatible
+          ? "AWS-compatible camera mode confirmed. AutoFace can access this webcam at a suitable resolution and frame rate."
+          : `The camera opened, but the negotiated video mode does not meet the AWS Face Liveness minimum. AutoFace needs at least ${AWS_MIN_SHORT_EDGE}×${AWS_MIN_LONG_EDGE} (either orientation) and ${AWS_MIN_FPS} fps. Try another camera or update the webcam driver.`,
+        deviceLabel: label,
+        width: settings.width,
+        height: settings.height,
+        frameRate: settings.frameRate,
+        awsCompatible: compatible,
+        errorName: compatible ? undefined : "AwsCameraRequirementsNotMet",
+      });
+      return compatible;
+    } catch (error) {
+      const mapped = cameraFailureMessage(error);
+      setCameraDiagnostic({ status: "failed", errorName: mapped.name, message: mapped.message });
+      return false;
+    } finally {
+      stream?.getTracks().forEach((track) => track.stop());
+    }
+  }
+
   async function startVerification() {
     if (!user || busy) return;
     try {
       setBusy(true);
       setMessage("");
       setResult(null);
+
+      const cameraReady = await runCameraDiagnostic();
+      if (!cameraReady) return;
+
+      // Give Windows/Chrome a moment to release the pre-flight camera stream before
+      // AWS Amplify opens the same physical webcam for the liveness session.
+      await new Promise((resolve) => window.setTimeout(resolve, 1200));
+
       configureAmplify();
       const token = await user.getIdToken();
       const response = await fetch("/api/face-verification/start", {
@@ -128,7 +257,24 @@ export default function VerifyFacePage() {
 
           {!browserReady && <div className="notice verification-warning"><b>AWS browser setup required:</b> add <code>NEXT_PUBLIC_AWS_COGNITO_IDENTITY_POOL_ID</code>. This Identity Pool is only used to sign the Rekognition liveness stream; Firebase remains the AutoFace login system.</div>}
 
-          <button className="btn btn-primary" disabled={busy || !browserReady} onClick={startVerification}>{busy ? "Starting…" : "Verify my face"}</button>
+          <div className="camera-diagnostic-actions">
+            <button className="btn" disabled={busy} onClick={runCameraDiagnostic}>
+              {cameraDiagnostic.status === "checking" ? "Testing camera…" : "Test camera"}
+            </button>
+            <button className="btn btn-primary" disabled={busy || !browserReady} onClick={startVerification}>{busy ? "Starting…" : "Verify my face"}</button>
+          </div>
+
+          {cameraDiagnostic.status !== "idle" && <div className={`camera-diagnostic ${cameraDiagnostic.status}`}>
+            <div className="camera-diagnostic-icon">{cameraDiagnostic.status === "passed" ? "✓" : cameraDiagnostic.status === "failed" ? "!" : "…"}</div>
+            <div>
+              <strong>{cameraDiagnostic.status === "passed" ? "Camera ready" : cameraDiagnostic.status === "failed" ? "AWS camera compatibility check failed" : "Checking camera"}</strong>
+              {cameraDiagnostic.message && <p>{cameraDiagnostic.message}</p>}
+              {cameraDiagnostic.deviceLabel && <small>Camera: {cameraDiagnostic.deviceLabel}</small>}
+              {(cameraDiagnostic.width || cameraDiagnostic.height || cameraDiagnostic.frameRate) && <small>Video: {cameraDiagnostic.width ?? "?"}×{cameraDiagnostic.height ?? "?"}{cameraDiagnostic.frameRate ? ` • ${cameraDiagnostic.frameRate.toFixed(0)} fps` : ""}</small>}
+              {cameraDiagnostic.errorName && <small>Browser error: <code>{cameraDiagnostic.errorName}</code></small>}
+            </div>
+          </div>}
+
           {!browserReady && <p className="muted face-helper">The page is intentionally disabled until the Cognito Identity Pool is configured.</p>}
         </>}
 
@@ -138,7 +284,10 @@ export default function VerifyFacePage() {
               sessionId={sessionId}
               region={region}
               onAnalysisComplete={finishVerification}
-              onError={(error) => setMessage(error?.error?.message ?? "The live face check could not be completed.")}
+              onError={(error) => {
+                const awsMessage = error?.error?.message ?? "The live face check could not be completed.";
+                setMessage(`${awsMessage} If the camera pre-flight above passes, this points to the AWS liveness session rather than Chrome camera permission.`);
+              }}
             />
           </ThemeProvider>
         </div>}
@@ -160,7 +309,7 @@ export default function VerifyFacePage() {
       <aside className="card verification-sidecard">
         <span className="privacy-kicker">PRIVACY BY DESIGN</span>
         <h3>Verification, not a searchable face database.</h3>
-        <p>v0.35.0 uses Rekognition as a one-to-one verification step. AutoFace does not create an AWS face collection for member discovery or identification.</p>
+        <p>v0.35.2 uses Rekognition as a one-to-one verification step and validates the webcam against AWS Face Liveness resolution and frame-rate requirements before starting the session. AutoFace does not create an AWS face collection for member discovery or identification.</p>
         <div className="no-store-list">
           <span>✓ Firebase remains your account identity</span>
           <span>✓ Only the verification outcome is trusted by AutoFace</span>

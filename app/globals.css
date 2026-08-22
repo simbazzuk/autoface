@@ -2855,3 +2855,18 @@ radial-gradient(circle at 20% 10%,rgba(124,92,255,.12),transparent 32%)}
 .face-result small{display:block;color:var(--muted);margin-top:3px}
 .face-result-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
 @media(max-width:700px){.aws-liveness-shell{min-height:520px}.face-check-steps>div{padding:13px}.face-result{padding:16px}.face-result-actions .btn{width:100%;justify-content:center}}
+
+
+/* v0.35.1 camera diagnostics */
+.camera-diagnostic-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.camera-diagnostic{display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:14px 15px;border-radius:16px;border:1px solid rgba(124,92,255,.18);background:rgba(124,92,255,.045)}
+.camera-diagnostic.passed{border-color:rgba(63,201,151,.32);background:rgba(63,201,151,.07)}
+.camera-diagnostic.failed{border-color:rgba(255,110,168,.34);background:rgba(255,110,168,.07)}
+.camera-diagnostic.checking{border-color:rgba(82,201,255,.28);background:rgba(82,201,255,.06)}
+.camera-diagnostic-icon{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:50%;background:rgba(124,92,255,.14);font-weight:800}
+.camera-diagnostic>div:last-child{display:flex;flex-direction:column;gap:4px;min-width:0}
+.camera-diagnostic strong{color:var(--text)}
+.camera-diagnostic p{margin:0;color:var(--muted);line-height:1.5}
+.camera-diagnostic small{color:var(--muted);overflow-wrap:anywhere}
+.camera-diagnostic code{font-size:.9em}
+@media(max-width:700px){.camera-diagnostic-actions .btn{width:100%;justify-content:center}}
