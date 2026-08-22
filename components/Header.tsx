@@ -213,7 +213,7 @@ export function Header() {
                 <Link onClick={closeDesktopMenus} href="/recommendations/history"><b>Reviewed Recommendations</b><small>Revisit previous Atlas explanations</small></Link>
                 <Link onClick={closeDesktopMenus} href="/discovery-preferences"><b>Introduction Preferences</b><small>What matters when Atlas considers people</small></Link>
                 <Link onClick={closeDesktopMenus} href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
-                <Link onClick={closeDesktopMenus} href="/verify-photo"><b>Photo Verification</b><small>Profile-photo authenticity</small></Link>
+                <Link onClick={closeDesktopMenus} href="/verify-face"><b>Face Verification</b><small>Live face + profile-photo match</small></Link>
                 <Link onClick={closeDesktopMenus} href="/account"><b>Privacy & Control</b><small>Discovery, data export and deletion</small></Link>
                 {developmentTools && <Link onClick={closeDesktopMenus} href="/development-tools"><b>Development Tools</b><small>Reset and seed synthetic test data</small></Link>}
                 <AdminLink />
@@ -278,7 +278,7 @@ export function Header() {
                 <Link href="/recommendations/history" onClick={closeMobile}>Reviewed Recommendations</Link>
                 <Link href="/discovery-preferences" onClick={closeMobile}>Introduction Preferences</Link>
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
-                <Link href="/verify-photo" onClick={closeMobile}>Photo Verification</Link>
+                <Link href="/verify-face" onClick={closeMobile}>Face Verification</Link>
                 <Link href="/account" onClick={closeMobile}>Privacy & Control</Link>
                 {developmentTools && <Link href="/development-tools" onClick={closeMobile}>Development Tools</Link>}
                 <AdminLink mobile />

@@ -2835,3 +2835,23 @@ radial-gradient(circle at 20% 10%,rgba(124,92,255,.12),transparent 32%)}
     height:46px !important;
   }
 }
+
+/* v0.35.0 — AWS Rekognition Face Verification */
+.face-verification-card{overflow:hidden}
+.face-check-steps{display:grid;gap:12px;margin:22px 0}
+.face-check-steps>div{display:flex;gap:13px;align-items:flex-start;padding:14px 15px;border:1px solid rgba(124,92,255,.18);background:rgba(124,92,255,.045);border-radius:16px}
+.face-check-steps>div>b{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6f57ff,#ff6ea8);color:#fff;font-size:14px}
+.face-check-steps span{display:flex;flex-direction:column;gap:3px}
+.face-check-steps strong{font-size:14px;color:var(--text)}
+.face-check-steps small,.face-helper{color:var(--muted);line-height:1.55}
+.aws-liveness-shell{margin-top:20px;min-height:440px;border-radius:20px;overflow:hidden;background:#fff;border:1px solid rgba(91,74,181,.18)}
+.aws-liveness-shell [data-amplify-liveness]{min-height:440px}
+.face-result{display:flex;gap:16px;align-items:flex-start;padding:20px;border-radius:18px;margin-top:18px;border:1px solid}
+.face-result.success{background:#eefbf5;border-color:#9bdabd}
+.face-result.failed{background:#fff7f3;border-color:#f1c2ac}
+.face-result-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font-size:24px;font-weight:800;background:#fff}
+.face-result h3{margin:0 0 6px}
+.face-result p{margin:0 0 8px}
+.face-result small{display:block;color:var(--muted);margin-top:3px}
+.face-result-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+@media(max-width:700px){.aws-liveness-shell{min-height:520px}.face-check-steps>div{padding:13px}.face-result{padding:16px}.face-result-actions .btn{width:100%;justify-content:center}}
