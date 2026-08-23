@@ -3933,3 +3933,100 @@ body{
   .relationship-section .relationship-tile-head label { font-size: 17px !important; }
   .relationship-section .relationship-choice { font-size: 14.5px !important; }
 }
+
+
+/* v0.35.7.3 — Profile Lifestyle Readability
+   Align the Lifestyle & Interests header and make hobby icons easier to see. */
+.profile-form-refreshed .profile-hobbies {
+  margin-top: 22px;
+  padding: 20px;
+}
+.profile-form-refreshed .profile-hobbies-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+.profile-form-refreshed .profile-hobbies-title > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.profile-form-refreshed .profile-hobbies-title small {
+  margin: 0 0 4px;
+  font-size: 10px;
+  line-height: 1.25;
+  letter-spacing: .10em;
+  color: #ffad72;
+}
+.profile-form-refreshed .profile-hobbies-title h4 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.25;
+  color: #f8f9ff;
+}
+.profile-form-refreshed .profile-hobbies-title > span {
+  flex: 0 0 auto;
+  align-self: center;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #aab7ca;
+  text-align: right;
+}
+.profile-form-refreshed .hobby-chip-grid {
+  gap: 10px;
+}
+.profile-form-refreshed .hobby-chip {
+  min-height: 82px;
+  padding: 12px 8px;
+  gap: 7px;
+  border-radius: 13px;
+}
+.profile-form-refreshed .hobby-chip span {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 4px;
+  border-radius: 11px;
+  font-size: 28px;
+  line-height: 1;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.08);
+}
+.profile-form-refreshed .hobby-chip b {
+  font-size: 11px;
+  line-height: 1.25;
+  font-weight: 750;
+  color: #d8e0ee;
+  text-align: center;
+}
+.profile-form-refreshed .hobby-chip.selected span {
+  background: rgba(126,98,255,.20);
+  border-color: rgba(155,132,255,.34);
+}
+.profile-form-refreshed .hobby-chip.selected b {
+  color: #ffffff;
+}
+
+@media (max-width: 700px) {
+  .profile-form-refreshed .profile-hobbies { padding: 16px; }
+  .profile-form-refreshed .profile-hobbies-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .profile-form-refreshed .profile-hobbies-title > span {
+    align-self: flex-start;
+    text-align: left;
+  }
+  .profile-form-refreshed .hobby-chip { min-height: 78px; }
+  .profile-form-refreshed .hobby-chip span {
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 26px;
+  }
+  .profile-form-refreshed .hobby-chip b { font-size: 10.5px; }
+}
