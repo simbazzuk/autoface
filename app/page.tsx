@@ -18,7 +18,7 @@ export default function Home() {
           <h1>A modern way for Sikhs to meet.<br/><em>Beyond traditional introductions.</em></h1>
           <p>AutoFace brings modern technology to matrimony — using compatibility, shared values, Atlas AI and authenticity signals to help Sikhs discover people worth being introduced to, with fewer profiles, clearer reasons and mutual choice.</p>
           <div className="experience-actions">
-            <Link className="experience-primary" href="/register">Join the beta <ArrowRight size={17}/></Link>
+            <Link className="experience-primary" href="/register">Join AutoFace <ArrowRight size={17}/></Link>
             <Link className="experience-secondary" href="/how-it-works">See how Atlas works</Link>
           </div>
           <div className="experience-proof">
@@ -103,9 +103,9 @@ export default function Home() {
 
     <section className="experience-final">
       <div className="container experience-final-inner">
-        <span className="experience-section-label">CONTROLLED BETA</span>
+        <span className="experience-section-label">JOIN AUTOFACE</span>
         <h2>Ready to be introduced, not overwhelmed?</h2>
-        <p>Join the controlled beta and help shape a modern Sikh introduction experience built around fewer, more considered introductions.</p>
+        <p>Create your profile and join a modern Sikh introduction experience built around fewer, more considered introductions.</p>
         <div className="experience-actions final-actions">
           <Link className="experience-primary" href="/register">Create your AutoFace account <ArrowRight size={17}/></Link>
           <Link className="experience-secondary" href="/early-access">Join the waiting list</Link>

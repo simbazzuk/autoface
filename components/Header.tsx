@@ -195,7 +195,7 @@ export function Header() {
       <div className="container nav-inner">
         <Link href="/" className="brand" onClick={closeMobile}>
           <Image src="/autoface-logo.png" alt="AutoFace" width={42} height={42} className="brand-logo" />
-          <span>AutoFace</span><span className="brand-beta">BETA</span>
+          <span>AutoFace</span>
         </Link>
 
         <nav className="nav-links desktop-nav" aria-label="Primary navigation">
@@ -225,10 +225,10 @@ export function Header() {
             <summary>Safety & Privacy <span aria-hidden="true">⌄</span></summary>
             <div className="nav-group-menu trust-menu">
               <Link onClick={closeDesktopMenus} href="/how-it-works"><b>How it works</b><small>Understand the AutoFace journey</small></Link>
-              <Link onClick={closeDesktopMenus} href="/pricing"><b>Pricing</b><small>Beta access and planned membership tiers</small></Link>
+              <Link onClick={closeDesktopMenus} href="/pricing"><b>Pricing</b><small>Membership options and founding access</small></Link>
               <Link onClick={closeDesktopMenus} href="/trust"><b>Trust & Privacy</b><small>Security and data minimisation</small></Link>
-              <Link onClick={closeDesktopMenus} href="/privacy"><b>Privacy Notice</b><small>How AutoFace handles beta data</small></Link>
-              <Link onClick={closeDesktopMenus} href="/terms"><b>Beta Terms</b><small>Terms for controlled beta access</small></Link>
+              <Link onClick={closeDesktopMenus} href="/privacy"><b>Privacy Notice</b><small>How AutoFace handles your data</small></Link>
+              <Link onClick={closeDesktopMenus} href="/terms"><b>Terms</b><small>Terms for using AutoFace</small></Link>
             </div>
           </details>
 
