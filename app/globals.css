@@ -4037,3 +4037,9 @@ body{
 
 /* v0.35.8 — Match Intelligence Brand */
 .brand-copy{display:flex;flex-direction:column;gap:1px;line-height:1}.brand-copy b{font-size:22px;letter-spacing:-.03em}.brand-copy small{font-size:9px;line-height:1.15;letter-spacing:.06em;text-transform:uppercase;color:#9fb0c8;font-weight:800}.experience-kicker{background:linear-gradient(135deg,rgba(76,125,255,.14),rgba(168,85,247,.16));border-color:rgba(139,116,255,.35)}@media(max-width:800px){.brand-copy b{font-size:19px}.brand-copy small{font-size:7.5px;max-width:135px}.brand{gap:8px}}@media(max-width:430px){.brand-copy small{display:none}}
+
+
+/* v0.35.8.1 — mip.chat domain identity */
+.mip-domain-chip{display:inline-flex;align-items:center;margin-left:7px;padding:4px 9px;border:1px solid rgba(103,201,255,.38);border-radius:999px;background:linear-gradient(135deg,rgba(46,160,255,.14),rgba(158,83,255,.16));color:#8fdcff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:lowercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.brand-copy small strong{color:#7fd6ff;font-weight:850;letter-spacing:.02em}.footer-inner>span:nth-child(2) b{color:#83d9ff;font-weight:850}
+@media(max-width:560px){.mip-domain-chip{margin-left:4px;padding:3px 7px;font-size:9px}.brand-copy small strong{display:inline}}

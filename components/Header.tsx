@@ -195,7 +195,7 @@ export function Header() {
       <div className="container nav-inner">
         <Link href="/" className="brand" onClick={closeMobile}>
           <Image src="/autoface-logo.png" alt="AutoFace" width={42} height={42} className="brand-logo" />
-          <span className="brand-copy"><b>AutoFace</b><small>The Match Intelligence Platform</small></span>
+          <span className="brand-copy"><b>AutoFace</b><small>The Match Intelligence Platform · <strong>mip.chat</strong></small></span>
         </Link>
 
         <nav className="nav-links desktop-nav" aria-label="Primary navigation">

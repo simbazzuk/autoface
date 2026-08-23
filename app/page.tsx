@@ -14,7 +14,7 @@ export default function Home() {
       <div className="experience-glow experience-glow-two" />
       <div className="container experience-hero-grid">
         <div className="experience-hero-copy">
-          <span className="experience-kicker"><Sparkles size={14}/> The Match Intelligence Platform</span>
+          <span className="experience-kicker"><Sparkles size={14}/> The Match Intelligence Platform <b className="mip-domain-chip">mip.chat</b></span>
           <h1>Meet with intention.<br/><em>Match with intelligence.</em></h1>
           <p>AutoFace is the Match Intelligence Platform — combining relationship understanding, explainable AI and verified profiles to help Sikhs discover people worth getting to know, with fewer profiles, clearer reasons and mutual choice.</p>
           <div className="experience-actions">
@@ -103,9 +103,9 @@ export default function Home() {
 
     <section className="experience-final">
       <div className="container experience-final-inner">
-        <span className="experience-section-label">JOIN AUTOFACE</span>
+        <span className="experience-section-label">AUTOFACE · MIP.CHAT</span>
         <h2>Ready to be introduced, not overwhelmed?</h2>
-        <p>Create your profile and join a modern Sikh introduction experience built around fewer, more considered introductions.</p>
+        <p>Create your profile at mip.chat and join a modern Sikh introduction experience built around fewer, more considered introductions.</p>
         <div className="experience-actions final-actions">
           <Link className="experience-primary" href="/register">Create your AutoFace account <ArrowRight size={17}/></Link>
           <Link className="experience-secondary" href="/early-access">Join the waiting list</Link>
