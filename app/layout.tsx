@@ -6,8 +6,8 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { SupportAssistant } from "@/components/SupportAssistant";
 
 export const metadata: Metadata = {
-  title: "AutoFace — Real people. Real compatibility.",
-  description: "A security-first platform for meaningful relationships, built around authenticity, privacy and trust.",
+  title: "AutoFace — The Match Intelligence Platform",
+  description: "AutoFace is the Match Intelligence Platform — combining relationship understanding, explainable AI and verified profiles for more considered introductions.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

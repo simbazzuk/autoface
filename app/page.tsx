@@ -14,9 +14,9 @@ export default function Home() {
       <div className="experience-glow experience-glow-two" />
       <div className="container experience-hero-grid">
         <div className="experience-hero-copy">
-          <span className="experience-kicker"><Sparkles size={14}/> Where technology meets matrimony</span>
-          <h1>A modern way for Sikhs to meet.<br/><em>Beyond traditional introductions.</em></h1>
-          <p>AutoFace brings modern technology to matrimony — using compatibility, shared values, Atlas AI and authenticity signals to help Sikhs discover people worth being introduced to, with fewer profiles, clearer reasons and mutual choice.</p>
+          <span className="experience-kicker"><Sparkles size={14}/> The Match Intelligence Platform</span>
+          <h1>Meet with intention.<br/><em>Match with intelligence.</em></h1>
+          <p>AutoFace is the Match Intelligence Platform — combining relationship understanding, explainable AI and verified profiles to help Sikhs discover people worth getting to know, with fewer profiles, clearer reasons and mutual choice.</p>
           <div className="experience-actions">
             <Link className="experience-primary" href="/register">Join AutoFace <ArrowRight size={17}/></Link>
             <Link className="experience-secondary" href="/how-it-works">See how Atlas works</Link>
@@ -68,7 +68,7 @@ export default function Home() {
 
     <section className="experience-statement">
       <div className="container">
-        <span className="experience-section-label">A NEW DIRECTION FOR SIKH INTRODUCTIONS</span>
+        <span className="experience-section-label">MATCH INTELLIGENCE FOR MODERN INTRODUCTIONS</span>
         <h2>Fewer profiles.<br/><em>Better reasons to meet.</em></h2>
         <p>AutoFace is not trying to predict love. Atlas helps narrow the noise, explains the compatibility signals and leaves the decision with you.</p>
       </div>
@@ -77,7 +77,7 @@ export default function Home() {
     <section className="product-story-section">
       <div className="container">
         <div className="product-story-intro">
-          <span className="experience-section-label">A DIFFERENT KIND OF MATRIMONIAL PLATFORM</span>
+          <span className="experience-section-label">THE MATCH INTELLIGENCE PLATFORM</span>
           <h2>Technology that helps you understand <em>who may be worth meeting.</em></h2>
           <p>Traditional matchmaking starts with a profile. AutoFace goes further — helping you understand compatibility, make considered choices and build confidence before an introduction begins.</p>
         </div>
