@@ -33,6 +33,7 @@ const emptyForm = {
   relationshipContext: "",
   consentForCompatibility: false,
   consentForAiDiscovery: false,
+  consentForAiReflection: false,
 };
 
 type FormState = typeof emptyForm;
@@ -87,7 +88,6 @@ export default function RelationshipProfilePage() {
   const [message, setMessage] = useState("");
   const [journeySaved,setJourneySaved]=useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
-  const [aiConsent, setAiConsent] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiInsight, setAiInsight] = useState("");
   const [aiError, setAiError] = useState("");
@@ -133,6 +133,7 @@ export default function RelationshipProfilePage() {
           relationshipContext: data.relationshipContext ?? "",
           consentForCompatibility: data.consentForCompatibility ?? false,
           consentForAiDiscovery: data.consentForAiDiscovery ?? false,
+          consentForAiReflection: data.consentForAiReflection ?? false,
         });
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "Unable to load your relationship profile.");
@@ -159,7 +160,29 @@ export default function RelationshipProfilePage() {
 
 
   async function generateAiReflection() {
-    if (!user || aiBusy || !aiConsent) return;
+    if (!user || aiBusy || !aiEnabled) return;
+
+    let consentGranted = form.consentForAiReflection;
+    if (!consentGranted) {
+      consentGranted = window.confirm(
+        "Generate your Atlas Reflection?\n\nAutoFace will send your saved Atlas relationship answers to its configured AI service to create this explanation. It does not use private messages or verification evidence, and it cannot change your compatibility or authenticity score.\n\nChoose OK to allow Atlas Reflection."
+      );
+      if (!consentGranted) return;
+
+      change("consentForAiReflection", true);
+      try {
+        if (db) {
+          await setDoc(doc(db, "relationshipProfiles", user.uid), {
+            consentForAiReflection: true,
+            updatedAt: serverTimestamp(),
+          }, { merge: true });
+        }
+      } catch {
+        // Consent is still valid for this explicit request even if remembering
+        // the preference fails. The user can be asked again next time.
+      }
+    }
+
     try {
       setAiBusy(true);
       setAiError("");
@@ -170,10 +193,12 @@ export default function RelationshipProfilePage() {
         body: JSON.stringify({ mode: "profile", consent: true }),
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.message ?? body.error ?? "Unable to generate Atlas AI reflection.");
-      setAiInsight(body.insight ?? "");
+      if (!response.ok) throw new Error(body.message ?? body.error ?? "Atlas Reflection is temporarily unavailable. Please try again.");
+      const insight = typeof body.insight === "string" ? body.insight.trim() : "";
+      if (!insight) throw new Error("Atlas Reflection could not create a useful explanation. Please try again.");
+      setAiInsight(insight);
     } catch (error) {
-      setAiError(error instanceof Error ? error.message : "Unable to generate Atlas AI reflection.");
+      setAiError(error instanceof Error ? error.message : "Atlas Reflection is temporarily unavailable. Please try again.");
     } finally {
       setAiBusy(false);
     }
@@ -307,32 +332,39 @@ export default function RelationshipProfilePage() {
               <p className="atlas-disclaimer">This deterministic Atlas insight remains the source of truth. It summarises your structured answers and does not decide who you should match with.</p>
             </div>
 
-            <div className="card atlas-ai-card">
+            <div className="card atlas-ai-card atlas-reflection-card">
               <div className="atlas-ai-title">
-                <div><span className="privacy-kicker">OPTIONAL AI LAYER</span><h3>Atlas AI reflection</h3></div>
-                <span className={`status-pill ${aiEnabled ? "" : "ai-off-pill"}`}>{aiEnabled ? "AVAILABLE" : "OFF"}</span>
+                <div>
+                  <span className="privacy-kicker">ATLAS REFLECTION</span>
+                  <h3>How Atlas sees your relationship outlook</h3>
+                </div>
               </div>
-              <p>Gemini can turn your saved Atlas answers into a more natural reflection. It cannot change your compatibility dimensions or authenticity score.</p>
+              <p>Turn the relationship preferences you have already shared into a short, natural-language reflection.</p>
 
               {aiEnabled ? (
                 <>
-                  <label className="consent-row ai-consent-row">
-                    <input type="checkbox" checked={aiConsent} onChange={(e) => setAiConsent(e.target.checked)} />
-                    <span><b>Use Gemini for this reflection</b><small>Your saved Atlas answers will be sent to the configured AI provider for this request. The generated reflection is not saved.</small></span>
-                  </label>
-                  <button type="button" className="btn btn-primary" disabled={!aiConsent || aiBusy} onClick={() => void generateAiReflection()}>
-                    {aiBusy ? "Asking Atlas AI…" : aiInsight ? "Regenerate reflection" : "Generate AI reflection"}
+                  <button type="button" className="btn btn-primary atlas-reflection-button" disabled={aiBusy} onClick={() => void generateAiReflection()}>
+                    {aiBusy ? "Creating your reflection…" : aiInsight ? "Refresh my reflection" : "Generate my reflection"}
                   </button>
-                  {aiInsight && <div className="atlas-ai-output"><span className="privacy-kicker">GEMINI EXPLANATION</span><p>{aiInsight}</p></div>}
+
+                  {aiInsight && (
+                    <div className="atlas-ai-output atlas-reflection-output">
+                      <span className="privacy-kicker">YOUR ATLAS REFLECTION</span>
+                      <p>{aiInsight}</p>
+                    </div>
+                  )}
                   {aiError && <p className="notice">{aiError}</p>}
+
+                  <p className="atlas-reflection-privacy">
+                    AI-generated from your saved Atlas answers only. It does not affect your compatibility or authenticity score.
+                  </p>
                 </>
               ) : (
-                <div className="ai-disabled-note">
-                  <b>Optional AI is disabled.</b>
-                  <span>Set ATLAS_AI_ENABLED, GEMINI_API_KEY and GEMINI_MODEL on the server to enable it. AutoFace works normally without Gemini.</span>
+                <div className="ai-disabled-note atlas-reflection-unavailable">
+                  <b>Atlas Reflection is not available right now.</b>
+                  <span>Your Atlas Profile and deterministic compatibility continue to work normally.</span>
                 </div>
               )}
-              <p className="atlas-disclaimer">AI output is explanatory only. The structured Atlas profile and deterministic compatibility engine remain authoritative.</p>
             </div>
 
             <div className="card completeness-card">

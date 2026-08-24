@@ -14,6 +14,8 @@ service cloud.firestore {
     match /profiles/{uid} {
       allow read: if signedInAs(uid);
       allow create, update: if signedInAs(uid)
+        && exists(/databases/$(database)/documents/profilePhotos/$(uid))
+        && get(/databases/$(database)/documents/profilePhotos/$(uid)).data.active == true
         && request.resource.data.uid == uid
         && request.resource.data.keys().hasOnly([
           'uid','firstName','surname','preferredName','age','generalLocation','heightCm','occupation',
@@ -82,7 +84,7 @@ service cloud.firestore {
           'sharedInterestsImportance','independencePreference','relationshipPace',
           'idealWeekend','whatMattersMost','nonNegotiables',
           'weekendPreferences','relationshipPriorities','nonNegotiablePreferences','relationshipContext',
-          'consentForCompatibility','consentForAiDiscovery','createdAt','updatedAt'
+          'consentForCompatibility','consentForAiDiscovery','consentForAiReflection','createdAt','updatedAt'
         ])
         && request.resource.data.familyOrientation is int
         && request.resource.data.familyOrientation >= 1 && request.resource.data.familyOrientation <= 5
@@ -116,7 +118,8 @@ service cloud.firestore {
         && request.resource.data.relationshipContext is string
         && request.resource.data.relationshipContext.size() <= 350
         && request.resource.data.consentForCompatibility is bool
-        && request.resource.data.consentForAiDiscovery is bool;
+        && request.resource.data.consentForAiDiscovery is bool
+        && (!request.resource.data.keys().hasAny(['consentForAiReflection']) || request.resource.data.consentForAiReflection is bool);
       allow delete: if signedInAs(uid);
     }
 

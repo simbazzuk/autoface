@@ -7,6 +7,8 @@ export function atlasAiEnabled() {
     && Boolean(process.env.GEMINI_MODEL);
 }
 
+type GeminiJsonSchema = Record<string, unknown>;
+
 const GEMINI_RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
 
 function sleep(ms: number) {
@@ -34,11 +36,16 @@ You are Atlas, an optional explanation assistant inside AutoFace, a relationship
 
 Your role is to reflect the user's own stated preferences. Do not judge attractiveness, worth, personality quality, mental health, identity, or likelihood of relationship success. Do not tell the user who they should marry or reject. Do not infer religion, ethnicity, caste, sexuality, health, politics, or other sensitive traits.
 
-Write a warm, concise reflection of no more than 160 words using only the supplied answers.
-Structure:
-1. A short paragraph describing the user's stated relationship style.
-2. "Likely strengths:" followed by 2-3 short phrases.
-3. "Worth exploring:" followed by 1-2 neutral conversation themes.
+Use only the supplied relationship answers. Be warm, concise and plain-English.
+
+Return ONLY JSON matching this structure:
+{
+  "summary": "2-3 natural sentences describing the user's stated relationship style, max 85 words",
+  "strengths": ["short phrase", "short phrase", "short phrase"],
+  "exploring": ["neutral conversation theme", "neutral conversation theme"]
+}
+
+Return 2-3 strengths and 1-2 exploring items. Do not use Markdown.
 
 Structured answers:
 - Family orientation: ${scale(profile.familyOrientation)}
@@ -57,7 +64,6 @@ User-written answers:
 - Non-negotiables: ${profile.nonNegotiables}
 `.trim();
 }
-
 function compatibilityPrompt(
   candidateName: string,
   result: CompatibilityResult,
@@ -140,8 +146,53 @@ async function callGemini(prompt: string) {
   }
 }
 
+const profileReflectionSchema: GeminiJsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["summary", "strengths", "exploring"],
+  properties: {
+    summary: { type: "string" },
+    strengths: {
+      type: "array",
+      minItems: 2,
+      maxItems: 3,
+      items: { type: "string" },
+    },
+    exploring: {
+      type: "array",
+      minItems: 1,
+      maxItems: 2,
+      items: { type: "string" },
+    },
+  },
+};
+
+function sanitiseProfileReflection(value: unknown) {
+  const raw = (value && typeof value === "object" ? value : {}) as Record<string, unknown>;
+  const summary = String(raw.summary ?? "").replace(/\s+/g, " ").trim().slice(0, 700);
+  const strengths = (Array.isArray(raw.strengths) ? raw.strengths : [])
+    .map((item) => String(item).replace(/^[\s:*•-]+/, "").trim().slice(0, 120))
+    .filter(Boolean)
+    .slice(0, 3);
+  const exploring = (Array.isArray(raw.exploring) ? raw.exploring : [])
+    .map((item) => String(item).replace(/^[\s:*•-]+/, "").trim().slice(0, 150))
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (!summary || strengths.length < 2 || exploring.length < 1) {
+    throw new Error("ATLAS_AI_INVALID_RESPONSE");
+  }
+
+  return [
+    summary,
+    `Likely strengths: ${strengths.join(" · ")}`,
+    `Worth exploring: ${exploring.join(" · ")}`,
+  ].join("\n\n");
+}
+
 export async function generateProfileReflection(profile: RelationshipProfile) {
-  return callGemini(relationshipProfilePrompt(profile));
+  const value = await callGeminiJson(relationshipProfilePrompt(profile), profileReflectionSchema);
+  return sanitiseProfileReflection(value);
 }
 
 export async function generateCompatibilityReflection(candidateName: string, result: CompatibilityResult) {
@@ -343,8 +394,6 @@ function parseGeminiJson(text: string): unknown {
 
   throw new Error("ATLAS_AI_INVALID_JSON");
 }
-
-type GeminiJsonSchema = Record<string, unknown>;
 
 const introductionCoachResponseSchema: GeminiJsonSchema = {
   type: "object",

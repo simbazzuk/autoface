@@ -20,6 +20,7 @@ export type RelationshipProfile = {
   relationshipContext?: string;
   consentForCompatibility: boolean;
   consentForAiDiscovery?: boolean;
+  consentForAiReflection?: boolean;
   createdAt?: unknown;
   updatedAt?: unknown;
 };

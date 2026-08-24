@@ -36,6 +36,16 @@ type AccountData = {
   hasDiscoveryPreferences: boolean;
 };
 
+type BlockedProfile = {
+  blockId: string;
+  uid: string;
+  firstName: string;
+  location: string | null;
+  matchId: string | null;
+  blockedAt: string | null;
+  source: string | null;
+};
+
 const DELETE_PHRASE = "DELETE MY AUTOFACE ACCOUNT";
 
 export default function AccountPage() {
@@ -46,6 +56,8 @@ export default function AccountPage() {
   const [busy, setBusy] = useState(false);
   const [deleteText, setDeleteText] = useState("");
   const [showDelete, setShowDelete] = useState(false);
+  const [blockedProfiles, setBlockedProfiles] = useState<BlockedProfile[]>([]);
+  const [blockedLoading, setBlockedLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
@@ -70,6 +82,56 @@ export default function AccountPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const loadBlockedProfiles = useCallback(async () => {
+    if (!user) return;
+    try {
+      setBlockedLoading(true);
+      const token = await user.getIdToken();
+      const response = await fetch("/api/blocks", {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error ?? "Unable to load blocked profiles.");
+      setBlockedProfiles(Array.isArray(body.blockedProfiles) ? body.blockedProfiles : []);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to load blocked profiles.");
+    } finally {
+      setBlockedLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    void loadBlockedProfiles();
+  }, [loadBlockedProfiles]);
+
+  async function unblockProfile(profile: BlockedProfile) {
+    if (!user || busy) return;
+    if (!window.confirm(`Unblock ${profile.firstName}? ${profile.matchId ? "If this introduction is still valid and they have not blocked you, messaging will become available again." : "They may become eligible for future AutoFace interactions again."}`)) return;
+    try {
+      setBusy(true);
+      setMessage("");
+      const token = await user.getIdToken();
+      const response = await fetch("/api/blocks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ blockedUid: profile.uid }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error ?? "Unable to unblock this profile.");
+      setBlockedProfiles((current) => current.filter((item) => item.uid !== profile.uid));
+      setMessage(
+        body.conversationRestored
+          ? `${profile.firstName} has been unblocked. Your introduction and messaging have been restored.`
+          : `${profile.firstName} has been unblocked. Any previous introduction remains subject to its current availability and the other member's safety controls.`,
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to unblock this profile.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function setDiscovery(enabled: boolean) {
     if (!user || busy) return;
@@ -330,6 +392,45 @@ export default function AccountPage() {
               <button className="btn btn-primary" disabled={busy} onClick={() => void downloadData()}>Download my data</button>
             </div>
 
+            <div className="card account-control-card blocked-profiles-card">
+              <div className="account-control-head">
+                <div><span className="privacy-kicker">SAFETY & BLOCKING</span><h2>Blocked profiles</h2></div>
+                <span className="status-pill">{blockedProfiles.length} BLOCKED</span>
+              </div>
+              <p>Profiles you block cannot message you or interact with you through that introduction. The other person is not told that you blocked them.</p>
+
+              {blockedLoading ? (
+                <div className="blocked-empty"><b>Loading blocked profiles…</b></div>
+              ) : blockedProfiles.length === 0 ? (
+                <div className="blocked-empty">
+                  <b>No blocked profiles</b>
+                  <span>If you block someone from a conversation, they will appear here so you always know who is blocked and can reverse the decision later.</span>
+                </div>
+              ) : (
+                <div className="blocked-profile-list">
+                  {blockedProfiles.map((profile) => (
+                    <div className="blocked-profile-row" key={profile.uid}>
+                      <div className="blocked-profile-avatar" aria-hidden="true">{profile.firstName.charAt(0).toUpperCase()}</div>
+                      <div className="blocked-profile-copy">
+                        <b>{profile.firstName}</b>
+                        <span>{profile.location || "AutoFace member"}</span>
+                        <small>
+                          Blocked {profile.blockedAt ? new Date(profile.blockedAt).toLocaleDateString() : "previously"}
+                          {profile.source === "report" ? " · blocked with a safety report" : ""}
+                        </small>
+                      </div>
+                      <button className="btn unblock-button" disabled={busy} onClick={() => void unblockProfile(profile)}>Unblock</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="blocked-privacy-note">
+                <b>What happens when you unblock?</b>
+                <span>Unblocking removes your block. If the same mutual introduction is still valid and the other member has not blocked you, AutoFace restores that conversation. Safety reports remain on record and are not removed by unblocking.</span>
+              </div>
+            </div>
+
             <div className="card account-control-card danger-zone">
               <span className="privacy-kicker danger-kicker">DANGER ZONE</span>
               <h2>Delete my AutoFace account</h2>
@@ -372,7 +473,7 @@ export default function AccountPage() {
               <h3>Verification evidence</h3>
               <div className="privacy-status-list">
                 <span><b>Identity</b>{data.verification.identityVerified ? "Verified" : "Not verified"}</span>
-                <span><b>Liveness</b>{data.verification.livenessVerified ? "Verified" : "Not verified"}</span>
+                <span><b>Live face check</b>{data.verification.photoVerified ? "Completed" : "Not completed"}</span>
                 <span><b>Profile photo</b>{data.verification.photoVerified ? "Verified" : "Not verified"}</span>
               </div>
               <a className="btn" href="/dashboard">Authenticity Centre</a>

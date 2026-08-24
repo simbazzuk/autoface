@@ -120,7 +120,7 @@ export default function MessagePage() {
   async function matchAction(action: "unmatch" | "block" | "report") {
     if (!user || actionBusy) return;
     if (action === "unmatch" && !window.confirm("End this introduction? Messaging will stop for both people.")) return;
-    if (action === "block" && !window.confirm("Block this member? They will no longer be able to message you.")) return;
+    if (action === "block" && !window.confirm(`Block ${data?.other.firstName ?? "this member"}? They will no longer be able to message you through this introduction. You can unblock them later from Account & Notifications.`)) return;
     setActionBusy(true);
     setStatusMessage("");
     try {
@@ -209,11 +209,11 @@ export default function MessagePage() {
         <div className="card safety-control-card">
           <span className="privacy-kicker">YOUR SAFETY CONTROLS</span>
           <h2>Stay in control.</h2>
-          <p>Blocking and reporting are enforced server-side. The other member is not told who submitted a report.</p>
+          <p>Blocking and reporting are enforced server-side. Blocked profiles can be reviewed and unblocked later from Account & Notifications. The other member is not told who submitted a report.</p>
 
           <div className="safety-actions">
             <button className="btn btn-secondary" onClick={() => void matchAction("unmatch")} disabled={actionBusy}>End introduction</button>
-            <button className="btn btn-secondary danger-button" onClick={() => void matchAction("block")} disabled={actionBusy}>Block member</button>
+            <button className="btn btn-secondary danger-button" onClick={() => void matchAction("block")} disabled={actionBusy}>{`Block ${other.firstName}`}</button>
             <button className={`btn btn-secondary ${showReport ? "report-open" : ""}`} onClick={() => setShowReport((v) => !v)} disabled={actionBusy}>
               {showReport ? "Cancel report" : "Report member"}
             </button>

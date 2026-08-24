@@ -57,10 +57,33 @@ export default function ProfilePage() {
   const [photoBusy,setPhotoBusy]=useState(false);
   const [photoMessage,setPhotoMessage]=useState("");
   const [photoRefresh,setPhotoRefresh]=useState(0);
+  const [photoPresent,setPhotoPresent]=useState(false);
+  const [photoStatusLoading,setPhotoStatusLoading]=useState(true);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
   }, [loading, user, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    (async () => {
+      try {
+        setPhotoStatusLoading(true);
+        const token = await user.getIdToken();
+        const response = await fetch(`/api/profile-photo/${encodeURIComponent(user.uid)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        });
+        if (active) setPhotoPresent(response.ok);
+      } catch {
+        if (active) setPhotoPresent(false);
+      } finally {
+        if (active) setPhotoStatusLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, [user, photoRefresh]);
 
   useEffect(() => {
     if (!db || !user) return;
@@ -162,6 +185,7 @@ export default function ProfilePage() {
       });
       const result=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(result.message??result.error??"Unable to upload profile photo.");
+      setPhotoPresent(true);
       setPhotoRefresh(v=>v+1);
       setPhotoMessage(result.verificationReset
         ? "Profile photo updated. Your previous Face Verified status has been reset — please verify the new primary photo."
@@ -181,6 +205,7 @@ export default function ProfilePage() {
       });
       const result=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(result.error??"Unable to remove profile photo.");
+      setPhotoPresent(false);
       setPhotoRefresh(v=>v+1);
       setPhotoMessage(result.verificationReset
         ? "Profile photo removed. Face Verified has been reset because the verified reference photo is no longer present."
@@ -205,6 +230,11 @@ export default function ProfilePage() {
     }
     if (!form.firstName.trim() || !form.surname.trim() || !form.generalLocation.trim() || !form.aboutMe.trim()) {
       setMessage("First name, surname, general location and About me are required.");
+      return;
+    }
+    if (!photoPresent) {
+      setMessage("Add a profile photo before saving your profile.");
+      setPhotoMessage("A profile photo is required before you can save your AutoFace profile.");
       return;
     }
     try {
@@ -395,7 +425,15 @@ export default function ProfilePage() {
               <div><span className="privacy-kicker">PROFILE COMPLETE</span><h3>Your profile is ready for the next step.</h3><p>Atlas now needs to understand the relationship values and expectations that matter to you before AutoFace can make considered recommendations.</p></div>
               <a className="btn btn-primary journey-next-button" href="/relationship-profile">Continue to Atlas →</a>
             </div>}
-            <div className="profile-actions profile-actions-sticky"><div><small>Your profile remains under your control.</small><b>Save changes when you&apos;re ready.</b></div><button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save profile"}</button></div>
+            <div className={`profile-actions profile-actions-sticky ${!photoPresent ? "photo-required-save" : ""}`}>
+              <div>
+                <small>{photoPresent ? "Your profile remains under your control." : "Profile photo required"}</small>
+                <b>{photoPresent ? "Save changes when you&apos;re ready." : "Add a profile photo to continue."}</b>
+              </div>
+              <button className="btn btn-primary" disabled={saving || photoStatusLoading || !photoPresent}>
+                {saving ? "Saving…" : photoStatusLoading ? "Checking photo…" : !photoPresent ? "Add photo to save" : "Save profile"}
+              </button>
+            </div>
           </form>
 
           <aside className="profile-side">
@@ -405,9 +443,9 @@ export default function ProfilePage() {
                 <div>
                   <span className="privacy-kicker">PROFILE PHOTO</span>
                   <h3>Make your first impression feel human.</h3>
-                  <p className="photo-card-intro">One clear, recent photo helps an introduction feel more real before a conversation starts.</p>
+                  <p className="photo-card-intro">One clear, recent photo is required before your profile can be saved. It also helps introductions feel more human and supports Face Verification.</p>
                 </div>
-                <span className="status-pill photo-status-pill">MEMBER VIEW</span>
+                <span className={`status-pill photo-status-pill ${photoPresent ? "photo-ready" : "photo-required"}`}>{photoPresent ? "PHOTO ADDED" : "REQUIRED"}</span>
               </div>
 
               <div className="photo-stage">
@@ -438,7 +476,7 @@ export default function ProfilePage() {
 
               <div className="photo-trust-strip">
                 <span className="photo-trust-icon">◎</span>
-                <div><b>Your photo is private infrastructure, not biometric data.</b><small>It is used as your member profile image. Facial verification remains a separate Coming Soon authenticity feature.</small></div>
+                <div><b>Your photo is private infrastructure, not biometric data.</b><small>It is used as your member profile image. Face Verification is a separate trust step after your profile photo has been added.</small></div>
               </div>
             </div>
             <div className="card completeness-card readiness-card readiness-card-premium">

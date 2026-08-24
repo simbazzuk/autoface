@@ -52,7 +52,7 @@ export const supportTopics: SupportTopic[] = [
     id: "authenticity",
     title: "Authenticity",
     keywords: ["authenticity","verify","verification","verified","score","identity","photo verification","trust score"],
-    answer: "Authenticity is based on explicit verification signals such as account, identity, liveness and profile-photo evidence. It controls trust eligibility and stays separate from compatibility scoring.",
+    answer: "Authenticity is based on verification checks AutoFace currently performs: verified email, verified mobile and Face Verification. Face Verification combines a live-person check with a one-to-one comparison against the current profile photo. Authenticity stays separate from compatibility scoring.",
     actionLabel: "Open Authenticity Centre",
     actionUrl: "/dashboard",
   },

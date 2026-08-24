@@ -6,7 +6,6 @@ import {
   PhoneAuthProvider,
   RecaptchaVerifier,
   linkWithCredential,
-  multiFactor,
   sendEmailVerification,
   signOut,
 } from "firebase/auth";
@@ -30,50 +29,26 @@ const checks: VerificationCheck[] = [
   {
     key: "emailVerified",
     label: "Email verification",
-    weight: "+10",
+    weight: "+20",
     available: true,
     summary: "Confirms access to the email address on your AutoFace account.",
-    detail: "Email verification is a basic account signal. It confirms that you control the email address used to register, but it does not establish your real-world identity.",
+    detail: "Email verification confirms that you control the email address used to register. It is an account-trust signal and does not establish your legal identity.",
   },
   {
     key: "phoneVerified",
     label: "Mobile verification",
-    weight: "+15",
+    weight: "+25",
     available: true,
     summary: "Confirms access to a mobile number linked to your account.",
-    detail: "Mobile verification adds a second independent account signal and makes disposable or automated account creation harder. It still does not mean AutoFace has verified your legal identity.",
-  },
-  {
-    key: "mfaEnabled",
-    label: "MFA / passkey",
-    weight: "+10",
-    available: false,
-    summary: "Strengthens account security with an additional sign-in factor.",
-    detail: "This is planned for the next security iteration. MFA or passkeys reduce the risk of account takeover even if a password is compromised.",
-  },
-  {
-    key: "identityVerified",
-    label: "Identity verification",
-    weight: "+30",
-    available: true,
-    summary: "Confirms a real-world identity check through the identity-verification boundary.",
-    detail: "In development, AutoFace uses a clearly labelled simulator. In production this signal must come from a specialist identity provider; AutoFace stores the outcome and provider reference rather than identity-document images.",
-  },
-  {
-    key: "livenessVerified",
-    label: "Liveness verification",
-    weight: "+20",
-    available: true,
-    summary: "Confirms that liveness evidence formed part of the identity-verification result.",
-    detail: "The external verification boundary is responsible for any liveness processing. AutoFace records only the completed check, provider reference and timestamp—not raw liveness media or biometric templates.",
+    detail: "Mobile verification adds an independent account signal and makes disposable or automated account creation harder. It does not mean AutoFace has verified a government-issued identity document.",
   },
   {
     key: "photoVerified",
-    label: "Facial verification",
-    weight: "+15",
-    available: false,
-    summary: "Coming soon — a secure live facial check to strengthen authenticity.",
-    detail: "Facial verification is planned as a specialist-provider integration. It will be used for authenticity only and will never influence compatibility, ranking or Atlas recommendations.",
+    label: "Face verification",
+    weight: "+55",
+    available: true,
+    summary: "Confirms a successful live face check and one-to-one match with your current profile photo.",
+    detail: "Amazon Rekognition performs a short Face Liveness check and AutoFace compares the resulting reference image one-to-one with your current profile photo. This is used only for authenticity and never for compatibility scoring.",
   },
 ];
 
@@ -117,9 +92,9 @@ export default function Dashboard() {
   const signals = useMemo<AuthenticitySignals>(() => ({
     emailVerified: Boolean(user?.emailVerified),
     phoneVerified: Boolean(user?.phoneNumber),
-    mfaEnabled: Boolean(user ? multiFactor(user).enrolledFactors.length : false),
-    identityVerified: identitySignals.identityVerified,
-    livenessVerified: identitySignals.livenessVerified,
+    mfaEnabled: false,
+    identityVerified: false,
+    livenessVerified: false,
     photoVerified: identitySignals.photoVerified,
   }), [user, identitySignals]);
 
@@ -194,7 +169,7 @@ export default function Dashboard() {
         <div className="container">
           <span className="eyebrow">Authenticity Centre</span>
           <h1>Build your authenticity.</h1>
-          <p className="lead">Your score comes from explicit verification evidence—not AI judgement, popularity or profile attractiveness.</p>
+          <p className="lead">Your authenticity status reflects verification checks that AutoFace actually performs today—not AI judgement, popularity or profile attractiveness.</p>
         </div>
       </section>
 
@@ -298,32 +273,48 @@ export default function Dashboard() {
 
             {message && <p className="notice status-message">{message}</p>}
 
-            <div className="security-action identity-action">
-              <div className="action-copy">
-                <strong>Identity + liveness verification</strong>
-                <p>Continue to the identity-verification boundary. In development this uses a clearly labelled simulator; production will use a specialist provider.</p>
+            <div className="security-action identity-action face-verification-action">
+              <div className="face-verification-header">
+                <div>
+                  <strong>Face verification</strong>
+                  <p>Live camera check + one-to-one comparison with your current profile photo.</p>
+                </div>
+                <span className={`face-status-badge ${signals.photoVerified ? "verified" : "pending"}`}>
+                  {signals.photoVerified ? "✓ Verified" : "Verification needed"}
+                </span>
               </div>
-              {signals.identityVerified && signals.livenessVerified ? (
-                <p className="notice">✓ Identity and liveness evidence recorded.</p>
-              ) : (
-                <button className="btn btn-primary" onClick={() => router.push("/verify-identity")}>Verify identity</button>
-              )}
-            </div>
 
-            <div className="security-action identity-action facial-coming-soon">
-              <div className="action-copy">
-                <div className="facial-title-row"><strong>Facial verification</strong><span className="coming-soon">COMING SOON</span></div>
-                <p>Use a secure live facial check to strengthen your authenticity. A specialist provider will perform liveness and verification outside the AutoFace matching engine.</p>
-                <div className="facial-principle">Used for authenticity, never matching.</div>
+              {signals.photoVerified ? (
+                <div className="face-verification-result verified">
+                  <div className="face-result-icon" aria-hidden="true">✓</div>
+                  <div className="face-result-copy">
+                    <b>Verification complete</b>
+                    <span>Your current profile photo has been successfully face verified.</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="face-verification-result pending">
+                  <div className="face-result-icon" aria-hidden="true">•</div>
+                  <div className="face-result-copy">
+                    <b>Verification required</b>
+                    <span>Complete the live face check to strengthen your authenticity status.</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="face-verification-footer">
+                <div className="facial-principle">Used for authenticity only — never compatibility or ranking.</div>
+                <button className={`btn ${signals.photoVerified ? "" : "btn-primary"}`} onClick={() => router.push("/verify-face")}>
+                  {signals.photoVerified ? "View verification" : "Verify my face"}
+                </button>
               </div>
-              <button className="btn" disabled>Verify my face · Coming soon</button>
             </div>
 
             <div className="privacy-box">
               <span className="privacy-kicker">PRIVACY BY DESIGN</span>
-              <b>Zero-ID Storage</b>
-              <p>AutoFace does not store passport images, driving-licence images, raw verification selfies or biometric templates.</p>
-              <p className="privacy-note">Identity and liveness results are written server-side after a provider session; users cannot self-award these verification signals.</p>
+              <b>Minimal verification data</b>
+              <p>AutoFace does not ask for or store passport or driving-licence images as part of the current authenticity journey.</p>
+              <p className="privacy-note">Face Verification uses AWS Face Liveness and a one-to-one profile-photo comparison. AutoFace records the verification outcome and security metadata; users cannot self-award verification status.</p>
             </div>
 
             <button className="btn danger" onClick={() => auth && signOut(auth)}>Sign out</button>

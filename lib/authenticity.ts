@@ -8,12 +8,16 @@ export type AuthenticitySignals = {
 };
 
 export const authenticityWeights: Record<keyof AuthenticitySignals, number> = {
-  emailVerified: 10,
-  phoneVerified: 15,
-  mfaEnabled: 10,
-  identityVerified: 30,
-  livenessVerified: 20,
-  photoVerified: 15,
+  // v0.35.9.2: only verification capabilities that genuinely operate in the
+  // current product contribute to the user-facing authenticity score.
+  emailVerified: 20,
+  phoneVerified: 25,
+  mfaEnabled: 0,
+  identityVerified: 0,
+  livenessVerified: 0,
+  // Face Verification combines AWS Face Liveness with the one-to-one
+  // comparison against the user's current profile photo.
+  photoVerified: 55,
 };
 
 export function calculateAuthenticity(signals: AuthenticitySignals) {
@@ -30,8 +34,10 @@ export function calculateAuthenticity(signals: AuthenticitySignals) {
           ? "BASIC"
           : "NOT YET ESTABLISHED";
 
-  const completed = (Object.keys(authenticityWeights) as (keyof AuthenticitySignals)[])
-    .filter((key) => signals[key]).length;
+  const activeKeys = (Object.keys(authenticityWeights) as (keyof AuthenticitySignals)[])
+    .filter((key) => authenticityWeights[key] > 0);
 
-  return { score, level, completed, total: Object.keys(authenticityWeights).length, weights: authenticityWeights };
+  const completed = activeKeys.filter((key) => signals[key]).length;
+
+  return { score, level, completed, total: activeKeys.length, weights: authenticityWeights };
 }
