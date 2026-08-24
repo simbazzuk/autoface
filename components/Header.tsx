@@ -181,7 +181,7 @@ export function Header() {
           <Link href="/profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>My Profile</Link>
           <Link href="/relationship-profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Atlas Profile</Link>
           <Link href="/dashboard" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Security & Verification</Link>
-          <Link href="/account" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Privacy & Control</Link>
+          <Link href="/account" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Account & Notifications</Link>
           <Link href="/introductions" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>My Introductions</Link>
         </div>
 
@@ -214,7 +214,7 @@ export function Header() {
                 <Link onClick={closeDesktopMenus} href="/discovery-preferences"><b>Introduction Preferences</b><small>What matters when Atlas considers people</small></Link>
                 <Link onClick={closeDesktopMenus} href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
                 <Link onClick={closeDesktopMenus} href="/verify-face"><b>Face Verification</b><small>Live face + profile-photo match</small></Link>
-                <Link onClick={closeDesktopMenus} href="/account"><b>Privacy & Control</b><small>Discovery, data export and deletion</small></Link>
+                <Link onClick={closeDesktopMenus} href="/account"><b>Account & Notifications</b><small>Email preferences, account settings and privacy controls</small></Link>
                 {developmentTools && <Link onClick={closeDesktopMenus} href="/development-tools"><b>Development Tools</b><small>Reset and seed synthetic test data</small></Link>}
                 <AdminLink />
               </div>
@@ -279,7 +279,7 @@ export function Header() {
                 <Link href="/discovery-preferences" onClick={closeMobile}>Introduction Preferences</Link>
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
                 <Link href="/verify-face" onClick={closeMobile}>Face Verification</Link>
-                <Link href="/account" onClick={closeMobile}>Privacy & Control</Link>
+                <Link href="/account" onClick={closeMobile}>Account & Notifications <span>Email, account & privacy settings</span></Link>
                 {developmentTools && <Link href="/development-tools" onClick={closeMobile}>Development Tools</Link>}
                 <AdminLink mobile />
               </div>

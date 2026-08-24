@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { compareFaceImages, getFaceLivenessResult } from "@/lib/server/aws-rekognition";
 import { getProfilePhotoBytes } from "@/lib/server/profile-photo-bytes";
+import { createNotification } from "@/lib/server/notifications";
 
 export const runtime = "nodejs";
 
@@ -89,6 +90,16 @@ export async function POST(request: Request) {
       provider: "aws-rekognition",
       createdAt: FieldValue.serverTimestamp(),
     });
+
+    if (verified) {
+      await createNotification({
+        recipientUid: user.uid,
+        type: "verification",
+        title: "Face verification complete",
+        body: "Your live face check and profile-photo match have been successfully verified.",
+        actionUrl: "/verify-face",
+      });
+    }
 
     return NextResponse.json({
       verified,
