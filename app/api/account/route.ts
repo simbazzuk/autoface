@@ -50,6 +50,11 @@ export async function GET(request: Request) {
         connectionUpdates: notificationPrefsSnap.data()?.connectionUpdates !== false,
         verificationUpdates: notificationPrefsSnap.data()?.verificationUpdates !== false,
         safetyUpdates: true,
+        emailIntroductions: notificationPrefsSnap.data()?.emailIntroductions !== false,
+        emailMessages: notificationPrefsSnap.data()?.emailMessages === true,
+        emailConnectionUpdates: notificationPrefsSnap.data()?.emailConnectionUpdates === true,
+        emailVerificationUpdates: notificationPrefsSnap.data()?.emailVerificationUpdates !== false,
+        emailSafetyUpdates: true,
       },
       hasDiscoveryPreferences: preferencesSnap.exists,
     });
@@ -77,6 +82,10 @@ export async function PATCH(request: Request) {
         messages?: boolean;
         connectionUpdates?: boolean;
         verificationUpdates?: boolean;
+        emailIntroductions?: boolean;
+        emailMessages?: boolean;
+        emailConnectionUpdates?: boolean;
+        emailVerificationUpdates?: boolean;
       };
     };
 
@@ -116,7 +125,16 @@ export async function PATCH(request: Request) {
         updatedAt: FieldValue.serverTimestamp(),
       };
       for (const [key, value] of Object.entries(allowed)) {
-        if (!["introductions", "messages", "connectionUpdates", "verificationUpdates"].includes(key)) continue;
+        if (![
+          "introductions",
+          "messages",
+          "connectionUpdates",
+          "verificationUpdates",
+          "emailIntroductions",
+          "emailMessages",
+          "emailConnectionUpdates",
+          "emailVerificationUpdates",
+        ].includes(key)) continue;
         if (typeof value === "boolean") notificationUpdates[key] = value;
       }
 

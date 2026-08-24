@@ -27,6 +27,11 @@ type AccountData = {
     connectionUpdates: boolean;
     verificationUpdates: boolean;
     safetyUpdates: true;
+    emailIntroductions: boolean;
+    emailMessages: boolean;
+    emailConnectionUpdates: boolean;
+    emailVerificationUpdates: boolean;
+    emailSafetyUpdates: true;
   };
   hasDiscoveryPreferences: boolean;
 };
@@ -117,7 +122,15 @@ export default function AccountPage() {
   }
 
   async function updateNotificationPreference(
-    key: "introductions" | "messages" | "connectionUpdates" | "verificationUpdates",
+    key:
+      | "introductions"
+      | "messages"
+      | "connectionUpdates"
+      | "verificationUpdates"
+      | "emailIntroductions"
+      | "emailMessages"
+      | "emailConnectionUpdates"
+      | "emailVerificationUpdates",
     enabled: boolean,
   ) {
     if (!user || busy) return;
@@ -268,18 +281,40 @@ export default function AccountPage() {
               <a className="btn" href="/profile">Preview my member profile</a>
             </div>
 
-            <div className="card account-control-card">
+            <div className="card account-control-card notification-preferences-card">
               <div className="account-control-head">
-                <div><span className="privacy-kicker">NOTIFICATIONS</span><h2>Choose which activity reaches you</h2></div>
-                <span className="status-pill">IN-APP</span>
+                <div><span className="privacy-kicker">COMMUNICATIONS</span><h2>Choose how AutoFace keeps you informed</h2></div>
+                <span className="status-pill">YOU CONTROL IT</span>
               </div>
-              <p>Turn off routine categories without affecting the underlying feature. Safety and account-protection notices always remain enabled.</p>
-              <div className="privacy-control-stack">
-                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.introductions} disabled={busy} onChange={(e) => void updateNotificationPreference("introductions", e.target.checked)} /><span><b>New introductions</b><small>Mutual-interest and introduction activity.</small></span></label>
-                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.messages} disabled={busy} onChange={(e) => void updateNotificationPreference("messages", e.target.checked)} /><span><b>New messages</b><small>Conversation activity from mutual introductions.</small></span></label>
-                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.connectionUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("connectionUpdates", e.target.checked)} /><span><b>Connection updates</b><small>Changes to your shared Connection journey.</small></span></label>
-                <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.verificationUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("verificationUpdates", e.target.checked)} /><span><b>Verification updates</b><small>Authenticity and verification result activity.</small></span></label>
-                <label className="toggle-row locked-toggle"><input type="checkbox" checked readOnly /><span><b>Safety & account protection</b><small>Always enabled so important trust and security notices cannot be missed.</small></span></label>
+              <p>In-app activity and email are separate channels. Essential safety and account-protection notices always remain enabled.</p>
+
+              <div className="notification-channel-grid">
+                <section className="notification-channel notification-channel-app">
+                  <div className="notification-channel-head"><span>●</span><div><b>In-app activity</b><small>Shown in your AutoFace Activity centre.</small></div></div>
+                  <div className="privacy-control-stack">
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.introductions} disabled={busy} onChange={(e) => void updateNotificationPreference("introductions", e.target.checked)} /><span><b>New introductions</b><small>Mutual-interest and introduction activity.</small></span></label>
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.messages} disabled={busy} onChange={(e) => void updateNotificationPreference("messages", e.target.checked)} /><span><b>New messages</b><small>Conversation activity from mutual introductions.</small></span></label>
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.connectionUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("connectionUpdates", e.target.checked)} /><span><b>Connection updates</b><small>Changes to your shared Connection journey.</small></span></label>
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.verificationUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("verificationUpdates", e.target.checked)} /><span><b>Verification updates</b><small>Authenticity and verification result activity.</small></span></label>
+                    <label className="toggle-row locked-toggle"><input type="checkbox" checked readOnly /><span><b>Safety & account protection</b><small>Always enabled.</small></span></label>
+                  </div>
+                </section>
+
+                <section className="notification-channel notification-channel-email">
+                  <div className="notification-channel-head"><span>✉</span><div><b>Email notifications</b><small>Privacy-safe alerts sent to {data.account.email}.</small></div></div>
+                  <div className="privacy-control-stack">
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.emailIntroductions} disabled={busy} onChange={(e) => void updateNotificationPreference("emailIntroductions", e.target.checked)} /><span><b>Mutual introductions</b><small>Recommended: know when a private introduction becomes mutual.</small></span></label>
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.emailMessages} disabled={busy} onChange={(e) => void updateNotificationPreference("emailMessages", e.target.checked)} /><span><b>Unread-message alerts</b><small>Optional. At most one email per conversation every 30 minutes.</small></span></label>
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.emailConnectionUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("emailConnectionUpdates", e.target.checked)} /><span><b>Connection updates</b><small>Optional updates to your shared connection journey.</small></span></label>
+                    <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.emailVerificationUpdates} disabled={busy} onChange={(e) => void updateNotificationPreference("emailVerificationUpdates", e.target.checked)} /><span><b>Verification updates</b><small>Recommended for verification and re-verification events.</small></span></label>
+                    <label className="toggle-row locked-toggle"><input type="checkbox" checked readOnly /><span><b>Safety & account protection</b><small>Always enabled for essential service notices.</small></span></label>
+                  </div>
+                </section>
+              </div>
+
+              <div className="email-privacy-note">
+                <b>Privacy-safe email by design</b>
+                <span>Notification emails do not include profile photos, compatibility detail, religion/family information or private Atlas answers. Sign in to mip.chat to see the full update.</span>
               </div>
               <a className="btn" href="/notifications">Open Activity</a>
             </div>

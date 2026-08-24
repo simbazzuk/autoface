@@ -4279,3 +4279,39 @@ body{
   .introductions-section .intro-tab-copy b{font-size:15px}
   .introductions-section .intro-tab-copy small{font-size:10.5px}
 }
+
+
+/* v0.35.9 — Email Notifications & Communication Preferences */
+.notification-preferences-card{
+  background:radial-gradient(520px 300px at 8% 0%,rgba(68,139,255,.10),transparent 68%),
+             radial-gradient(520px 320px at 96% 30%,rgba(174,75,255,.11),transparent 68%),
+             linear-gradient(155deg,rgba(14,24,53,.98),rgba(14,18,42,.98))!important;
+  border-color:rgba(117,137,212,.28)!important;
+}
+.notification-channel-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:22px 0}
+.notification-channel{
+  padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.10);
+  background:rgba(4,12,31,.48);
+}
+.notification-channel-app{border-color:rgba(72,157,255,.30);background:linear-gradient(145deg,rgba(22,65,122,.38),rgba(9,22,53,.72))}
+.notification-channel-email{border-color:rgba(185,101,255,.32);background:linear-gradient(145deg,rgba(86,43,128,.42),rgba(19,20,58,.74))}
+.notification-channel-head{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.notification-channel-head>span{
+  display:grid;place-items:center;width:40px;height:40px;border-radius:13px;
+  background:rgba(255,255,255,.07);font-size:19px;color:#c7dcff;
+}
+.notification-channel-email .notification-channel-head>span{color:#e8b9ff;background:rgba(191,91,255,.11)}
+.notification-channel-head div{display:flex;flex-direction:column;gap:3px}
+.notification-channel-head b{font-size:16px;color:#fff}
+.notification-channel-head small{font-size:11px;color:#aebbd0;line-height:1.4}
+.notification-channel .toggle-row{background:rgba(4,11,27,.48)!important;border-color:rgba(195,215,250,.13)!important}
+.notification-channel .toggle-row:has(input:checked){border-color:rgba(116,104,255,.46)!important;background:linear-gradient(135deg,rgba(88,70,218,.24),rgba(42,109,194,.14))!important}
+.notification-channel-email .toggle-row:has(input:checked){border-color:rgba(191,99,255,.46)!important;background:linear-gradient(135deg,rgba(130,62,194,.25),rgba(73,58,154,.17))!important}
+.email-privacy-note{
+  display:flex;flex-direction:column;gap:6px;margin:0 0 18px;padding:16px 18px;
+  border:1px solid rgba(49,210,173,.28);border-radius:15px;
+  background:linear-gradient(135deg,rgba(12,89,77,.24),rgba(12,31,53,.64));
+}
+.email-privacy-note b{color:#9ce8d0;font-size:13px}
+.email-privacy-note span{color:#b8c7d8;font-size:12px;line-height:1.55}
+@media(max-width:850px){.notification-channel-grid{grid-template-columns:1fr}}
