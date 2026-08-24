@@ -5,7 +5,7 @@ import { findSupportTopic } from "@/lib/support-knowledge";
 
 export const runtime = "nodejs";
 
-type RequestBody = { question?: string };
+type RequestBody = { question?: string; path?: string };
 
 async function discoveryDiagnostic(uid: string, token: Awaited<ReturnType<typeof requireUser>>) {
   if (!adminDb) return null;
@@ -50,16 +50,17 @@ export async function POST(request: Request) {
     const user = await requireUser(request);
     const body = await request.json() as RequestBody;
     const question = body.question?.trim() ?? "";
+    const path = typeof body.path === "string" ? body.path.slice(0, 120) : "";
 
     if (question.length < 2 || question.length > 500) {
       return NextResponse.json({ error: "INVALID_QUESTION" }, { status: 400 });
     }
 
-    const topic = findSupportTopic(question);
+    const topic = findSupportTopic(question, path);
 
     if (!topic) {
       return NextResponse.json({
-        answer: "I can help with using AutoFace — including setup, authenticity, Atlas compatibility, Discovery, introductions, messaging, privacy and safety. Try asking how a feature works or where to find it.",
+        answer: "I can help with AutoFace — The Match Intelligence Platform — including profiles, face verification, Discovery Preferences, Compatibility, Atlas recommendations, introductions, messaging, Founding Member access, privacy and safety. Ask about the page you are on or how a feature works.",
         actionLabel: "Open Getting Started",
         actionUrl: "/get-started",
         source: "curated_support",
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
       topic: topic.id,
       source: "curated_support",
       diagnostic,
-      notice: "Atlas Support answers product-navigation questions from approved AutoFace guidance. It does not inspect private messages or make relationship or moderation decisions.",
+      notice: "AutoFace Assistant answers product-navigation questions from approved AutoFace guidance. It uses the current page only to tailor help; it does not inspect private messages or make relationship or moderation decisions.",
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";

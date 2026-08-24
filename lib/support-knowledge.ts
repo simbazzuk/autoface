@@ -9,6 +9,30 @@ export type SupportTopic = {
 
 export const supportTopics: SupportTopic[] = [
   {
+    id: "face_verification",
+    title: "Face verification",
+    keywords: ["face verification","verify face","liveness","camera","face check","profile photo verification","change profile photo"],
+    answer: "Face Verification uses a live camera check and compares the result with your current primary profile photo. If you replace that photo with a different image, the verified-photo status is cleared and you will need to verify the new photo. AutoFace stores the verification status and photo-integrity fingerprint rather than treating the liveness capture as a profile image.",
+    actionLabel: "Open Face Verification",
+    actionUrl: "/verify-face",
+  },
+  {
+    id: "founding_member",
+    title: "Founding Member access",
+    keywords: ["founding member","founder member","first 20","12 months free","unlimited access","founding access"],
+    answer: "AutoFace is offering the first 20 qualifying verified members 12 months of complimentary AutoFace Unlimited. Complete registration, your relationship profile and verification to qualify. The homepage offer describes the programme; entitlement activation is handled separately from the support assistant.",
+    actionLabel: "View Founding Member offer",
+    actionUrl: "/",
+  },
+  {
+    id: "match_intelligence_platform",
+    title: "Match Intelligence Platform",
+    keywords: ["match intelligence","mip.chat","mip chat","what is mip","what is autoface","match intelligence platform"],
+    answer: "AutoFace is The Match Intelligence Platform. mip.chat is the memorable public domain identity for the platform, while AutoFace remains the product brand. Atlas is the intelligence layer that explains compatibility and recommendations; it does not make relationship decisions for you.",
+    actionLabel: "Open AutoFace home",
+    actionUrl: "/",
+  },
+  {
     id: "getting_started",
     title: "Getting started",
     keywords: ["start","getting started","setup","set up","begin","new","checklist","ready"],
@@ -140,19 +164,39 @@ export const supportTopics: SupportTopic[] = [
 
 export const quickSupportQuestions = [
   "How do I get started?",
+  "How does face verification work?",
   "Why is Discovery locked?",
   "How does compatibility work?",
-  "How do I improve authenticity?",
+  "What is Founding Member access?",
   "How do I report someone?",
-  "How do I delete my account?",
 ];
+
+const pageQuestions: Record<string, string[]> = {
+  "/discover": ["Why did Atlas show me this person?", "Why is Discovery locked?", "What happens when I choose Interested?", "Where are reviewed recommendations?"],
+  "/discovery-preferences": ["How do Discovery Preferences work?", "Do preferences change my Atlas answers?", "How does relocation affect Discovery?", "Why is Discovery locked?"],
+  "/compatibility": ["How is the compatibility score calculated?", "What do the compatibility dimensions mean?", "Does authenticity affect compatibility?", "Does Atlas predict relationship success?"],
+  "/relationship-profile": ["What does Atlas use from my relationship profile?", "Can I change my answers later?", "What is Atlas AI Discovery?", "How does compatibility work?"],
+  "/verify-face": ["How does face verification work?", "Why did my face check fail?", "What happens if I change my profile photo?", "What verification data does AutoFace keep?"],
+  "/profile": ["What should I include in my profile?", "What happens if I change my profile photo?", "How do privacy controls work?", "How do I get ready for Discovery?"],
+  "/introductions": ["When is an introduction created?", "Why can't I message someone?", "What is Atlas Introduction Coach?", "How do I report someone?"],
+  "/get-started": ["What do I need to complete?", "Why is Discovery locked?", "How do I improve authenticity?", "What are Discovery Preferences?"],
+};
+
+export function supportQuestionsForPath(pathname: string | null | undefined) {
+  if (!pathname) return quickSupportQuestions;
+  const exact = pageQuestions[pathname];
+  if (exact) return exact;
+  const prefix = Object.keys(pageQuestions).find((key) => pathname.startsWith(`${key}/`));
+  return prefix ? pageQuestions[prefix] : quickSupportQuestions;
+}
 
 function normalise(value: string) {
   return value.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, " ").trim();
 }
 
-export function findSupportTopic(question: string): SupportTopic | null {
+export function findSupportTopic(question: string, pathname = ""): SupportTopic | null {
   const q = normalise(question);
+  const path = normalise(pathname);
   let best: { topic: SupportTopic; score: number } | null = null;
 
   for (const topic of supportTopics) {
@@ -164,6 +208,13 @@ export function findSupportTopic(question: string): SupportTopic | null {
         const words = k.split(" ");
         score += words.filter((word) => word.length > 3 && q.includes(word)).length;
       }
+    }
+    if (path) {
+      if (topic.actionUrl && path.includes(normalise(topic.actionUrl))) score += 2;
+      if (path.includes("verify-face") && topic.id === "face_verification") score += 3;
+      if (path.includes("compatibility") && topic.id === "compatibility") score += 3;
+      if (path.includes("discovery-preferences") && topic.id === "preferences") score += 3;
+      if (path.includes("introductions") && (topic.id === "introductions" || topic.id === "introduction_coach")) score += 2;
     }
     if (!best || score > best.score) best = { topic, score };
   }

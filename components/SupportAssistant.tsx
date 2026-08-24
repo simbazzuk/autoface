@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { quickSupportQuestions } from "@/lib/support-knowledge";
+import { quickSupportQuestions, supportQuestionsForPath } from "@/lib/support-knowledge";
 
 type ChatMessage = {
   id: number;
@@ -15,6 +16,7 @@ type ChatMessage = {
 
 export function SupportAssistant() {
   const { user, loading } = useAuth();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
@@ -22,7 +24,7 @@ export function SupportAssistant() {
     {
       id: 1,
       role: "assistant",
-      text: "Hi — I’m Atlas Support. I can help you find features and understand how AutoFace works. I don’t read your private conversations or make relationship decisions.",
+      text: "Hi — I’m the AutoFace Assistant. I can help you navigate the Match Intelligence Platform, explain features and point you to the right place. I don’t read your private conversations or make relationship decisions.",
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
@@ -52,7 +54,7 @@ export function SupportAssistant() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ question: trimmed }),
+        body: JSON.stringify({ question: trimmed, path: pathname }),
       });
       const body = await response.json().catch(() => ({}));
 
@@ -92,12 +94,12 @@ export function SupportAssistant() {
   return (
     <div className={`support-assistant ${open ? "open" : ""}`}>
       {open && (
-        <section className="support-panel" aria-label="Atlas Support">
+        <section className="support-panel" aria-label="AutoFace Assistant">
           <div className="support-header">
             <div className="support-avatar">A</div>
             <div>
-              <b>Atlas Support</b>
-              <span>AutoFace product guide</span>
+              <b>AutoFace Assistant</b>
+              <span>Context-aware product guide</span>
             </div>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close support">×</button>
           </div>
@@ -109,7 +111,7 @@ export function SupportAssistant() {
           <div className="support-messages">
             {messages.map((message) => (
               <div className={`support-message ${message.role}`} key={message.id}>
-                <span>{message.role === "assistant" ? "Atlas" : "You"}</span>
+                <span>{message.role === "assistant" ? "AutoFace" : "You"}</span>
                 <p>{message.text}</p>
                 {message.actionUrl && message.actionLabel && (
                   <Link className="support-action" href={message.actionUrl} onClick={() => setOpen(false)}>
@@ -118,13 +120,13 @@ export function SupportAssistant() {
                 )}
               </div>
             ))}
-            {busy && <div className="support-message assistant support-thinking"><span>Atlas</span><p>Checking AutoFace guidance…</p></div>}
+            {busy && <div className="support-message assistant support-thinking"><span>AutoFace</span><p>Checking guidance for this page…</p></div>}
             <div ref={endRef} />
           </div>
 
           {messages.length <= 1 && (
             <div className="support-quick">
-              {quickSupportQuestions.map((item) => (
+              {supportQuestionsForPath(pathname).map((item) => (
                 <button type="button" key={item} disabled={busy} onClick={() => void ask(item)}>{item}</button>
               ))}
             </div>
@@ -135,8 +137,8 @@ export function SupportAssistant() {
               value={question}
               maxLength={500}
               onChange={(event) => setQuestion(event.target.value)}
-              placeholder="Ask how AutoFace works…"
-              aria-label="Ask Atlas Support"
+              placeholder="Ask about this page or AutoFace…"
+              aria-label="Ask AutoFace Assistant"
             />
             <button disabled={busy || question.trim().length < 2}>Send</button>
           </form>
@@ -147,11 +149,11 @@ export function SupportAssistant() {
         className="support-launcher"
         type="button"
         onClick={() => setOpen((value) => !value)}
-        aria-label={open ? "Close Atlas Support" : "Open Atlas Support"}
+        aria-label={open ? "Close AutoFace Assistant" : "Open AutoFace Assistant"}
         aria-expanded={open}
       >
         <span className="support-launcher-orb">A</span>
-        <span className="support-launcher-copy"><b>Need help?</b><small>Ask Atlas Support</small></span>
+        <span className="support-launcher-copy"><b>Need help?</b><small>Ask AutoFace</small></span>
       </button>
     </div>
   );

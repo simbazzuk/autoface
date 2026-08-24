@@ -58,9 +58,9 @@ export default function IntroductionsPage(){
     <section className="section introductions-section"><div className="container">
       {error&&<p className="notice">{error}</p>}
       <div className="intro-tabs" role="tablist" aria-label="Introduction status">
-        <button className={tab==="mutual"?"active":""} onClick={()=>setTab("mutual")}><HeartHandshake size={15}/>Introductions <span>{data.counts.mutual}</span></button>
-        <button className={tab==="waiting"?"active":""} onClick={()=>setTab("waiting")}><Clock3 size={15}/>Waiting <span>{data.counts.waiting}</span></button>
-        <button className={tab==="saved"?"active":""} onClick={()=>setTab("saved")}><Bookmark size={15}/>Saved <span>{data.counts.saved}</span></button>
+        <button className={`intro-tab intro-tab-mutual ${tab==="mutual"?"active":""}`} onClick={()=>setTab("mutual")}><HeartHandshake size={20}/><span className="intro-tab-copy"><b>Introductions</b><small>New & mutual</small></span><span className="intro-tab-count">{data.counts.mutual}</span></button>
+        <button className={`intro-tab intro-tab-waiting ${tab==="waiting"?"active":""}`} onClick={()=>setTab("waiting")}><Clock3 size={20}/><span className="intro-tab-copy"><b>Waiting</b><small>Private interest</small></span><span className="intro-tab-count">{data.counts.waiting}</span></button>
+        <button className={`intro-tab intro-tab-saved ${tab==="saved"?"active":""}`} onClick={()=>setTab("saved")}><Bookmark size={20}/><span className="intro-tab-copy"><b>Saved</b><small>Your shortlist</small></span><span className="intro-tab-count">{data.counts.saved}</span></button>
       </div>
 
       {items.length===0?<div className="card intro-empty-state">
