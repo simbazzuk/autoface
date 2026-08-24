@@ -162,7 +162,7 @@ export default function GetStartedPage() {
         <div className="card onboarding-intro-count"><HeartHandshake size={20}/><div><strong>{data.activeIntroductions}</strong><span>active mutual introduction{data.activeIntroductions===1?"":"s"}</span></div><a href="/introductions">Open →</a></div>
 
         <form className="card beta-feedback-card" onSubmit={submitFeedback}>
-          <span className="privacy-kicker">BETA FEEDBACK</span><h3>Help shape AutoFace.</h3>
+          <span className="privacy-kicker">PRODUCT FEEDBACK</span><h3>Help shape AutoFace.</h3>
           <p>If any step feels confusing or unnecessary, tell us.</p>
           <label>Feedback type<select value={category} onChange={(e)=>setCategory(e.target.value as typeof category)}><option value="idea">Idea</option><option value="problem">Problem</option><option value="confusing">Confusing</option><option value="positive">Working well</option></select></label>
           <label>Your feedback<textarea rows={4} maxLength={1200} value={feedback} onChange={(e)=>setFeedback(e.target.value)} placeholder="What would make this journey clearer?"/><small>{feedback.length}/1200</small></label>

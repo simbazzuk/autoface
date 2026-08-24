@@ -118,7 +118,7 @@ export default function CompatibilityPage() {
           ) : result ? (
             <div className="compatibility-layout">
               <div className="compatibility-main">
-                <div className="card candidate-picker-card">
+                <div className="card candidate-picker-card compatibility-color-blue">
                   <div className="compatibility-title-row">
                     <div>
                       <span className="privacy-kicker">SAFE DEMONSTRATION</span>
@@ -136,7 +136,7 @@ export default function CompatibilityPage() {
                   </div>
                 </div>
 
-                <div className="card compatibility-score-card">
+                <div className="card compatibility-score-card compatibility-color-purple">
                   <div className="match-score-head">
                     <div>
                       <span className="privacy-kicker">EXPLAINABLE COMPATIBILITY</span>
@@ -149,12 +149,12 @@ export default function CompatibilityPage() {
                   <div className="candidate-note">{selected.note}</div>
                 </div>
 
-                <div className="card dimension-card">
+                <div className="card dimension-card compatibility-color-indigo">
                   <span className="privacy-kicker">WHY THIS SCORE</span>
                   <h2>Dimension by dimension</h2>
                   <div className="dimension-list">
                     {result.dimensions.map((dimension) => (
-                      <div className="dimension-row" key={dimension.key}>
+                      <div className={`dimension-row dimension-${dimension.key}`} key={dimension.key}>
                         <div className="dimension-copy">
                           <div className="dimension-heading"><b>{dimension.label}</b><span>{dimension.weight}% weight</span></div>
                           <div className="dimension-values"><span>You: {dimension.userValue}</span><span>{selected.name}: {dimension.candidateValue}</span></div>
@@ -168,7 +168,7 @@ export default function CompatibilityPage() {
               </div>
 
               <aside className="compatibility-side">
-                <div className="card">
+                <div className="card compatibility-insight-card compatibility-color-green">
                   <span className="privacy-kicker">STRONGEST ALIGNMENTS</span>
                   <h3>Where you naturally align</h3>
                   <div className="insight-stack">
@@ -176,7 +176,7 @@ export default function CompatibilityPage() {
                   </div>
                 </div>
 
-                <div className="card">
+                <div className="card compatibility-insight-card compatibility-color-amber">
                   <span className="privacy-kicker">CONVERSATION POINTS</span>
                   <h3>Worth talking about</h3>
                   {result.conversationPoints.length ? (
@@ -188,14 +188,14 @@ export default function CompatibilityPage() {
 
                 <DemoMutualIntroduction />
 
-                <div className="card methodology-card">
+                <div className="card methodology-card compatibility-color-cyan">
                   <span className="privacy-kicker">METHOD</span>
                   <h3>Deterministic, not mysterious</h3>
                   <p>Each dimension has a published weight. Similar answers score more highly; differences are surfaced rather than hidden.</p>
                   <p>No free-text answer is scored in v0.6, and this comparison is not saved to Firestore.</p>
                 </div>
 
-                <div className="card atlas-ai-compat-card">
+                <div className="card atlas-ai-compat-card compatibility-color-pink">
                   <div className="atlas-ai-title">
                     <div><span className="privacy-kicker">OPTIONAL GEMINI EXPLANATION</span><h3>Explain this result naturally</h3></div>
                     <span className={`status-pill ${aiEnabled ? "" : "ai-off-pill"}`}>{aiEnabled ? "AVAILABLE" : "OFF"}</span>

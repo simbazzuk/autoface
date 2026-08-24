@@ -4043,3 +4043,154 @@ body{
 .mip-domain-chip{display:inline-flex;align-items:center;margin-left:7px;padding:4px 9px;border:1px solid rgba(103,201,255,.38);border-radius:999px;background:linear-gradient(135deg,rgba(46,160,255,.14),rgba(158,83,255,.16));color:#8fdcff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:lowercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .brand-copy small strong{color:#7fd6ff;font-weight:850;letter-spacing:.02em}.footer-inner>span:nth-child(2) b{color:#83d9ff;font-weight:850}
 @media(max-width:560px){.mip-domain-chip{margin-left:4px;padding:3px 7px;font-size:9px}.brand-copy small strong{display:inline}}
+
+
+/* v0.35.8.2 — Get Started readability */
+.onboarding-section .simple-journey-card h2{font-size:26px!important;line-height:1.2!important}
+.onboarding-section .simple-journey-grid>div{min-height:150px!important;padding:20px!important}
+.onboarding-section .simple-journey-grid>div>span{font-size:10px!important}
+.onboarding-section .simple-journey-grid svg{width:28px!important;height:28px!important;margin-bottom:12px!important}
+.onboarding-section .simple-journey-grid b{font-size:16px!important;line-height:1.3!important}
+.onboarding-section .simple-journey-grid p{font-size:13.5px!important;line-height:1.55!important;color:#aebbd0!important}
+.onboarding-section .onboarding-card-head h2{font-size:26px!important}
+.onboarding-section .onboarding-step-copy small{font-size:10px!important;line-height:1.3!important}
+.onboarding-section .onboarding-step-copy b{font-size:15px!important;line-height:1.35!important;color:#f2f5fb!important}
+.onboarding-section .onboarding-step-copy p{font-size:13px!important;line-height:1.5!important;color:#9fafc4!important;margin-top:3px!important}
+.onboarding-section .onboarding-rail-step>strong{font-size:10px!important}
+.onboarding-section .onboarding-rail-step{grid-template-columns:48px minmax(0,1fr) 54px!important;gap:14px!important;padding:14px 8px!important}
+.onboarding-section .onboarding-step-marker{width:42px!important;height:42px!important}
+.onboarding-section .onboarding-step-marker svg{width:18px!important;height:18px!important}
+.onboarding-section .privacy-kicker{font-size:11px!important;letter-spacing:.10em!important}
+.onboarding-side .onboarding-next-card h3,.onboarding-side .onboarding-control-card h3,.onboarding-side .beta-feedback-card h3{font-size:21px!important;line-height:1.25!important}
+.onboarding-side .onboarding-next-card p,.onboarding-side .onboarding-control-card p,.onboarding-side .beta-feedback-card>p{font-size:13px!important;line-height:1.55!important;color:#aebbd0!important}
+.onboarding-side .beta-feedback-card label{font-size:12px!important}
+.onboarding-side .beta-feedback-card select,.onboarding-side .beta-feedback-card textarea{font-size:13px!important;line-height:1.45!important}
+.onboarding-side .onboarding-intro-count strong{font-size:20px!important}
+.onboarding-side .onboarding-intro-count span{font-size:11px!important}
+@media(max-width:760px){.onboarding-section .simple-journey-grid{grid-template-columns:1fr!important;gap:12px!important}.onboarding-section .simple-journey-grid>i{display:none}.onboarding-section .simple-journey-grid>div{min-height:auto!important}.onboarding-section .onboarding-rail-step{grid-template-columns:44px 1fr!important}.onboarding-section .onboarding-rail-step>strong{grid-column:2!important;justify-self:start!important}}
+
+/* v0.35.8.3 — Compatibility Colour System
+   Give each major Compatibility area a distinct, readable AutoFace colour identity. */
+.compatibility-section .candidate-picker-card{
+  background:radial-gradient(560px 250px at 8% 0%,rgba(43,144,255,.22),transparent 68%),linear-gradient(145deg,rgba(18,65,124,.62),rgba(16,30,68,.92) 58%,rgba(12,20,44,.98))!important;
+  border-color:rgba(74,164,255,.38)!important;
+  box-shadow:0 18px 44px rgba(12,75,160,.13),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.compatibility-section .compatibility-score-card{
+  background:radial-gradient(560px 260px at 90% 8%,rgba(193,73,255,.22),transparent 68%),linear-gradient(145deg,rgba(73,42,142,.66),rgba(39,31,92,.91) 58%,rgba(21,22,54,.98))!important;
+  border-color:rgba(164,107,255,.42)!important;
+  box-shadow:0 18px 44px rgba(83,46,176,.15),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.compatibility-section .dimension-card{
+  background:radial-gradient(620px 280px at 8% 0%,rgba(255,76,148,.19),transparent 70%),linear-gradient(145deg,rgba(111,35,82,.58),rgba(63,30,79,.86) 58%,rgba(25,23,54,.98))!important;
+  border-color:rgba(255,101,163,.36)!important;
+  box-shadow:0 18px 44px rgba(177,44,102,.12),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.compatibility-section .dimension-row{
+  margin:0 -8px;
+  padding:18px 10px;
+  border-bottom-color:rgba(255,255,255,.09);
+  border-radius:12px;
+}
+.compatibility-section .dimension-row:nth-child(4n+1){background:rgba(54,137,255,.055)}
+.compatibility-section .dimension-row:nth-child(4n+2){background:rgba(149,93,255,.055)}
+.compatibility-section .dimension-row:nth-child(4n+3){background:rgba(244,82,149,.05)}
+.compatibility-section .dimension-row:nth-child(4n+4){background:rgba(49,203,198,.045)}
+.compatibility-section .compatibility-side > .card:nth-of-type(1){
+  background:linear-gradient(145deg,rgba(14,87,96,.55),rgba(18,43,69,.90) 62%,rgba(12,23,44,.98))!important;
+  border-color:rgba(72,216,203,.34)!important;
+}
+.compatibility-section .compatibility-side > .card:nth-of-type(2){
+  background:linear-gradient(145deg,rgba(116,69,25,.48),rgba(73,45,46,.76) 62%,rgba(28,25,47,.98))!important;
+  border-color:rgba(255,183,77,.35)!important;
+}
+.compatibility-section .compatibility-side > .card:nth-of-type(3){
+  background:linear-gradient(145deg,rgba(35,77,128,.50),rgba(34,45,94,.82) 62%,rgba(20,23,53,.98))!important;
+  border-color:rgba(87,163,255,.34)!important;
+}
+.compatibility-section .methodology-card{
+  background:linear-gradient(145deg,rgba(48,57,96,.56),rgba(30,34,70,.90) 62%,rgba(19,21,48,.98))!important;
+  border-color:rgba(140,151,213,.30)!important;
+}
+.compatibility-section .atlas-ai-compat-card{
+  background:radial-gradient(440px 220px at 90% 0%,rgba(91,178,255,.16),transparent 68%),linear-gradient(145deg,rgba(73,44,146,.62),rgba(34,48,104,.88) 60%,rgba(20,23,53,.98))!important;
+  border-color:rgba(133,112,255,.40)!important;
+}
+.compatibility-section .privacy-kicker{color:#8fd7ff}
+.compatibility-section .compatibility-score-card .privacy-kicker,
+.compatibility-section .atlas-ai-compat-card .privacy-kicker{color:#c9a5ff}
+.compatibility-section .dimension-card .privacy-kicker{color:#ff9dc8}
+.compatibility-section .compatibility-side > .card:nth-of-type(1) .privacy-kicker{color:#7fe7d6}
+.compatibility-section .compatibility-side > .card:nth-of-type(2) .privacy-kicker{color:#ffd08a}
+.compatibility-section .compatibility-side h3{font-size:21px;line-height:1.25;margin-top:8px}
+.compatibility-section .insight-stack>div{background:rgba(5,13,31,.38);border-color:rgba(255,255,255,.11)}
+.compatibility-section .insight-stack b{font-size:14px}.compatibility-section .insight-stack span{font-size:12px}
+
+@media(max-width:800px){
+  .compatibility-section .compatibility-main,.compatibility-section .compatibility-side{gap:14px}
+  .compatibility-section .candidate-picker-card,.compatibility-section .compatibility-score-card,.compatibility-section .dimension-card,.compatibility-section .compatibility-side>.card{border-radius:17px}
+}
+
+
+/* v0.35.8.3.1 — Compatibility Dimension Colour Refinement
+   Keep the parent panel neutral and colour each dimension independently for faster scanning. */
+.compatibility-section .dimension-card{
+  background:radial-gradient(660px 280px at 90% 0%,rgba(116,83,255,.12),transparent 70%),linear-gradient(145deg,rgba(15,27,58,.96),rgba(10,19,42,.98))!important;
+  border-color:rgba(122,145,214,.30)!important;
+  box-shadow:0 18px 44px rgba(4,10,28,.28),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.compatibility-section .dimension-card .privacy-kicker{color:#ff86c8!important}
+.compatibility-section .dimension-list{gap:10px;border-top:0!important;margin-top:22px!important}
+.compatibility-section .dimension-row{
+  position:relative;
+  margin:0!important;
+  padding:18px 20px!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:14px!important;
+  overflow:hidden;
+}
+.compatibility-section .dimension-row::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--dimension-accent,#7c5cff);
+}
+.compatibility-section .dimension-row:nth-child(n){background:linear-gradient(120deg,var(--dimension-bg,rgba(124,92,255,.12)),rgba(9,18,41,.72))!important}
+.compatibility-section .dimension-familyOrientation{--dimension-accent:#ff59b5;--dimension-bg:rgba(177,41,126,.25);border-color:rgba(255,89,181,.34)!important}
+.compatibility-section .dimension-communicationDirectness{--dimension-accent:#5596ff;--dimension-bg:rgba(37,92,190,.26);border-color:rgba(85,150,255,.36)!important}
+.compatibility-section .dimension-socialEnergy{--dimension-accent:#43dc87;--dimension-bg:rgba(21,124,82,.25);border-color:rgba(67,220,135,.34)!important}
+.compatibility-section .dimension-careerPriority{--dimension-accent:#ffa719;--dimension-bg:rgba(145,82,16,.27);border-color:rgba(255,167,25,.36)!important}
+.compatibility-section .dimension-routineVsAdventure{--dimension-accent:#25d6db;--dimension-bg:rgba(13,117,131,.28);border-color:rgba(37,214,219,.35)!important}
+.compatibility-section .dimension-relocationFlexibility{--dimension-accent:#9b6dff;--dimension-bg:rgba(91,55,161,.27);border-color:rgba(155,109,255,.36)!important}
+.compatibility-section .dimension-sharedInterestsImportance{--dimension-accent:#ff7d63;--dimension-bg:rgba(143,63,49,.26);border-color:rgba(255,125,99,.34)!important}
+.compatibility-section .dimension-independencePreference{--dimension-accent:#63c7ff;--dimension-bg:rgba(30,103,146,.25);border-color:rgba(99,199,255,.34)!important}
+.compatibility-section .dimension-relationshipPace{--dimension-accent:#d06cff;--dimension-bg:rgba(112,48,143,.26);border-color:rgba(208,108,255,.34)!important}
+.compatibility-section .dimension-heading b{font-size:15px!important;color:#fff!important}
+.compatibility-section .dimension-heading span{font-size:11px!important;color:var(--dimension-accent)!important;font-weight:800}
+.compatibility-section .dimension-values span{font-size:12px!important;background:rgba(255,255,255,.065)!important;color:#d4dcec!important}
+.compatibility-section .dimension-copy small{font-size:13px!important;color:#aebbd0!important;line-height:1.5!important}
+.compatibility-section .dimension-score{width:56px!important;height:56px!important;font-size:18px!important;border:1px solid color-mix(in srgb,var(--dimension-accent) 48%, transparent)!important;background:rgba(8,18,42,.55)!important;color:var(--dimension-accent)!important}
+.compatibility-section .dimension-score.good,.compatibility-section .dimension-score.attention{color:var(--dimension-accent)!important;border-color:color-mix(in srgb,var(--dimension-accent) 55%, transparent)!important;background:rgba(8,18,42,.55)!important}
+@media(max-width:800px){.compatibility-section .dimension-row{padding:16px!important}.compatibility-section .dimension-heading b{font-size:14px!important}.compatibility-section .dimension-copy small{font-size:12.5px!important}.compatibility-section .dimension-score{width:48px!important;height:48px!important;font-size:16px!important}}
+
+
+/* v0.35.8.4 — Discovery Preferences Colour System */
+.discovery-preferences-section{background:radial-gradient(720px 480px at 8% 10%,rgba(37,99,235,.10),transparent 64%),radial-gradient(680px 460px at 94% 28%,rgba(168,85,247,.10),transparent 64%),transparent}
+.preference-form-colour{background:linear-gradient(180deg,rgba(8,17,37,.90),rgba(8,14,31,.96))!important;border-color:rgba(123,144,190,.22)!important;padding:18px!important}
+.preference-form-colour .card-inside{position:relative;overflow:hidden;border-radius:18px!important;padding:22px!important;margin:0!important}
+.preference-form-colour .card-inside::after{content:"";position:absolute;width:330px;height:170px;right:-110px;bottom:-100px;border-radius:50%;pointer-events:none;opacity:.50}
+.preference-form-colour .card-inside>*{position:relative;z-index:1}
+.preference-hard{border:1px solid rgba(59,153,255,.48)!important;background:radial-gradient(520px 250px at 8% 0%,rgba(37,139,255,.26),transparent 70%),linear-gradient(140deg,rgba(12,61,121,.86),rgba(16,38,79,.94) 58%,rgba(11,24,53,.98))!important;box-shadow:0 18px 42px rgba(0,84,180,.16),inset 0 1px 0 rgba(255,255,255,.05)!important}
+.preference-hard::after{background:radial-gradient(ellipse,rgba(48,145,255,.30),transparent 70%)}
+.preference-lifestyle{border:1px solid rgba(175,103,255,.50)!important;background:radial-gradient(520px 250px at 8% 0%,rgba(157,83,255,.28),transparent 70%),linear-gradient(140deg,rgba(72,42,145,.90),rgba(47,31,103,.94) 58%,rgba(25,23,65,.98))!important;box-shadow:0 18px 42px rgba(93,48,190,.18),inset 0 1px 0 rgba(255,255,255,.05)!important}
+.preference-lifestyle::after{background:radial-gradient(ellipse,rgba(190,76,255,.28),transparent 70%)}
+.preference-career{border:1px solid rgba(45,211,221,.46)!important;background:radial-gradient(520px 250px at 8% 0%,rgba(24,198,211,.23),transparent 70%),linear-gradient(140deg,rgba(10,86,100,.88),rgba(17,52,78,.94) 58%,rgba(12,28,55,.98))!important;box-shadow:0 18px 42px rgba(0,120,140,.15),inset 0 1px 0 rgba(255,255,255,.05)!important}
+.preference-career::after{background:radial-gradient(ellipse,rgba(34,211,238,.25),transparent 70%)}
+.preference-form-colour .preference-relocation{margin-top:0;padding:18px!important;border:1px solid rgba(251,191,36,.42)!important;border-radius:16px!important;background:linear-gradient(135deg,rgba(116,73,15,.48),rgba(52,39,33,.72),rgba(29,28,48,.88))!important}
+.preference-form-colour .preference-relocation span b{color:#fff2c2!important;font-size:14px!important}.preference-form-colour .preference-relocation span small{color:#d8c9a4!important;font-size:12px!important;line-height:1.5!important}
+.preference-form-colour .field label,.preference-form-colour .preference-block>label:first-child,.preference-form-colour .preference-age label{color:#dbe6f6!important;font-size:13px!important;font-weight:750!important}
+.preference-form-colour input[type="number"],.preference-form-colour select{background:rgba(5,12,29,.74)!important;border-color:rgba(200,218,250,.20)!important;color:#f7f9ff!important}
+.preference-form-colour .field small{color:#b9c7da!important;font-size:11.5px!important;line-height:1.5!important}
+.preference-form-colour .toggle-row{border-color:rgba(210,224,255,.16)!important;background:rgba(5,12,29,.54)!important}
+.preference-form-colour .toggle-row:has(input:checked){border-color:rgba(125,103,255,.56)!important;background:linear-gradient(135deg,rgba(98,77,225,.34),rgba(38,122,215,.18))!important}
+.preference-form-colour .preference-interest-chip{min-height:44px;background:rgba(5,12,29,.62)!important;border-color:rgba(210,224,255,.16)!important;color:#d8e2f2!important;font-size:11px!important}.preference-form-colour .preference-interest-chip span{font-size:17px!important}.preference-form-colour .preference-interest-chip.selected{background:linear-gradient(135deg,rgba(113,78,238,.72),rgba(37,131,238,.54))!important;border-color:rgba(174,139,255,.62)!important;color:#fff!important}
+.preference-explainer{border-color:rgba(105,122,255,.38)!important;background:radial-gradient(420px 250px at 80% 0%,rgba(111,76,255,.20),transparent 68%),linear-gradient(160deg,rgba(24,31,72,.96),rgba(11,21,46,.98))!important;box-shadow:0 20px 48px rgba(30,26,100,.16)!important}.preference-explainer .recommendation-flow span{background:rgba(5,12,29,.58)!important;border:1px solid rgba(157,137,255,.18);color:#e4e7ff!important;font-size:12px!important}.preference-explainer .recommendation-flow b{color:#9f8cff!important;font-size:14px!important}
+.preference-form-colour .journey-complete-card{border-color:rgba(52,211,153,.42)!important;background:linear-gradient(135deg,rgba(10,94,75,.50),rgba(15,51,64,.76),rgba(18,31,58,.92))!important}
+@media(max-width:700px){.preference-form-colour{padding:12px!important}.preference-form-colour .card-inside{padding:17px!important}}
