@@ -8,13 +8,20 @@ export async function POST(request: Request) {
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
 
     const body = await request.json() as {
-      category?: "idea" | "problem" | "confusing" | "positive";
+      category?: string;
       message?: string;
+      rating?: number;
+      contactAllowed?: boolean;
+      source?: string;
     };
 
+    const allowedCategories = ["idea","problem","confusing","positive","matching","atlas","introductions","verification","experience","other"];
     const category = body.category ?? "idea";
     const message = body.message?.trim() ?? "";
-    if (!["idea","problem","confusing","positive"].includes(category) || message.length < 3 || message.length > 1200) {
+    const rating = Number.isInteger(body.rating) && Number(body.rating) >= 1 && Number(body.rating) <= 5 ? Number(body.rating) : null;
+    const contactAllowed = body.contactAllowed === true;
+    const source = body.source === "feedback_page" ? "feedback_page" : "get_started";
+    if (!allowedCategories.includes(category) || message.length < 3 || message.length > 1200) {
       return NextResponse.json({ error: "INVALID_REQUEST" }, { status: 400 });
     }
 
@@ -24,7 +31,10 @@ export async function POST(request: Request) {
       category,
       message,
       status: "new",
-      appVersion: "0.17.0",
+      rating,
+      contactAllowed,
+      source,
+      appVersion: "0.36.0",
       createdAt: FieldValue.serverTimestamp(),
     });
 

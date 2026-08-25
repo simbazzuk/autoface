@@ -34,6 +34,8 @@ export default function RecommendationHistoryPage(){
   const [message,setMessage]=useState("");
   const [filter,setFilter]=useState<Filter>("all");
   const [busyUid,setBusyUid]=useState("");
+  const [hiddenCount,setHiddenCount]=useState(0);
+  const [fullHistory,setFullHistory]=useState(false);
   const [aiStatuses,setAiStatuses]=useState<Record<string,{available:boolean;enabled:boolean;viewerOptIn:boolean;candidateOptIn:boolean}>>({});
 
   useEffect(()=>{if(!loading&&!user)router.replace("/sign-in")},[loading,user,router]);
@@ -47,7 +49,7 @@ export default function RecommendationHistoryPage(){
         const response=await fetch("/api/recommendations/history",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
         const body=await response.json();
         if(!response.ok)throw new Error(body.error??"Unable to load reviewed recommendations.");
-        setItems(body.items??[]);
+        setItems(body.items??[]);setHiddenCount(Number(body.hiddenCount??0));setFullHistory(body.membership?.fullRecommendationHistory===true);
       }catch(e){
         setError(e instanceof Error?e.message:"Unable to load reviewed recommendations.");
         setItems([]);
@@ -141,6 +143,10 @@ export default function RecommendationHistoryPage(){
             <span>{items.length} considered recommendation{items.length===1?"":"s"}</span>
             <a className="btn" href="/discover">Back to Discover</a>
           </div>
+          {!fullHistory&&<div className="premium-history-banner">
+            <div><span className="privacy-kicker">FREE MEMBERSHIP</span><b>Recent recommendation history</b><p>Free members can revisit the 3 most recent recommendations.{hiddenCount>0?` ${hiddenCount} older recommendation${hiddenCount===1?" is":"s are"} locked.`:""}</p></div>
+            <a className="btn btn-relationship" href="/pricing">Unlock full history</a>
+          </div>}
 
           {items.length===0 ? (
             <div className="card discovery-empty">

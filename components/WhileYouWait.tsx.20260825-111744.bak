@@ -55,27 +55,19 @@ export function WhileYouWait(){
 
   return <div className="card while-you-wait-card">
     <div className="while-you-wait-heading">
-      <div className="while-you-wait-icon"><Gamepad2 size={30}/></div>
-      <div><span className="privacy-kicker">WHILE YOU WAIT</span><h2>Let&apos;s have a little fun! <span aria-hidden="true">🎉</span></h2><p>Atlas is still looking for introductions worth showing you. In the meantime, try a quick round of <b>This or That</b>.</p></div>
-      <span className="while-you-wait-progress"><span aria-hidden="true">★</span>{answered}/{questions.length}</span>
+      <div className="while-you-wait-icon"><Gamepad2 size={22}/></div>
+      <div><span className="privacy-kicker">WHILE YOU WAIT</span><h2>Let&apos;s have a little fun.</h2><p>Atlas is still looking for introductions worth showing you. In the meantime, try a quick round of <b>This or That</b>.</p></div>
+      <span className="while-you-wait-progress">{answered}/{questions.length}</span>
     </div>
 
     {!complete&&current?<div className="this-or-that-game">
-      <div className="this-or-that-prompt"><small>QUESTION {index+1}</small><b>Which feels more like <em>you?</em></b></div>
+      <div className="this-or-that-prompt"><small>QUESTION {index+1}</small><b>Which feels more like you?</b></div>
       <div className="this-or-that-options">
-        <button className="this-or-that-option option-a" type="button" onClick={()=>choose(current.left)}>
-          <span className="choice-badge">A</span>
-          <b>{current.left}</b>
-          <small>Pick this one</small>
-        </button>
+        <button type="button" onClick={()=>choose(current.left)}><span>A</span><b>{current.left}</b></button>
         <div className="this-or-that-or">OR</div>
-        <button className="this-or-that-option option-b" type="button" onClick={()=>choose(current.right)}>
-          <span className="choice-badge">B</span>
-          <b>{current.right}</b>
-          <small>Pick this one</small>
-        </button>
+        <button type="button" onClick={()=>choose(current.right)}><span>B</span><b>{current.right}</b></button>
       </div>
-      <p className="this-or-that-note"><Sparkles size={18}/>Just for fun for now — these answers stay in this browser and are <b>not used by Atlas matching</b>.</p>
+      <p className="this-or-that-note"><Sparkles size={13}/>Just for fun for now — these answers stay in this browser and are <b>not used by Atlas matching</b>.</p>
     </div>:<div className="this-or-that-complete">
       <span className="this-or-that-confetti">✦</span>
       <h3>That&apos;s the round complete.</h3>

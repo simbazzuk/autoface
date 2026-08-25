@@ -21,7 +21,18 @@ type Report = {
   resolvedAt: string | null;
 };
 
+type Member = {
+  uid:string;
+  email:string;
+  firstName:string;
+  plan:string;
+  membershipStatus:string;
+  foundingMemberNumber:number|null;
+  disabled:boolean;
+};
+
 type AdminData = {
+  members: Member[];
   summary: {
     openReports: number;
     totalReports: number;
@@ -183,6 +194,23 @@ export default function AdminPage() {
             </div>
           </article>)}
         </div>}
+
+      <div className="admin-toolbar membership-admin-toolbar">
+        <div><span className="privacy-kicker">MEMBERSHIP</span><h2>Free & Founding Member access</h2><p>Use this while payments are not yet connected. Changes are server-owned and audited.</p></div>
+      </div>
+      <div className="admin-member-list">
+        {data.members.map(member=><article className="card admin-member-row" key={member.uid}>
+          <div className="admin-member-identity"><div className="blocked-profile-avatar">{member.firstName.slice(0,1).toUpperCase()}</div><div><b>{member.firstName}</b><span>{member.email||member.uid}</span></div></div>
+          <div className="admin-member-plan">
+            <span className={`status-pill ${member.plan==="founding"?"founding-plan-pill":""}`}>{member.plan==="founding"?`FOUNDING${member.foundingMemberNumber?` #${member.foundingMemberNumber}`:""}`:"FREE"}</span>
+          </div>
+          <div className="admin-member-actions">
+            {member.plan==="founding"
+              ? <button className="btn" disabled={Boolean(busyId)} onClick={()=>void action({action:"set_free",targetUid:member.uid},`membership-${member.uid}`)}>Set Free</button>
+              : <button className="btn btn-relationship" disabled={Boolean(busyId)} onClick={()=>void action({action:"grant_founding",targetUid:member.uid},`membership-${member.uid}`)}>Grant Founding</button>}
+          </div>
+        </article>)}
+      </div>
 
       <div className="card admin-principles">
         <span className="privacy-kicker">OPERATOR PRINCIPLES</span>

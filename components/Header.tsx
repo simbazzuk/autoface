@@ -182,6 +182,7 @@ export function Header() {
           <Link href="/relationship-profile" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Atlas Profile</Link>
           <Link href="/dashboard" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Security & Verification</Link>
           <Link href="/account" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Account & Notifications</Link>
+          <Link href="/feedback" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>Feedback</Link>
           <Link href="/introductions" onClick={() => { if (menuRef.current) menuRef.current.open = false; }}>My Introductions</Link>
         </div>
 
@@ -215,6 +216,7 @@ export function Header() {
                 <Link onClick={closeDesktopMenus} href="/dashboard"><b>Authenticity Centre</b><small>Identity and security evidence</small></Link>
                 <Link onClick={closeDesktopMenus} href="/verify-face"><b>Face Verification</b><small>Live face + profile-photo match</small></Link>
                 <Link onClick={closeDesktopMenus} href="/account"><b>Account & Notifications</b><small>Email preferences, account settings and privacy controls</small></Link>
+                <Link onClick={closeDesktopMenus} href="/feedback"><b>Feedback</b><small>Rate AutoFace and help shape the product</small></Link>
                 {developmentTools && <Link onClick={closeDesktopMenus} href="/development-tools"><b>Development Tools</b><small>Reset and seed synthetic test data</small></Link>}
                 <AdminLink />
               </div>
@@ -280,6 +282,7 @@ export function Header() {
                 <Link href="/dashboard" onClick={closeMobile}>Authenticity Centre</Link>
                 <Link href="/verify-face" onClick={closeMobile}>Face Verification</Link>
                 <Link href="/account" onClick={closeMobile}>Account & Notifications <span>Email, account & privacy settings</span></Link>
+                <Link href="/feedback" onClick={closeMobile}>Feedback <span>Rate AutoFace & share ideas</span></Link>
                 {developmentTools && <Link href="/development-tools" onClick={closeMobile}>Development Tools</Link>}
                 <AdminLink mobile />
               </div>

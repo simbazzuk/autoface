@@ -36,11 +36,13 @@ export async function GET(request: Request) {
   try {
     await requireAdmin(request);
     if (!adminDb || !adminAuth) throw new Error("SERVER_NOT_CONFIGURED");
+    const db = adminDb;
 
-    const [reportSnap, blockSnap, eventSnap] = await Promise.all([
+    const [reportSnap, blockSnap, eventSnap, authUsers] = await Promise.all([
       adminDb.collection("reports").limit(200).get(),
       adminDb.collection("blocks").limit(500).get(),
       adminDb.collection("securityEvents").limit(500).get(),
+      adminAuth.listUsers(200),
     ]);
 
     const reportDocs = [...reportSnap.docs].sort(
@@ -81,7 +83,27 @@ export async function GET(request: Request) {
       securityCounts[type] = (securityCounts[type] ?? 0) + 1;
     });
 
+    const members = await Promise.all(authUsers.users.map(async (authUser) => {
+      const [profileSnap,membershipSnap] = await Promise.all([
+        db.collection("profiles").doc(authUser.uid).get(),
+        db.collection("memberships").doc(authUser.uid).get(),
+      ]);
+      const profile = profileSnap.data() ?? {};
+      const membership = membershipSnap.data() ?? {};
+      return {
+        uid: authUser.uid,
+        email: authUser.email ?? "",
+        firstName: String(profile.firstName ?? profile.preferredName ?? authUser.displayName ?? "Member"),
+        plan: String(membership.plan ?? "free"),
+        membershipStatus: String(membership.status ?? "active"),
+        foundingMemberNumber: typeof membership.foundingMemberNumber === "number" ? membership.foundingMemberNumber : null,
+        disabled: authUser.disabled,
+      };
+    }));
+    members.sort((x,y)=>x.firstName.localeCompare(y.firstName));
+
     return NextResponse.json({
+      members,
       summary: {
         openReports: reports.filter((report) => report.status === "open").length,
         totalReports: reports.length,
@@ -108,7 +130,7 @@ export async function POST(request: Request) {
     if (!adminDb || !adminAuth) throw new Error("SERVER_NOT_CONFIGURED");
 
     const body = await request.json() as {
-      action?: "resolve_report" | "suspend_member" | "reinstate_member";
+      action?: "resolve_report" | "suspend_member" | "reinstate_member" | "grant_founding" | "set_free";
       reportId?: string;
       targetUid?: string;
       resolution?: string;
@@ -150,6 +172,55 @@ export async function POST(request: Request) {
 
     const targetUid = body.targetUid?.trim() ?? "";
     if (!targetUid) return NextResponse.json({ error: "INVALID_REQUEST" }, { status: 400 });
+
+    if (action === "grant_founding") {
+      const existingFounders = await adminDb.collection("memberships").where("plan","==","founding").get();
+      const current = await adminDb.collection("memberships").doc(targetUid).get();
+      let number = current.data()?.foundingMemberNumber;
+      if (typeof number !== "number") number = existingFounders.size + 1;
+      if (number > 500) return NextResponse.json({ error: "FOUNDING_PLACES_FULL" }, { status: 409 });
+
+      await adminDb.collection("memberships").doc(targetUid).set({
+        uid: targetUid,
+        plan: "founding",
+        status: "active",
+        foundingMemberNumber: number,
+        activatedAt: FieldValue.serverTimestamp(),
+        activatedBy: admin.uid,
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+
+      await adminDb.collection("adminAuditEvents").add({
+        adminUid: admin.uid,
+        adminEmail: admin.email ?? null,
+        action: "founding_membership_granted",
+        targetUid,
+        foundingMemberNumber: number,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+      return NextResponse.json({ ok:true, plan:"founding", foundingMemberNumber:number });
+    }
+
+    if (action === "set_free") {
+      await adminDb.collection("memberships").doc(targetUid).set({
+        uid: targetUid,
+        plan: "free",
+        status: "active",
+        foundingMemberNumber: null,
+        updatedAt: FieldValue.serverTimestamp(),
+        changedBy: admin.uid,
+      }, { merge: true });
+
+      await adminDb.collection("adminAuditEvents").add({
+        adminUid: admin.uid,
+        adminEmail: admin.email ?? null,
+        action: "membership_set_free",
+        targetUid,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+      return NextResponse.json({ ok:true, plan:"free" });
+    }
+
     if (targetUid === admin.uid) return NextResponse.json({ error: "SELF_ADMIN_ACTION_FORBIDDEN" }, { status: 400 });
 
     if (action === "suspend_member") {

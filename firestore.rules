@@ -250,5 +250,12 @@ service cloud.firestore {
     // v0.13 account privacy, export and deletion are handled by trusted server APIs.
     // No additional client-writeable collections are introduced.
 
+
+
+    // Membership entitlements are server-owned. Clients read them only through
+    // authenticated APIs and can never grant themselves premium access.
+    match /memberships/{uid} {
+      allow read, write: if false;
+    }
   }
 }

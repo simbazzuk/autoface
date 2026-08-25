@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { useAuth } from "@/components/AuthProvider";
+import type { Membership } from "@/lib/membership";
 import { MemberJourney } from "@/components/MemberJourney";
 import { db } from "@/lib/firebase";
 import {
@@ -92,6 +93,7 @@ export default function RelationshipProfilePage() {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiInsight, setAiInsight] = useState("");
   const [aiError, setAiError] = useState("");
+  const [membership, setMembership] = useState<Membership | null>(null);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
@@ -175,8 +177,28 @@ export default function RelationshipProfilePage() {
   }
 
 
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    (async () => {
+      try {
+        const token = await user.getIdToken();
+        const response = await fetch("/api/membership", {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        });
+        const body = await response.json().catch(() => ({}));
+        if (active && response.ok) setMembership(body.membership ?? null);
+      } catch {
+        if (active) setMembership(null);
+      }
+    })();
+    return () => { active = false; };
+  }, [user]);
+
+
   async function generateAiReflection() {
-    if (!user || aiBusy || !aiEnabled) return;
+    if (!user || aiBusy || !aiEnabled || !membership?.entitlements.atlasReflection) return;
 
     let consentGranted = form.consentForAiReflection;
     if (!consentGranted) {
@@ -357,7 +379,15 @@ export default function RelationshipProfilePage() {
               </div>
               <p>Turn the relationship preferences you have already shared into a short, natural-language reflection.</p>
 
-              {aiEnabled ? (
+              {!membership ? (
+                <div className="ai-disabled-note atlas-reflection-unavailable"><b>Checking membership…</b><span>This should only take a moment.</span></div>
+              ) : !membership.entitlements.atlasReflection ? (
+                <div className="premium-lock-card">
+                  <div className="premium-lock-icon">✦</div>
+                  <div><span className="privacy-kicker">FOUNDING MEMBER FEATURE</span><b>Unlock Atlas Reflection</b><p>Founding Members can turn their saved Atlas answers into a private, natural-language reflection.</p></div>
+                  <a className="btn btn-relationship" href="/pricing">View Founding Membership</a>
+                </div>
+              ) : aiEnabled ? (
                 <>
                   <button type="button" className="btn btn-primary atlas-reflection-button" disabled={aiBusy} onClick={() => void generateAiReflection()}>
                     {aiBusy ? "Creating your reflection…" : aiInsight ? "Refresh my reflection" : "Generate my reflection"}

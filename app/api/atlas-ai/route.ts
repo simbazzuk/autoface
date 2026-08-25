@@ -5,6 +5,7 @@ import { atlasAiEnabled, atlasAiStatus, generateCompatibilityReflection, generat
 import { calculateCompatibility } from "@/lib/compatibility";
 import { demoCompatibilityProfiles } from "@/lib/demo-compatibility-profiles";
 import type { RelationshipProfile } from "@/lib/relationship-profile";
+import { requireEntitlement } from "@/lib/server/membership";
 
 export const runtime = "nodejs";
 
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
     }
 
     if (body.mode === "profile") {
+      await requireEntitlement(user.uid, "atlasReflection");
       const insight = await generateProfileReflection(profile);
       return NextResponse.json({
         insight,
@@ -56,6 +58,7 @@ export async function POST(request: Request) {
     }
 
     if (body.mode === "compatibility") {
+      await requireEntitlement(user.uid, "fullAtlasExplanations");
       const candidate = demoCompatibilityProfiles.find((item) => item.id === body.candidateId);
       if (!candidate) {
         return NextResponse.json({ error: "CANDIDATE_NOT_FOUND" }, { status: 404 });

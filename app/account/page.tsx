@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import type { Membership } from "@/lib/membership";
 import { auth } from "@/lib/firebase";
 
 type AccountData = {
@@ -58,6 +59,7 @@ export default function AccountPage() {
   const [showDelete, setShowDelete] = useState(false);
   const [blockedProfiles, setBlockedProfiles] = useState<BlockedProfile[]>([]);
   const [blockedLoading, setBlockedLoading] = useState(true);
+  const [membership,setMembership]=useState<Membership|null>(null);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/sign-in");
@@ -105,6 +107,18 @@ export default function AccountPage() {
   useEffect(() => {
     void loadBlockedProfiles();
   }, [loadBlockedProfiles]);
+
+  useEffect(() => {
+    if (!user) return;
+    (async()=>{
+      try{
+        const token=await user.getIdToken();
+        const response=await fetch("/api/membership",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
+        const body=await response.json().catch(()=>({}));
+        if(response.ok)setMembership(body.membership??null);
+      }catch{ setMembership(null); }
+    })();
+  },[user]);
 
   async function unblockProfile(profile: BlockedProfile) {
     if (!user || busy) return;
@@ -390,6 +404,20 @@ export default function AccountPage() {
                 <span>Provider-held passport images, verification selfies or biometric templates are not stored by AutoFace and therefore are not part of this export.</span>
               </div>
               <button className="btn btn-primary" disabled={busy} onClick={() => void downloadData()}>Download my data</button>
+            </div>
+
+            <div className={`card account-control-card membership-status-card ${membership?.plan==="founding"?"is-founding":""}`}>
+              <div className="account-control-head">
+                <div><span className="privacy-kicker">MEMBERSHIP</span><h2>{membership?.plan==="founding"?"Founding Member":"AutoFace Free"}</h2></div>
+                <span className={`status-pill ${membership?.plan==="founding"?"founding-plan-pill":""}`}>{membership?.plan==="founding"?"FOUNDING":"FREE"}</span>
+              </div>
+              {membership?.plan==="founding" ? <>
+                <p>Your Founding Member access is active. Premium founding features are switched on for this account.</p>
+                {membership.foundingMemberNumber&&<div className="founding-member-number">Founding Member <b>#{membership.foundingMemberNumber}</b></div>}
+              </> : <>
+                <p>You have the core AutoFace experience. Founding Member features remain visible but locked until membership is granted or purchased.</p>
+                <a className="btn btn-relationship" href="/pricing">See Founding Membership</a>
+              </>}
             </div>
 
             <div className="card account-control-card blocked-profiles-card">

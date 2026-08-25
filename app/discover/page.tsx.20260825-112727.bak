@@ -254,22 +254,7 @@ export default function DiscoverPage() {
         <div className="daily-discovery-footer"><span>That&apos;s today&apos;s current set.</span><p>Review them at your own pace. AutoFace does not reward rapid decisions or endless swiping.</p></div>
       </div>}
       {message && <p className="notice discovery-message">{message}</p>}
-      <div className="card discovery-privacy discovery-mutual-explainer">
-        <span className="privacy-kicker">PRIVATE BY DESIGN</span>
-        <h3>Messaging starts when interest is mutual</h3>
-        <p>If you&apos;re interested in someone, choose <b>Interested</b>. They cannot message you unless they independently choose <b>Interested</b> too.</p>
-        <div className="mutual-message-flow" aria-label="How mutual introductions work">
-          <div className="mutual-flow-step"><span>1</span><b>You&apos;re interested</b></div>
-          <div className="mutual-flow-arrow">→</div>
-          <div className="mutual-flow-step"><span>2</span><b>They&apos;re interested</b></div>
-          <div className="mutual-flow-arrow">→</div>
-          <div className="mutual-flow-step mutual-flow-success"><span>✓</span><b>It&apos;s mutual</b></div>
-          <div className="mutual-flow-arrow">→</div>
-          <div className="mutual-flow-step mutual-flow-chat"><span>💬</span><b>Chat unlocks</b></div>
-        </div>
-        <p className="mutual-message-reassurance">Your email, mobile number and private Atlas answers are never shared as part of expressing interest.</p>
-        <a className="btn btn-relationship" href="/introductions">View my introductions</a>
-      </div>
+      <div className="card discovery-privacy"><span className="privacy-kicker">MUTUAL BY DESIGN</span><h3>No unsolicited messaging</h3><p>Expressing interest does not expose your email, mobile number or private Atlas answers. Communication remains locked until both people independently choose Interested.</p><a className="btn" href="/introductions">View mutual introductions</a></div>
     </div></section>
   </main>;
 }
