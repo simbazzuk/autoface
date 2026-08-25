@@ -9,6 +9,24 @@ function configuredGeminiModel() {
   return (process.env.GEMINI_MODEL || "gemini-3.6-flash").trim();
 }
 
+function safeProviderMessage(value: unknown) {
+  if (value instanceof Error) return value.message.slice(0, 500);
+  if (typeof value === "string") return value.slice(0, 500);
+  try {
+    return JSON.stringify(value).slice(0, 500);
+  } catch {
+    return "Unknown provider error";
+  }
+}
+
+function atlasLog(event: string, details: Record<string, unknown>) {
+  // Never log prompts, Atlas answers, API keys or raw user data.
+  console.error("[Atlas AI]", event, {
+    model: configuredGeminiModel(),
+    ...details,
+  });
+}
+
 export function atlasAiStatus() {
   const enabledFlag = (process.env.ATLAS_AI_ENABLED || "").trim().toLowerCase() === "true";
   const hasApiKey = Boolean(configuredGeminiApiKey());
@@ -513,31 +531,100 @@ async function requestGeminiJson(prompt: string, responseJsonSchema?: GeminiJson
   }
 }
 
-async function callGeminiJson(prompt: string, responseJsonSchema?: GeminiJsonSchema) {
-  let firstText: string;
-  try {
-    firstText = await requestGeminiJson(prompt, responseJsonSchema);
-  } catch (error) {
-    if (!isTemporaryAtlasError(error)) throw error;
-    await sleep(650);
-    firstText = await requestGeminiJson(prompt, responseJsonSchema);
+async function callGeminiJson(prompt: string, schema?: GeminiJsonSchema) {
+  const apiKey = configuredGeminiApiKey();
+  const model = configuredGeminiModel();
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  async function request(
+    body: Record<string, unknown>,
+    mode: "schema" | "json_fallback",
+  ) {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+
+    const raw = await response.text();
+    let payload: any = {};
+    try {
+      payload = raw ? JSON.parse(raw) : {};
+    } catch {
+      payload = {};
+    }
+
+    if (!response.ok) {
+      atlasLog("provider_request_failed", {
+        mode,
+        status: response.status,
+        statusText: response.statusText,
+        providerMessage: safeProviderMessage(payload?.error?.message ?? raw),
+      });
+      const error = new Error(`GEMINI_HTTP_${response.status}`);
+      (error as Error & { status?: number }).status = response.status;
+      throw error;
+    }
+
+    const output = payload?.candidates?.[0]?.content?.parts
+      ?.map((part: { text?: string }) => part?.text ?? "")
+      .join("")
+      .trim();
+
+    if (!output) {
+      atlasLog("provider_empty_response", { mode });
+      throw new Error("GEMINI_EMPTY_RESPONSE");
+    }
+
+    return output;
   }
 
+  // Preferred path: schema-guided JSON.
   try {
-    return parseGeminiJson(firstText);
+    const output = await request({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.35,
+        responseMimeType: "application/json",
+        ...(schema ? { responseJsonSchema: schema } : {}),
+      },
+    }, "schema");
+
+    try {
+      return JSON.parse(output);
+    } catch (error) {
+      atlasLog("schema_json_parse_failed", {
+        providerMessage: safeProviderMessage(error),
+      });
+      throw new Error("ATLAS_AI_INVALID_JSON");
+    }
   } catch (error) {
-    if (!(error instanceof Error) || error.message !== "ATLAS_AI_INVALID_JSON") throw error;
+    atlasLog("schema_mode_fallback", {
+      providerMessage: safeProviderMessage(error),
+    });
+  }
 
-    // One controlled format retry only. Provider errors are never exposed to
-    // the client as raw provider messages.
-    const retryPrompt = `${prompt}
+  // Fallback path: plain JSON output with local validation/sanitisation.
+  const fallbackPrompt = `${prompt}
 
-RETRY FORMAT REQUIREMENT:
-Your previous response could not be parsed. Return one complete valid JSON object only.
-Do not use Markdown fences, commentary, prefixes, suffixes or trailing commas.`;
+Return ONLY valid JSON. Do not include Markdown fences, commentary or any text before or after the JSON object.`;
 
-    const retryText = await requestGeminiJson(retryPrompt, responseJsonSchema);
-    return parseGeminiJson(retryText);
+  const output = await request({
+    contents: [{ role: "user", parts: [{ text: fallbackPrompt }] }],
+    generationConfig: {
+      temperature: 0.35,
+      responseMimeType: "application/json",
+    },
+  }, "json_fallback");
+
+  try {
+    return JSON.parse(output);
+  } catch (error) {
+    atlasLog("fallback_json_parse_failed", {
+      providerMessage: safeProviderMessage(error),
+    });
+    throw new Error("ATLAS_AI_INVALID_JSON");
   }
 }
 

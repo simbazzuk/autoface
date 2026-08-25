@@ -73,7 +73,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: "INVALID_MODE" }, { status: 400 });
   } catch (error) {
+    console.error("[Atlas AI API] generation_failed", {
+      model: atlasAiStatus().model,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return atlasApiError(error);
-
   }
 }
