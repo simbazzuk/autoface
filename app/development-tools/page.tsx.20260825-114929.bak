@@ -12,7 +12,6 @@ export default function DevelopmentToolsPage(){
   const [allowed,setAllowed]=useState<boolean|null>(null);
   const [seedHealth,setSeedHealth]=useState<{total:number;healthy:number;unhealthy:number;profiles:Array<{uid:string;name:string;location:string;healthy:boolean;checks:Record<string,boolean>}>}|null>(null);
   const [readiness,setReadiness]=useState<{ready:boolean;checks:{profileExists:boolean;profileVisible:boolean;atlasProfileExists:boolean;compatibilityConsent:boolean;authenticityReady:boolean};authenticityScore:number;atlasCompleteness:number}|null>(null);
-  const [entitlementStatus,setEntitlementStatus]=useState<{plan:"free"|"founding";seededProfiles:number;reviewedItems:number;mutualIntroductions:number;testDataReady:boolean}|null>(null);
 
   useEffect(()=>{if(!loading&&!user)router.replace("/sign-in")},[loading,user,router]);
   useEffect(()=>{
@@ -38,58 +37,6 @@ export default function DevelopmentToolsPage(){
     }catch{setReadiness(null)}
   }
   useEffect(()=>{void loadReadiness()},[user]);
-
-  async function loadEntitlementStatus(){
-    if(!user||process.env.NODE_ENV==="production")return;
-    try{
-      const token=await user.getIdToken();
-      const response=await fetch("/api/dev/entitlements",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
-      if(response.ok)setEntitlementStatus(await response.json());
-    }catch{setEntitlementStatus(null)}
-  }
-  useEffect(()=>{void loadEntitlementStatus()},[user]);
-
-  async function runEntitlement(action:"set_free"|"set_founding"|"create_test_data"|"reset_test_data"){
-    if(!user||busy)return;
-    const confirmations={
-      set_free:"Switch this local test account to Free? Founding-only features will lock.",
-      set_founding:"Switch this local test account to Founding Member? Founding entitlements will become active.",
-      create_test_data:"Create entitlement test data? This will create one synthetic mutual introduction and five reviewed recommendation records using the seeded development community.",
-      reset_test_data:"Clear entitlement harness data and return this test account to Free?"
-    };
-    if(!window.confirm(confirmations[action]))return;
-    try{
-      setBusy(`entitlement_${action}`);setMessage("");
-      const token=await user.getIdToken();
-      const response=await fetch("/api/dev/entitlements",{
-        method:"POST",
-        headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},
-        body:JSON.stringify({action})
-      });
-      const body=await response.json().catch(()=>({}));
-      if(!response.ok){
-        const friendly=body.error==="SEED_COMMUNITY_REQUIRED"
-          ?"Seed the 8 synthetic community profiles first."
-          :body.error==="PROFILE_REQUIRED"
-            ?"Create and save your Profile first."
-            :body.error==="ATLAS_PROFILE_REQUIRED"
-              ?"Complete your Atlas Profile first."
-              :(body.error??"Entitlement test action failed.");
-        throw new Error(friendly);
-      }
-      setEntitlementStatus({
-        plan:body.plan??"free",
-        seededProfiles:Number(body.seededProfiles??0),
-        reviewedItems:Number(body.reviewedItems??0),
-        mutualIntroductions:Number(body.mutualIntroductions??0),
-        testDataReady:Boolean(body.testDataReady),
-      });
-      setMessage(body.created?.notice ? `${body.message} ${body.created.notice}` : (body.message??"Done."));
-      await loadReadiness();
-    }catch(error){
-      setMessage(error instanceof Error?error.message:"Entitlement test action failed.");
-    }finally{setBusy("")}
-  }
 
   async function run(action:"reset_me"|"seed_community"|"remove_seed_community"|"make_discovery_ready"|"reset_reviews"|"factory_reset"|"validate_community"){
     if(!user||busy)return;
@@ -126,7 +73,6 @@ export default function DevelopmentToolsPage(){
             : `Reset ${body.reset??0} reviewed profile decision(s). They can now appear in Discovery again.`)
         : (body.message??"Done."));
       await loadReadiness();
-      await loadEntitlementStatus();
       if(action==="reset_me"||action==="factory_reset")setTimeout(()=>router.push("/profile"),900);
     }catch(error){setMessage(error instanceof Error?error.message:"Development action failed.")}
     finally{setBusy("")}
@@ -187,78 +133,6 @@ export default function DevelopmentToolsPage(){
             <em>{Object.entries(profile.checks).filter(([,value])=>!value).map(([key])=>key).join(", ")||"Auth · Profile · Atlas · Visible · Trust ✓"}</em>
           </div>)}</div>
         </div>}
-      </div>
-
-      <div className="card dev-tools-card dev-entitlement-card">
-        <div className="dev-entitlement-head">
-          <div><span className="privacy-kicker">ENTITLEMENT TESTING</span><h2>Free vs Founding Member</h2></div>
-          <span className={`status-pill ${entitlementStatus?.plan==="founding"?"founding-plan-pill":""}`}>{entitlementStatus?.plan==="founding"?"FOUNDING":"FREE"}</span>
-        </div>
-        <p>Create repeatable local data so you can test membership locks without waiting for real introductions or payments.</p>
-
-        <div className="dev-entitlement-stats">
-          <span><b>{entitlementStatus?.seededProfiles??0}/8</b><small>seeded profiles</small></span>
-          <span><b>{entitlementStatus?.mutualIntroductions??0}</b><small>mutual introduction</small></span>
-          <span><b>{entitlementStatus?.reviewedItems??0}</b><small>reviewed items</small></span>
-        </div>
-
-        <div className="dev-entitlement-flow">
-          <span><b>1</b>Seed 8 test profiles here</span>
-          <span><b>2</b>Create introduction + history data</span>
-          <span><b>3</b>Switch Free / Founding</span>
-          <span><b>4</b>Compare locked and unlocked features</span>
-        </div>
-
-        <div className="dev-entitlement-seed-state">
-          <div>
-            <span className="privacy-kicker">STEP 1</span>
-            <b>{(entitlementStatus?.seededProfiles??0)>=8?"Test profiles are ready":"Seed the test profiles first"}</b>
-            <small>{entitlementStatus?.seededProfiles??0}/8 synthetic community profiles currently available.</small>
-          </div>
-          <button className={`btn ${(entitlementStatus?.seededProfiles??0)>=8?"entitlement-seeded-button":"btn-primary"}`} disabled={Boolean(busy)} onClick={()=>void run("seed_community")}>
-            {busy==="seed_community"?"Seeding + validating…":(entitlementStatus?.seededProfiles??0)>=8?"Refresh test profiles":"Seed 8 test profiles"}
-          </button>
-        </div>
-
-        <div className="dev-entitlement-actions">
-          <button className="btn btn-primary" disabled={Boolean(busy)||(entitlementStatus?.seededProfiles??0)<8} onClick={()=>void runEntitlement("create_test_data")}>
-            {busy==="entitlement_create_test_data"?"Creating…":(entitlementStatus?.seededProfiles??0)<8?"Seed profiles to continue":"Create entitlement test data"}
-          </button>
-          <button className={`btn ${entitlementStatus?.plan==="free"?"entitlement-active-button":""}`} disabled={Boolean(busy)||!entitlementStatus?.testDataReady} onClick={()=>void runEntitlement("set_free")}>
-            Test as Free
-          </button>
-          <button className={`btn btn-relationship ${entitlementStatus?.plan==="founding"?"entitlement-active-button":""}`} disabled={Boolean(busy)||!entitlementStatus?.testDataReady} onClick={()=>void runEntitlement("set_founding")}>
-            Test as Founding
-          </button>
-          <button className="btn" disabled={Boolean(busy)||!entitlementStatus?.testDataReady} onClick={()=>void runEntitlement("reset_test_data")}>
-            Reset entitlement data
-          </button>
-        </div>
-
-        <div className="dev-entitlement-test-grid">
-          <div>
-            <span className="privacy-kicker">FREE CHECK</span>
-            <b>What to verify</b>
-            <small>Atlas Reflection locked · advanced preferences locked · recommendation history limited to 3 · Discovery limited to 3.</small>
-          </div>
-          <div>
-            <span className="privacy-kicker">FOUNDING CHECK</span>
-            <b>What to verify</b>
-            <small>Atlas Reflection enabled · advanced preferences enabled · all 5 history records visible · expanded Discovery after reviewed profiles are reset.</small>
-          </div>
-        </div>
-
-        <div className="dev-entitlement-tip">
-          <b>Testing expanded Discovery</b>
-          <span>After comparing recommendation history, use <strong>Reset reviewed profiles</strong> below. It preserves the mutual introduction but makes the non-mutual synthetic profiles discoverable again. Free remains capped at 3; Founding can show the larger available set.</span>
-        </div>
-
-        <div className="dev-entitlement-links">
-          <a className="btn" href="/introductions">Open Introductions</a>
-          <a className="btn" href="/recommendations/history">Open History</a>
-          <a className="btn" href="/discover">Open Discover</a>
-          <a className="btn" href="/relationship-profile">Open Atlas Profile</a>
-        </div>
       </div>
 
       <div className="card dev-tools-card dev-discovery-reset-card">

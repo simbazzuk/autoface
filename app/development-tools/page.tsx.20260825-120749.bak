@@ -126,7 +126,6 @@ export default function DevelopmentToolsPage(){
             : `Reset ${body.reset??0} reviewed profile decision(s). They can now appear in Discovery again.`)
         : (body.message??"Done."));
       await loadReadiness();
-      await loadEntitlementStatus();
       if(action==="reset_me"||action==="factory_reset")setTimeout(()=>router.push("/profile"),900);
     }catch(error){setMessage(error instanceof Error?error.message:"Development action failed.")}
     finally{setBusy("")}
@@ -203,34 +202,23 @@ export default function DevelopmentToolsPage(){
         </div>
 
         <div className="dev-entitlement-flow">
-          <span><b>1</b>Seed 8 test profiles here</span>
-          <span><b>2</b>Create introduction + history data</span>
+          <span><b>1</b>Seed the synthetic community</span>
+          <span><b>2</b>Create entitlement test data</span>
           <span><b>3</b>Switch Free / Founding</span>
           <span><b>4</b>Compare locked and unlocked features</span>
         </div>
 
-        <div className="dev-entitlement-seed-state">
-          <div>
-            <span className="privacy-kicker">STEP 1</span>
-            <b>{(entitlementStatus?.seededProfiles??0)>=8?"Test profiles are ready":"Seed the test profiles first"}</b>
-            <small>{entitlementStatus?.seededProfiles??0}/8 synthetic community profiles currently available.</small>
-          </div>
-          <button className={`btn ${(entitlementStatus?.seededProfiles??0)>=8?"entitlement-seeded-button":"btn-primary"}`} disabled={Boolean(busy)} onClick={()=>void run("seed_community")}>
-            {busy==="seed_community"?"Seeding + validating…":(entitlementStatus?.seededProfiles??0)>=8?"Refresh test profiles":"Seed 8 test profiles"}
-          </button>
-        </div>
-
         <div className="dev-entitlement-actions">
-          <button className="btn btn-primary" disabled={Boolean(busy)||(entitlementStatus?.seededProfiles??0)<8} onClick={()=>void runEntitlement("create_test_data")}>
-            {busy==="entitlement_create_test_data"?"Creating…":(entitlementStatus?.seededProfiles??0)<8?"Seed profiles to continue":"Create entitlement test data"}
+          <button className="btn btn-primary" disabled={Boolean(busy)} onClick={()=>void runEntitlement("create_test_data")}>
+            {busy==="entitlement_create_test_data"?"Creating…":"Create entitlement test data"}
           </button>
-          <button className={`btn ${entitlementStatus?.plan==="free"?"entitlement-active-button":""}`} disabled={Boolean(busy)||!entitlementStatus?.testDataReady} onClick={()=>void runEntitlement("set_free")}>
+          <button className={`btn ${entitlementStatus?.plan==="free"?"entitlement-active-button":""}`} disabled={Boolean(busy)} onClick={()=>void runEntitlement("set_free")}>
             Test as Free
           </button>
-          <button className={`btn btn-relationship ${entitlementStatus?.plan==="founding"?"entitlement-active-button":""}`} disabled={Boolean(busy)||!entitlementStatus?.testDataReady} onClick={()=>void runEntitlement("set_founding")}>
+          <button className={`btn btn-relationship ${entitlementStatus?.plan==="founding"?"entitlement-active-button":""}`} disabled={Boolean(busy)} onClick={()=>void runEntitlement("set_founding")}>
             Test as Founding
           </button>
-          <button className="btn" disabled={Boolean(busy)||!entitlementStatus?.testDataReady} onClick={()=>void runEntitlement("reset_test_data")}>
+          <button className="btn" disabled={Boolean(busy)} onClick={()=>void runEntitlement("reset_test_data")}>
             Reset entitlement data
           </button>
         </div>
