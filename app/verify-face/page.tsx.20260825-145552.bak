@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import "@aws-amplify/ui-react/styles.css";
 import "@aws-amplify/ui-react-liveness/styles.css";
@@ -115,7 +115,7 @@ export default function VerifyFacePage() {
       return false;
     }
 
-    setCameraDiagnostic({ status: "checking", message: "Opening your camera for a quick pre-flight checkâ€¦" });
+    setCameraDiagnostic({ status: "checking", message: "Opening your camera for a quick pre-flight check…" });
 
     let stream: MediaStream | null = null;
     try {
@@ -154,7 +154,7 @@ export default function VerifyFacePage() {
         status: compatible ? "passed" : "failed",
         message: compatible
           ? "AWS-compatible camera mode confirmed. AutoFace can access this webcam at a suitable resolution and frame rate."
-          : `The camera opened, but the negotiated video mode does not meet the AWS Face Liveness minimum. AutoFace needs at least ${AWS_MIN_SHORT_EDGE}Ã—${AWS_MIN_LONG_EDGE} (either orientation) and ${AWS_MIN_FPS} fps. Try another camera or update the webcam driver.`,
+          : `The camera opened, but the negotiated video mode does not meet the AWS Face Liveness minimum. AutoFace needs at least ${AWS_MIN_SHORT_EDGE}×${AWS_MIN_LONG_EDGE} (either orientation) and ${AWS_MIN_FPS} fps. Try another camera or update the webcam driver.`,
         deviceLabel: label,
         width: settings.width,
         height: settings.height,
@@ -221,7 +221,7 @@ export default function VerifyFacePage() {
     if (!user || !sessionId) return;
     try {
       setBusy(true);
-      setMessage("Checking your liveness result and matching it to your profile photoâ€¦");
+      setMessage("Checking your liveness result and matching it to your profile photo…");
       const token = await user.getIdToken();
       const response = await fetch("/api/face-verification/result", {
         method: "POST",
@@ -243,12 +243,12 @@ export default function VerifyFacePage() {
     }
   }
 
-  if (loading || !user) return <main><section className="section"><div className="container"><p className="muted">Loading face verificationâ€¦</p></div></section></main>;
+  if (loading || !user) return <main><section className="section"><div className="container"><p className="muted">Loading face verification…</p></div></section></main>;
 
   return <main>
     <section className="page-hero compact-hero"><div className="container">
-      <span className="eyebrow">AutoFace Trust â€¢ AWS Rekognition</span>
-      <h1>Prove the person is real â€” and matches the profile photo.</h1>
+      <span className="eyebrow">AutoFace Trust • AWS Rekognition</span>
+      <h1>Prove the person is real — and matches the profile photo.</h1>
       <p className="lead">A short live camera check confirms liveness. AutoFace then performs a one-to-one comparison against your existing profile photo before displaying the Face Verified signal.</p>
     </div></section>
 
@@ -268,7 +268,7 @@ export default function VerifyFacePage() {
 
           <div className="biometric-privacy-panel">
             <div className="biometric-privacy-heading">
-              <span className="biometric-privacy-shield" aria-hidden="true">âœ“</span>
+              <span className="biometric-privacy-shield" aria-hidden="true">✓</span>
               <div>
                 <span className="privacy-kicker">YOUR FACE DATA & PRIVACY</span>
                 <h3>How AutoFace uses your photo and live face check</h3>
@@ -278,19 +278,19 @@ export default function VerifyFacePage() {
 
             <div className="biometric-privacy-grid">
               <div className="biometric-info-row info-blue">
-                <span className="biometric-info-icon" aria-hidden="true">â—‰</span>
+                <span className="biometric-info-icon" aria-hidden="true">◉</span>
                 <div><strong>Profile photo</strong><p>Your profile photo is stored with your AutoFace profile and is used only as the reference photo for this one-to-one verification.</p></div>
               </div>
               <div className="biometric-info-row info-green">
-                <span className="biometric-info-icon" aria-hidden="true">âœ“</span>
+                <span className="biometric-info-icon" aria-hidden="true">✓</span>
                 <div><strong>Live face check</strong><p>Amazon Rekognition performs a short liveness check to confirm that a real person is present in front of the camera.</p></div>
               </div>
               <div className="biometric-info-row info-purple">
-                <span className="biometric-info-icon" aria-hidden="true">âŒ</span>
+                <span className="biometric-info-icon" aria-hidden="true">⌁</span>
                 <div><strong>Face match</strong><p>The resulting live reference image is compared one-to-one with your profile photo. AutoFace does not search your face against other members or create an AWS face collection for member identification.</p></div>
               </div>
               <div className="biometric-info-row info-orange">
-                <span className="biometric-info-icon" aria-hidden="true">â–£</span>
+                <span className="biometric-info-icon" aria-hidden="true">▣</span>
                 <div><strong>What AutoFace records</strong><p>AutoFace records the verification outcome, provider, date and security event information needed to operate the trust feature. Face verification is separate from compatibility scoring.</p></div>
               </div>
               <div className="biometric-info-row info-teal">
@@ -301,25 +301,25 @@ export default function VerifyFacePage() {
 
             <label className={`biometric-consent ${biometricConsent ? "consent-selected" : ""}`}>
               <input type="checkbox" checked={biometricConsent} onChange={(event) => setBiometricConsent(event.target.checked)} />
-              <span className="biometric-consent-icon" aria-hidden="true">âœ“</span>
+              <span className="biometric-consent-icon" aria-hidden="true">✓</span>
               <span><strong>I explicitly consent to AutoFace processing my biometric data for face verification.</strong><small>I understand that I can choose not to verify my face and can withdraw consent for future biometric processing through AutoFace privacy controls.</small></span>
             </label>
           </div>
 
           <div className="camera-diagnostic-actions">
             <button className="btn" disabled={busy} onClick={runCameraDiagnostic}>
-              {cameraDiagnostic.status === "checking" ? "Testing cameraâ€¦" : "Test camera"}
+              {cameraDiagnostic.status === "checking" ? "Testing camera…" : "Test camera"}
             </button>
-            <button className="btn btn-primary" disabled={busy || !browserReady || !biometricConsent} onClick={startVerification}>{busy ? "Startingâ€¦" : "Verify my face"}</button>
+            <button className="btn btn-primary" disabled={busy || !browserReady || !biometricConsent} onClick={startVerification}>{busy ? "Starting…" : "Verify my face"}</button>
           </div>
 
           {cameraDiagnostic.status !== "idle" && <div className={`camera-diagnostic ${cameraDiagnostic.status}`}>
-            <div className="camera-diagnostic-icon">{cameraDiagnostic.status === "passed" ? "âœ“" : cameraDiagnostic.status === "failed" ? "!" : "â€¦"}</div>
+            <div className="camera-diagnostic-icon">{cameraDiagnostic.status === "passed" ? "✓" : cameraDiagnostic.status === "failed" ? "!" : "…"}</div>
             <div>
               <strong>{cameraDiagnostic.status === "passed" ? "Camera ready" : cameraDiagnostic.status === "failed" ? "AWS camera compatibility check failed" : "Checking camera"}</strong>
               {cameraDiagnostic.message && <p>{cameraDiagnostic.message}</p>}
               {cameraDiagnostic.deviceLabel && <small>Camera: {cameraDiagnostic.deviceLabel}</small>}
-              {(cameraDiagnostic.width || cameraDiagnostic.height || cameraDiagnostic.frameRate) && <small>Video: {cameraDiagnostic.width ?? "?"}Ã—{cameraDiagnostic.height ?? "?"}{cameraDiagnostic.frameRate ? ` â€¢ ${cameraDiagnostic.frameRate.toFixed(0)} fps` : ""}</small>}
+              {(cameraDiagnostic.width || cameraDiagnostic.height || cameraDiagnostic.frameRate) && <small>Video: {cameraDiagnostic.width ?? "?"}×{cameraDiagnostic.height ?? "?"}{cameraDiagnostic.frameRate ? ` • ${cameraDiagnostic.frameRate.toFixed(0)} fps` : ""}</small>}
               {cameraDiagnostic.errorName && <small>Browser error: <code>{cameraDiagnostic.errorName}</code></small>}
             </div>
           </div>}
@@ -341,35 +341,19 @@ export default function VerifyFacePage() {
           </ThemeProvider>
         </div>}
 
-        {result && result.verified && <div className="face-result success face-result-celebration">
-          <span className="face-result-icon" aria-hidden="true">âœ“</span>
-          <div className="face-result-success-content">
-            <h3>Face verification complete!</h3>
+        {result && result.verified && <div className="face-result success">
+          <span className="face-result-icon">✓</span>
+          <div>
+            <h3>Face Verified</h3>
             <p>Your live check passed and matched your AutoFace profile photo.</p>
-          </div>
-          <div className="face-success-metrics">
-            {typeof result.livenessConfidence === "number" && <div className="face-success-metric">
-              <span className="face-success-metric-icon" aria-hidden="true">âœ“</span>
-              <div className="face-success-metric-copy">
-                <small>Liveness confidence</small>
-                <span>Live check confirmed a real, live person.</span>
-              </div>
-              <strong>{result.livenessConfidence.toFixed(1)}%</strong>
-            </div>}
-            {typeof result.faceSimilarity === "number" && <div className="face-success-metric">
-              <span className="face-success-metric-icon" aria-hidden="true">â—Ž</span>
-              <div className="face-success-metric-copy">
-                <small>Face similarity</small>
-                <span>Your live face matched your profile photo.</span>
-              </div>
-              <strong>{result.faceSimilarity.toFixed(1)}%</strong>
-            </div>}
+            {typeof result.livenessConfidence === "number" && <small>Liveness confidence: {result.livenessConfidence.toFixed(1)}%</small>}
+            {typeof result.faceSimilarity === "number" && <small>Face similarity: {result.faceSimilarity.toFixed(1)}%</small>}
           </div>
         </div>}
 
         {result && !result.verified && <div className="face-failure-wrap">
           <div className="face-failure-hero">
-            <span className="face-failure-icon" aria-hidden="true">Ã—</span>
+            <span className="face-failure-icon" aria-hidden="true">×</span>
             <div>
               <h3>We couldn't verify this attempt</h3>
               <p>Your live check did not match your profile photo closely enough, so no Face Verified badge has been added.</p>
@@ -382,25 +366,25 @@ export default function VerifyFacePage() {
             <h4>What happened</h4>
             <div className="face-failure-metrics">
               {typeof result.livenessConfidence === "number" && <div className="face-metric metric-live">
-                <span className="metric-icon" aria-hidden="true">âœ“</span>
+                <span className="metric-icon" aria-hidden="true">✓</span>
                 <div><small>Liveness confidence</small><strong>{result.livenessConfidence.toFixed(1)}%</strong><em>{result.livenessConfidence >= 90 ? "Passed" : "Needs another check"}</em><p>{result.livenessConfidence >= 90 ? "We detected a real person in front of the camera." : "The live-person check did not meet the verification threshold."}</p></div>
               </div>}
               {typeof result.faceSimilarity === "number" && <div className="face-metric metric-match">
-                <span className="metric-icon" aria-hidden="true">âŒ</span>
+                <span className="metric-icon" aria-hidden="true">⌁</span>
                 <div><small>Face similarity</small><strong>{result.faceSimilarity.toFixed(1)}%</strong><em>{result.faceSimilarity >= 90 ? "Matched" : "Too low"}</em><p>{result.faceSimilarity >= 90 ? "The live reference image matched your profile photo." : "Your live face did not match the current profile photo closely enough."}</p></div>
               </div>}
             </div>
             <div className="face-failure-tips">
               <strong>Tips to improve your next attempt</strong>
-              <span>âœ“ Use a recent, clear, front-facing profile photo</span>
-              <span>âœ“ Face the camera directly in good lighting</span>
-              <span>âœ“ Remove sunglasses, hats or heavy filters</span>
+              <span>✓ Use a recent, clear, front-facing profile photo</span>
+              <span>✓ Face the camera directly in good lighting</span>
+              <span>✓ Remove sunglasses, hats or heavy filters</span>
             </div>
           </div>
         </div>}
 
         {message && <p className="notice status-message">{message}</p>}
-        {result && <div className="face-result-actions"><Link className="btn btn-primary" href="/dashboard">Back to Authenticity Centre</Link>{!result.verified && <button className="btn face-retry-btn" onClick={() => setResult(null)}>â†» Try again</button>}</div>}
+        {result && <div className="face-result-actions"><Link className="btn btn-primary" href="/dashboard">Back to Authenticity Centre</Link>{!result.verified && <button className="btn face-retry-btn" onClick={() => setResult(null)}>↻ Try again</button>}</div>}
       </div>
 
       <aside className="card verification-sidecard">
@@ -408,14 +392,13 @@ export default function VerifyFacePage() {
         <h3>Verification, not a searchable face database.</h3>
         <p>v0.35.3 uses Rekognition as a one-to-one verification step and validates the webcam against AWS Face Liveness resolution and frame-rate requirements before starting the session. AutoFace does not create an AWS face collection for member discovery or identification.</p>
         <div className="no-store-list">
-          <span>âœ“ Firebase remains your account identity</span>
-          <span>âœ“ Only the verification outcome is trusted by AutoFace</span>
-          <span>âœ“ No public biometric score</span>
-          <span>âœ“ No face search across other members</span>
+          <span>✓ Firebase remains your account identity</span>
+          <span>✓ Only the verification outcome is trusted by AutoFace</span>
+          <span>✓ No public biometric score</span>
+          <span>✓ No face search across other members</span>
         </div>
         <Link className="btn" href="/trust">Trust & Privacy</Link>
       </aside>
     </div></section>
   </main>;
 }
-
