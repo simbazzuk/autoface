@@ -24,57 +24,32 @@ export async function GET(request: Request) {
     const user = await requireUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
 
-    // AutoFace has used two block record shapes during development:
-    // current: blockerUid / blockedUid
-    // legacy:  fromUid / toUid
-    // Read both and merge them so Account & Notifications always reflects
-    // the effective block state enforced by messaging/discovery.
-    const [currentSnap, legacySnap] = await Promise.all([
-      adminDb.collection("blocks")
-        .where("blockerUid", "==", user.uid)
-        .limit(200)
-        .get(),
-      adminDb.collection("blocks")
-        .where("fromUid", "==", user.uid)
-        .limit(200)
-        .get(),
-    ]);
+    const snap = await adminDb.collection("blocks")
+      .where("blockerUid", "==", user.uid)
+      .limit(200)
+      .get();
 
-    const docsByPath = new Map<string, FirebaseFirestore.QueryDocumentSnapshot>();
-    currentSnap.docs.forEach((doc) => docsByPath.set(doc.ref.path, doc));
-    legacySnap.docs.forEach((doc) => docsByPath.set(doc.ref.path, doc));
-
-    const candidates = Array.from(docsByPath.values());
-    const seenBlockedUids = new Set<string>();
-    const blocks: BlockedProfile[] = [];
-
-    for (const doc of candidates) {
+    const blocks = await Promise.all(snap.docs.map(async (doc) => {
       const data = doc.data() ?? {};
       const blockedUid = String(data.blockedUid ?? data.toUid ?? "");
-      if (!blockedUid || blockedUid === user.uid || seenBlockedUids.has(blockedUid)) continue;
+      if (!blockedUid) return null;
 
-      seenBlockedUids.add(blockedUid);
-      const profileSnap = await adminDb.collection("profiles").doc(blockedUid).get();
+      const profileSnap = await adminDb!.collection("profiles").doc(blockedUid).get();
       const profile = profileSnap.data() ?? {};
-
-      blocks.push({
+      return {
         blockId: doc.id,
         uid: blockedUid,
         firstName: String(profile.firstName ?? profile.displayName ?? "Member"),
-        location: profile.generalLocation
-          ? String(profile.generalLocation)
-          : profile.location
-            ? String(profile.location)
-            : null,
+        location: profile.location ? String(profile.location) : null,
         matchId: data.matchId ? String(data.matchId) : null,
         blockedAt: asIso(data.createdAt),
         source: data.source ? String(data.source) : null,
-      });
-    }
+      } satisfies BlockedProfile;
+    }));
 
-    blocks.sort((a, b) => (b.blockedAt ?? "").localeCompare(a.blockedAt ?? ""));
-
-    return NextResponse.json({ blockedProfiles: blocks });
+    return NextResponse.json({
+      blockedProfiles: blocks.filter((item): item is BlockedProfile => Boolean(item)),
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : 500 });

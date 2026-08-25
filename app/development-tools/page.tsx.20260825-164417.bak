@@ -1,9 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useEffect,useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { DevChatEntitlementHarness } from "@/components/DevChatEntitlementHarness";
 
 export default function DevelopmentToolsPage(){
   const {user,loading}=useAuth();
@@ -133,7 +132,7 @@ export default function DevelopmentToolsPage(){
     finally{setBusy("")}
   }
 
-  if(loading||!user||allowed===null)return <main><section className="section"><div className="container"><p className="muted">Loading development toolsâ€¦</p></div></section></main>;
+  if(loading||!user||allowed===null)return <main><section className="section"><div className="container"><p className="muted">Loading development tools…</p></div></section></main>;
   if(process.env.NODE_ENV==="production"||!allowed)return <main><section className="section"><div className="container narrow"><div className="card dev-denied"><span className="privacy-kicker">DEVELOPMENT ONLY</span><h1>Development tools are unavailable.</h1><p>These controls are restricted to local development test profiles.</p></div></div></section></main>;
 
   return <main>
@@ -156,8 +155,8 @@ export default function DevelopmentToolsPage(){
           <span><b>DELETE</b>Interests + matches</span>
           <span><b>DELETE</b>Conversations + history</span>
         </div>
-        <div className="dev-factory-warning"><b>Local development only.</b> After reset, rebuild your own Profile â†’ Atlas â†’ Preferences, then seed the community again.</div>
-        <button className="btn danger-button dev-action dev-factory-button" disabled={Boolean(busy)} onClick={()=>void run("factory_reset")}>{busy==="factory_reset"?"Resetting test environmentâ€¦":"Factory reset test environment"}</button>
+        <div className="dev-factory-warning"><b>Local development only.</b> After reset, rebuild your own Profile → Atlas → Preferences, then seed the community again.</div>
+        <button className="btn danger-button dev-action dev-factory-button" disabled={Boolean(busy)} onClick={()=>void run("factory_reset")}>{busy==="factory_reset"?"Resetting test environment…":"Factory reset test environment"}</button>
       </div>
 
       <div className="card dev-tools-card dev-reset-card">
@@ -169,28 +168,26 @@ export default function DevelopmentToolsPage(){
           <span><b>RESET</b>Discovery preferences</span><span><b>RESET</b>Recommendations/history</span>
           <span><b>RESET</b>Interests + introductions</span><span><b>RESET</b>Profile photo</span>
         </div>
-        <button className="btn danger-button dev-action" disabled={Boolean(busy)} onClick={()=>void run("reset_me")}>{busy==="reset_me"?"Resettingâ€¦":"Reset my test journey"}</button>
+        <button className="btn danger-button dev-action" disabled={Boolean(busy)} onClick={()=>void run("reset_me")}>{busy==="reset_me"?"Resetting…":"Reset my test journey"}</button>
       </div>
 
       <div className="card dev-tools-card dev-seed-card">
         <span className="privacy-kicker">SYNTHETIC COMMUNITY</span><h2>Seed Sikh test profiles</h2>
         <p>Create eight synthetic members with deliberately varied Sikh identity, lifestyle and Atlas relationship answers so Discovery has a useful population to rank.</p>
-        <div className="dev-seed-people"><span>Harpreet Â· Manchester</span><span>Simran Â· London</span><span>Jaspreet Â· Birmingham</span><span>Priya Â· Leeds</span><span>Gurpreet Â· Leicester</span><span>Navdeep Â· Toronto</span><span>Aman Â· Nairobi</span><span>Kiran Â· Melbourne</span></div>
+        <div className="dev-seed-people"><span>Harpreet · Manchester</span><span>Simran · London</span><span>Jaspreet · Birmingham</span><span>Priya · Leeds</span><span>Gurpreet · Leicester</span><span>Navdeep · Toronto</span><span>Aman · Nairobi</span><span>Kiran · Melbourne</span></div>
         <div className="dev-action-row">
-          <button className="btn btn-primary dev-action" disabled={Boolean(busy)} onClick={()=>void run("seed_community")}>{busy==="seed_community"?"Seeding + validatingâ€¦":"Seed + validate community"}</button>
-          <button className="btn dev-action" disabled={Boolean(busy)} onClick={()=>void run("validate_community")}>{busy==="validate_community"?"Validatingâ€¦":"Validate existing seed"}</button>
-          <button className="btn dev-action" disabled={Boolean(busy)} onClick={()=>void run("remove_seed_community")}>{busy==="remove_seed_community"?"Removingâ€¦":"Remove seeded profiles"}</button>
+          <button className="btn btn-primary dev-action" disabled={Boolean(busy)} onClick={()=>void run("seed_community")}>{busy==="seed_community"?"Seeding + validating…":"Seed + validate community"}</button>
+          <button className="btn dev-action" disabled={Boolean(busy)} onClick={()=>void run("validate_community")}>{busy==="validate_community"?"Validating…":"Validate existing seed"}</button>
+          <button className="btn dev-action" disabled={Boolean(busy)} onClick={()=>void run("remove_seed_community")}>{busy==="remove_seed_community"?"Removing…":"Remove seeded profiles"}</button>
         </div>
         {seedHealth&&<div className="dev-seed-health">
           <div className="dev-seed-health-summary"><b>{seedHealth.healthy}/{seedHealth.total}</b><span>synthetic profiles healthy</span><em>{seedHealth.unhealthy===0?"READY":"NEEDS ATTENTION"}</em></div>
           <div className="dev-seed-health-list">{seedHealth.profiles.map(profile=><div className={profile.healthy?"healthy":"unhealthy"} key={profile.uid}>
-            <span>{profile.healthy?"âœ“":"!"}</span><b>{profile.name}</b><small>{profile.location}</small>
-            <em>{Object.entries(profile.checks).filter(([,value])=>!value).map(([key])=>key).join(", ")||"Auth Â· Profile Â· Atlas Â· Visible Â· Trust âœ“"}</em>
+            <span>{profile.healthy?"✓":"!"}</span><b>{profile.name}</b><small>{profile.location}</small>
+            <em>{Object.entries(profile.checks).filter(([,value])=>!value).map(([key])=>key).join(", ")||"Auth · Profile · Atlas · Visible · Trust ✓"}</em>
           </div>)}</div>
         </div>}
       </div>
-
-      <DevChatEntitlementHarness />
 
       <div className="card dev-tools-card dev-entitlement-card">
         <div className="dev-entitlement-head">
@@ -219,13 +216,13 @@ export default function DevelopmentToolsPage(){
             <small>{entitlementStatus?.seededProfiles??0}/8 synthetic community profiles currently available.</small>
           </div>
           <button className={`btn ${(entitlementStatus?.seededProfiles??0)>=8?"entitlement-seeded-button":"btn-primary"}`} disabled={Boolean(busy)} onClick={()=>void run("seed_community")}>
-            {busy==="seed_community"?"Seeding + validatingâ€¦":(entitlementStatus?.seededProfiles??0)>=8?"Refresh test profiles":"Seed 8 test profiles"}
+            {busy==="seed_community"?"Seeding + validating…":(entitlementStatus?.seededProfiles??0)>=8?"Refresh test profiles":"Seed 8 test profiles"}
           </button>
         </div>
 
         <div className="dev-entitlement-actions">
           <button className="btn btn-primary" disabled={Boolean(busy)||(entitlementStatus?.seededProfiles??0)<8} onClick={()=>void runEntitlement("create_test_data")}>
-            {busy==="entitlement_create_test_data"?"Creatingâ€¦":(entitlementStatus?.seededProfiles??0)<8?"Seed profiles to continue":"Create entitlement test data"}
+            {busy==="entitlement_create_test_data"?"Creating…":(entitlementStatus?.seededProfiles??0)<8?"Seed profiles to continue":"Create entitlement test data"}
           </button>
           <button className={`btn ${entitlementStatus?.plan==="free"?"entitlement-active-button":""}`} disabled={Boolean(busy)||!entitlementStatus?.testDataReady} onClick={()=>void runEntitlement("set_free")}>
             Test as Free
@@ -242,12 +239,12 @@ export default function DevelopmentToolsPage(){
           <div>
             <span className="privacy-kicker">FREE CHECK</span>
             <b>What to verify</b>
-            <small>Atlas Reflection locked Â· advanced preferences locked Â· recommendation history limited to 3 Â· Discovery limited to 3.</small>
+            <small>Atlas Reflection locked · advanced preferences locked · recommendation history limited to 3 · Discovery limited to 3.</small>
           </div>
           <div>
             <span className="privacy-kicker">FOUNDING CHECK</span>
             <b>What to verify</b>
-            <small>Atlas Reflection enabled Â· advanced preferences enabled Â· all 5 history records visible Â· expanded Discovery after reviewed profiles are reset.</small>
+            <small>Atlas Reflection enabled · advanced preferences enabled · all 5 history records visible · expanded Discovery after reviewed profiles are reset.</small>
           </div>
         </div>
 
@@ -269,7 +266,7 @@ export default function DevelopmentToolsPage(){
         <h2>Reset reviewed profiles</h2>
         <p>Clear your previous decisions about synthetic profiles without resetting your Profile, Atlas answers, preferences, authenticity or seeded community.</p>
         <div className="dev-review-reset-summary">
-          <span><b>RESET</b>Interested â€” non-mutual</span>
+          <span><b>RESET</b>Interested — non-mutual</span>
           <span><b>RESET</b>Saved for later</span>
           <span><b>RESET</b>Not for me</span>
           <span><b>KEEP</b>Mutual introductions</span>
@@ -277,7 +274,7 @@ export default function DevelopmentToolsPage(){
           <span><b>KEEP</b>Seeded community</span>
         </div>
         <button className="btn btn-primary dev-action" disabled={Boolean(busy)} onClick={()=>void run("reset_reviews")}>
-          {busy==="reset_reviews"?"Resettingâ€¦":"Reset reviewed profiles"}
+          {busy==="reset_reviews"?"Resetting…":"Reset reviewed profiles"}
         </button>
       </div>
 
@@ -285,14 +282,14 @@ export default function DevelopmentToolsPage(){
         <div className="dev-readiness-heading"><div><span className="privacy-kicker">DISCOVERY READINESS</span><h2>{readiness?.ready?"Your test account is ready":"Why seeded people may not appear"}</h2></div><span className={`status-pill ${readiness?.ready?"ready-pill":"attention-pill"}`}>{readiness?.ready?"READY":"CHECK SETUP"}</span></div>
         <p>Seeding creates candidates. Your own account must also pass Discovery eligibility before those candidates can be returned.</p>
         <div className="dev-readiness-grid">
-          <span className={readiness?.checks.profileExists?"ok":"bad"}><b>{readiness?.checks.profileExists?"âœ“":"!"}</b><em>Profile saved</em></span>
-          <span className={readiness?.checks.profileVisible?"ok":"bad"}><b>{readiness?.checks.profileVisible?"âœ“":"!"}</b><em>Visible for introductions</em></span>
-          <span className={readiness?.checks.atlasProfileExists?"ok":"bad"}><b>{readiness?.checks.atlasProfileExists?"âœ“":"!"}</b><em>Atlas Profile completed</em></span>
-          <span className={readiness?.checks.compatibilityConsent?"ok":"bad"}><b>{readiness?.checks.compatibilityConsent?"âœ“":"!"}</b><em>Compatibility enabled</em></span>
-          <span className={readiness?.checks.authenticityReady?"ok":"bad"}><b>{readiness?.checks.authenticityReady?"âœ“":"!"}</b><em>Authenticity {readiness?.authenticityScore??0}%</em></span>
+          <span className={readiness?.checks.profileExists?"ok":"bad"}><b>{readiness?.checks.profileExists?"✓":"!"}</b><em>Profile saved</em></span>
+          <span className={readiness?.checks.profileVisible?"ok":"bad"}><b>{readiness?.checks.profileVisible?"✓":"!"}</b><em>Visible for introductions</em></span>
+          <span className={readiness?.checks.atlasProfileExists?"ok":"bad"}><b>{readiness?.checks.atlasProfileExists?"✓":"!"}</b><em>Atlas Profile completed</em></span>
+          <span className={readiness?.checks.compatibilityConsent?"ok":"bad"}><b>{readiness?.checks.compatibilityConsent?"✓":"!"}</b><em>Compatibility enabled</em></span>
+          <span className={readiness?.checks.authenticityReady?"ok":"bad"}><b>{readiness?.checks.authenticityReady?"✓":"!"}</b><em>Authenticity {readiness?.authenticityScore??0}%</em></span>
         </div>
         {!readiness?.ready&&<div className="dev-readiness-actions">
-          <button className="btn btn-primary" disabled={Boolean(busy)} onClick={()=>void run("make_discovery_ready")}>{busy==="make_discovery_ready"?"Preparingâ€¦":"Make my test account Discovery-ready"}</button>
+          <button className="btn btn-primary" disabled={Boolean(busy)} onClick={()=>void run("make_discovery_ready")}>{busy==="make_discovery_ready"?"Preparing…":"Make my test account Discovery-ready"}</button>
           {!readiness?.checks.atlasProfileExists&&<a className="btn" href="/relationship-profile">Complete Atlas Profile</a>}
           {!readiness?.checks.profileExists&&<a className="btn" href="/profile">Create Profile</a>}
         </div>}
@@ -300,10 +297,9 @@ export default function DevelopmentToolsPage(){
       </div>
 
       <div className="card dev-warning">
-        <span>âš </span><div><b>Local development only</b><p>These controls deliberately refuse to run when Next.js is in production mode. Seeded people are synthetic test profiles and must never be presented as real AutoFace members.</p></div>
+        <span>⚠</span><div><b>Local development only</b><p>These controls deliberately refuse to run when Next.js is in production mode. Seeded people are synthetic test profiles and must never be presented as real AutoFace members.</p></div>
       </div>
       {message&&<p className="notice dev-tools-message">{message}</p>}
     </div></section>
   </main>
 }
-

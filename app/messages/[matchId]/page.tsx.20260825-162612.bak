@@ -6,16 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
 
 type Message = { id: string; senderUid: string; text: string; createdAt: string | null };
-type MessagingEntitlement = {
-  plan: "free" | "founding" | "plus";
-  unlimited: boolean;
-  contactDetailSharing: boolean;
-  freeLimit: number;
-  sentCount: number;
-  remaining: number | null;
-  locked: boolean;
-};
-type Conversation = { matchId: string; other: SafeDiscoveryProfile; messages: Message[]; messaging: MessagingEntitlement };
+type Conversation = { matchId: string; other: SafeDiscoveryProfile; messages: Message[] };
 type CoachStarter = { theme:string; question:string; basis:"shared_theme"|"discussion_point" };
 type CoachResult = { intro:string; starters:CoachStarter[] };
 
@@ -119,23 +110,10 @@ export default function MessagePage() {
         body: JSON.stringify({ matchId, text }),
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        if (body.error === "MESSAGE_LIMIT_REACHED") throw new Error("FREE_MESSAGE_LIMIT");
-        if (body.error === "CONTACT_DETAILS_MEMBERSHIP_REQUIRED") throw new Error("CONTACT_DETAILS_LOCKED");
-        throw new Error(body.error ?? "Unable to send message.");
-      }
+      if (!response.ok) throw new Error(body.error ?? "Unable to send message.");
       setText("");
       await load();
-    } catch (err) {
-      const raw = err instanceof Error ? err.message : "Unable to send message.";
-      setError(
-        raw === "FREE_MESSAGE_LIMIT"
-          ? "You have used your 5 free messages in this introduction. Upgrade to Founding Membership to continue chatting."
-          : raw === "CONTACT_DETAILS_LOCKED"
-            ? "Phone numbers, email addresses, links and social handles can be shared once messaging is unlocked with Founding Membership."
-            : raw
-      );
-    }
+    } catch (err) { setError(err instanceof Error ? err.message : "Unable to send message."); }
     finally { setSending(false); }
   }
 
@@ -173,7 +151,7 @@ export default function MessagePage() {
 
   return <main>
     <section className="page-hero compact-hero"><div className="container message-hero-row">
-      <div><a className="message-back-link" href={`/connections/${matchId}`}>← Connection overview</a><span className="eyebrow">Safe Messaging</span><h1>Conversation with {other.firstName}</h1><p className="lead">Messaging is available because interest was mutual. Free members can start the conversation; Founding Members unlock unlimited chat and contact-detail sharing.</p></div>
+      <div><a className="message-back-link" href={`/connections/${matchId}`}>← Connection overview</a><span className="eyebrow">Safe Messaging</span><h1>Conversation with {other.firstName}</h1><p className="lead">Messaging is available because interest was mutual. Keep contact details private until you are comfortable sharing them.</p></div>
       <div className="message-trust"><span><b>{other.authenticityScore}%</b><small>Authenticity</small></span><span><b>{other.compatibilityScore}%</b><small>Compatibility</small></span>{other.isTestProfile && <span className="status-pill test-profile-pill">TEST PROFILE</span>}</div>
     </div></section>
     <section className="section message-section"><div className="container message-layout">
@@ -222,27 +200,9 @@ export default function MessagePage() {
           })}
           <div ref={bottomRef} />
         </div>
-        {!data.messaging.unlimited && <div className={`chat-entitlement-banner ${data.messaging.locked ? "chat-entitlement-locked" : ""}`}>
-          <div className="chat-entitlement-icon" aria-hidden="true">{data.messaging.locked ? "🔒" : "💬"}</div>
-          <div>
-            <span className="privacy-kicker">FREE MESSAGING</span>
-            <h3>{data.messaging.locked ? "Ready to keep talking?" : `${data.messaging.remaining ?? 0} of ${data.messaging.freeLimit} free messages remaining`}</h3>
-            <p>{data.messaging.locked
-              ? `You have used your free message allowance with ${other.firstName}. Founding Members get unlimited messaging and can exchange contact details.`
-              : `You can send ${data.messaging.freeLimit} messages in this introduction for free. Contact details stay protected until messaging is unlocked.`}</p>
-          </div>
-          <a className="btn btn-relationship" href="/pricing">{data.messaging.locked ? "Unlock this conversation" : "View Founding Membership"}</a>
-        </div>}
-        {data.messaging.unlimited && <div className="chat-entitlement-banner chat-entitlement-unlimited">
-          <div className="chat-entitlement-icon" aria-hidden="true">✓</div>
-          <div><span className="privacy-kicker">MEMBER MESSAGING</span><h3>Unlimited conversation</h3><p>Your membership includes unlimited messaging and contact-detail sharing.</p></div>
-        </div>}
-        <form className={`message-composer ${data.messaging.locked ? "message-composer-locked" : ""}`} onSubmit={send}>
-          <textarea disabled={data.messaging.locked} value={text} onChange={(e) => setText(e.target.value)} maxLength={1000} placeholder={data.messaging.locked ? "Upgrade to continue this conversation…" : `Message ${other.firstName}…`} rows={3} />
-          <div className="composer-footer">
-            <small>{data.messaging.unlimited ? `${text.length}/1000` : `${data.messaging.remaining ?? 0} free messages left · ${text.length}/1000`}</small>
-            <button className="btn btn-primary" disabled={data.messaging.locked || sending || !text.trim()}>{data.messaging.locked ? "Messaging locked" : sending ? "Sending…" : "Send message"}</button>
-          </div>
+        <form className="message-composer" onSubmit={send}>
+          <textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={1000} placeholder={`Message ${other.firstName}…`} rows={3} />
+          <div className="composer-footer"><small>{text.length}/1000</small><button className="btn btn-primary" disabled={sending || !text.trim()}>{sending ? "Sending…" : "Send message"}</button></div>
         </form>
       </div>
       <aside className="message-side">

@@ -1,0 +1,381 @@
+import { FieldValue } from "firebase-admin/firestore";
+import { mkdir, copyFile } from "node:fs/promises";
+import path from "node:path";
+import { NextResponse } from "next/server";
+import { adminAuth, adminDb, requireUser } from "@/lib/server/firebase-admin";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const TEST_PASSWORD = "AutoFaceTest123!";
+
+const PRIYA = {
+  uid: "demo-chat-priya",
+  email: "priya.chat@autoface.test",
+  firstName: "Priya",
+  surname: "Kaur",
+  age: 33,
+  location: "Leeds",
+  occupation: "Doctor",
+  avatar: "priya.png",
+};
+
+const MAYA = {
+  uid: "demo-chat-maya",
+  email: "maya.chat@autoface.test",
+  firstName: "Maya",
+  surname: "Kaur",
+  age: 32,
+  location: "Birmingham",
+  occupation: "Product Designer",
+  avatar: "maya.png",
+};
+
+const CHAT_USERS = [PRIYA, MAYA] as const;
+
+function assertDevelopment() {
+  if (process.env.NODE_ENV === "production") throw new Error("DEVELOPMENT_ONLY");
+}
+
+async function requireDevelopmentUser(request: Request) {
+  assertDevelopment();
+  const user = await requireUser(request);
+  if (!adminDb || !adminAuth) throw new Error("SERVER_NOT_CONFIGURED");
+  await adminDb.collection("demoProfiles").doc(user.uid).set({
+    uid: user.uid,
+    isTestProfile: true,
+    developmentAccount: true,
+    updatedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+  return user;
+}
+
+function localPhotoPath(uid: string) {
+  return path.join(process.cwd(), ".autoface-local", "profile-photos", `${uid}.png`);
+}
+
+async function installAvatar(uid: string, avatar: string) {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+  const photoDir = path.join(process.cwd(), ".autoface-local", "profile-photos");
+  await mkdir(photoDir, { recursive: true });
+
+  const source = path.join(process.cwd(), "public", "dev-test-avatars", avatar);
+  const target = localPhotoPath(uid);
+  await copyFile(source, target);
+
+  await adminDb.collection("profilePhotos").doc(uid).set({
+    uid,
+    storagePath: target,
+    storageProvider: "local-dev",
+    contentType: "image/png",
+    sizeBytes: 0,
+    sha256: `development-${uid}`,
+    photoVersion: 1,
+    active: true,
+    developmentChatHarness: true,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+async function ensureAuthUser(person: typeof PRIYA | typeof MAYA) {
+  if (!adminAuth) throw new Error("SERVER_NOT_CONFIGURED");
+  try {
+    await adminAuth.getUser(person.uid);
+    await adminAuth.updateUser(person.uid, {
+      email: person.email,
+      emailVerified: true,
+      displayName: `${person.firstName} - CHAT TEST`,
+      disabled: false,
+      password: TEST_PASSWORD,
+    });
+  } catch {
+    await adminAuth.createUser({
+      uid: person.uid,
+      email: person.email,
+      emailVerified: true,
+      displayName: `${person.firstName} - CHAT TEST`,
+      disabled: false,
+      password: TEST_PASSWORD,
+    });
+  }
+}
+
+async function provisionPerson(person: typeof PRIYA | typeof MAYA) {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+
+  await ensureAuthUser(person);
+  await installAvatar(person.uid, person.avatar);
+
+  const now = FieldValue.serverTimestamp();
+  const batch = adminDb.batch();
+
+  batch.set(adminDb.collection("profiles").doc(person.uid), {
+    uid: person.uid,
+    firstName: person.firstName,
+    surname: person.surname,
+    preferredName: "",
+    age: person.age,
+    generalLocation: person.location,
+    occupation: person.occupation,
+    professionArea: person.firstName === "Priya" ? "healthcare" : "creative",
+    employmentType: "employed",
+    careerImportance: "important",
+    educationLevel: "postgraduate",
+    educationField: person.firstName === "Priya" ? "Medicine" : "Design",
+    hobbies: person.firstName === "Priya"
+      ? ["travel","food","fitness","family"]
+      : ["travel","arts","food","family"],
+    caste: "",
+    sikhAppearance: "not_applicable",
+    sikhPractice: "moderate",
+    diet: "vegetarian",
+    relationshipIntent: "marriage",
+    aboutMe: "Synthetic AutoFace profile used only for local chat entitlement testing.",
+    visibility: "future_matches",
+    showAge: true,
+    showLocation: true,
+    showOccupation: true,
+    developmentSeed: true,
+    developmentChatHarness: true,
+    createdAt: now,
+    updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("relationshipProfiles").doc(person.uid), {
+    uid: person.uid,
+    familyOrientation: 5,
+    communicationDirectness: 4,
+    socialEnergy: person.firstName === "Priya" ? 4 : 3,
+    careerPriority: 4,
+    routineVsAdventure: 4,
+    relocationFlexibility: 3,
+    sharedInterestsImportance: 4,
+    independencePreference: 3,
+    relationshipPace: "balanced",
+    idealWeekend: "Family time, food, travel and relaxed conversation",
+    whatMattersMost: "Trust, family, communication and shared values",
+    nonNegotiables: "Honesty, loyalty and mutual respect",
+    consentForCompatibility: true,
+    consentForAiDiscovery: true,
+    developmentChatHarness: true,
+    createdAt: now,
+    updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("identity").doc(person.uid), {
+    identityVerified: true,
+    livenessVerified: true,
+    photoVerified: false,
+    faceVerified: false,
+    developmentChatHarness: true,
+    updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("demoProfiles").doc(person.uid), {
+    uid: person.uid,
+    isTestProfile: true,
+    developmentChatHarness: true,
+    updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("discoveryPreferences").doc(person.uid), {
+    uid: person.uid,
+    minAge: 25,
+    maxAge: 45,
+    locations: [],
+    relationshipIntent: "marriage",
+    developmentChatHarness: true,
+    updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("memberships").doc(person.uid), {
+    uid: person.uid,
+    plan: "free",
+    status: "active",
+    foundingMemberNumber: null,
+    developmentChatHarness: true,
+    updatedAt: now,
+  }, { merge: true });
+
+  await batch.commit();
+}
+
+function testMatchId() {
+  return [PRIYA.uid, MAYA.uid].sort().join("__");
+}
+
+async function setBothFree() {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+  const batch = adminDb.batch();
+  for (const person of CHAT_USERS) {
+    batch.set(adminDb.collection("memberships").doc(person.uid), {
+      uid: person.uid,
+      plan: "free",
+      status: "active",
+      foundingMemberNumber: null,
+      developmentChatHarness: true,
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true });
+  }
+  await batch.commit();
+}
+
+async function createMutualIntroduction() {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+  const id = testMatchId();
+  const participants = [PRIYA.uid, MAYA.uid].sort();
+  const now = FieldValue.serverTimestamp();
+  const batch = adminDb.batch();
+
+  batch.set(adminDb.collection("interests").doc(`${PRIYA.uid}_${MAYA.uid}`), {
+    fromUid: PRIYA.uid, toUid: MAYA.uid, status: "interested",
+    developmentChatHarness: true, createdAt: now, updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("interests").doc(`${MAYA.uid}_${PRIYA.uid}`), {
+    fromUid: MAYA.uid, toUid: PRIYA.uid, status: "interested",
+    developmentChatHarness: true, createdAt: now, updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("matches").doc(id), {
+    participants,
+    status: "mutual",
+    developmentChatHarness: true,
+    createdAt: now,
+    updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("connections").doc(id), {
+    matchId: id,
+    participants,
+    stages: {
+      [PRIYA.uid]: "introduced",
+      [MAYA.uid]: "introduced",
+    },
+    developmentChatHarness: true,
+    createdAt: now,
+    updatedAt: now,
+  }, { merge: true });
+
+  batch.set(adminDb.collection("conversations").doc(id), {
+    matchId: id,
+    participants,
+    status: "active",
+    developmentChatHarness: true,
+    createdAt: now,
+    updatedAt: now,
+  }, { merge: true });
+
+  await batch.commit();
+}
+
+async function resetMessages() {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+  const messages = await adminDb.collection("conversations").doc(testMatchId())
+    .collection("messages").limit(500).get();
+  if (messages.empty) return 0;
+
+  const batch = adminDb.batch();
+  messages.docs.forEach((doc) => batch.delete(doc.ref));
+  await batch.commit();
+  return messages.size;
+}
+
+async function counts() {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+  const messages = await adminDb.collection("conversations").doc(testMatchId())
+    .collection("messages").limit(500).get();
+  return {
+    priya: messages.docs.filter((doc) => doc.data()?.senderUid === PRIYA.uid).length,
+    maya: messages.docs.filter((doc) => doc.data()?.senderUid === MAYA.uid).length,
+  };
+}
+
+async function status() {
+  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+  const [priyaProfile, mayaProfile, priyaMembership, mayaMembership, match, sent] = await Promise.all([
+    adminDb.collection("profiles").doc(PRIYA.uid).get(),
+    adminDb.collection("profiles").doc(MAYA.uid).get(),
+    adminDb.collection("memberships").doc(PRIYA.uid).get(),
+    adminDb.collection("memberships").doc(MAYA.uid).get(),
+    adminDb.collection("matches").doc(testMatchId()).get(),
+    counts(),
+  ]);
+
+  return {
+    ready: priyaProfile.exists && mayaProfile.exists && match.data()?.status === "mutual",
+    matchId: testMatchId(),
+    priya: {
+      email: PRIYA.email,
+      password: TEST_PASSWORD,
+      profileReady: priyaProfile.exists,
+      plan: String(priyaMembership.data()?.plan ?? "free"),
+      sentCount: sent.priya,
+    },
+    maya: {
+      email: MAYA.email,
+      password: TEST_PASSWORD,
+      profileReady: mayaProfile.exists,
+      plan: String(mayaMembership.data()?.plan ?? "free"),
+      sentCount: sent.maya,
+    },
+  };
+}
+
+export async function GET(request: Request) {
+  try {
+    await requireDevelopmentUser(request);
+    return NextResponse.json(await status());
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
+    const statusCode = message === "UNAUTHENTICATED" ? 401 : message === "DEVELOPMENT_ONLY" ? 403 : 500;
+    return NextResponse.json({ error: message }, { status: statusCode });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await requireDevelopmentUser(request);
+    const body = await request.json().catch(() => ({})) as {
+      action?: "prepare_free_chat_test" | "reset_messages" | "set_both_free";
+    };
+
+    if (body.action === "prepare_free_chat_test") {
+      await provisionPerson(PRIYA);
+      await provisionPerson(MAYA);
+      await setBothFree();
+      await createMutualIntroduction();
+      await resetMessages();
+      return NextResponse.json({
+        ok: true,
+        message: "Priya and Maya are ready as Free users with profile pictures, a mutual introduction and 0/5 messages sent.",
+        ...(await status()),
+      });
+    }
+
+    if (body.action === "reset_messages") {
+      const deleted = await resetMessages();
+      return NextResponse.json({
+        ok: true,
+        message: `Reset ${deleted} message(s). Priya and Maya are back at 0/5.`,
+        ...(await status()),
+      });
+    }
+
+    if (body.action === "set_both_free") {
+      await setBothFree();
+      return NextResponse.json({
+        ok: true,
+        message: "Priya and Maya are both set to Free.",
+        ...(await status()),
+      });
+    }
+
+    return NextResponse.json({ error: "INVALID_ACTION" }, { status: 400 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
+    const statusCode = message === "UNAUTHENTICATED" ? 401 : message === "DEVELOPMENT_ONLY" ? 403 : 500;
+    return NextResponse.json({ error: message }, { status: statusCode });
+  }
+}

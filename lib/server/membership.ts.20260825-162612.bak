@@ -9,8 +9,6 @@ export type MembershipEntitlements = {
   fullRecommendationHistory: boolean;
   expandedIntroductions: boolean;
   foundingBadge: boolean;
-  unlimitedMessaging: boolean;
-  contactDetailSharing: boolean;
 };
 
 export type Membership = {
@@ -29,8 +27,6 @@ const FREE: MembershipEntitlements = {
   fullRecommendationHistory: false,
   expandedIntroductions: false,
   foundingBadge: false,
-  unlimitedMessaging: false,
-  contactDetailSharing: false,
 };
 
 const FOUNDING: MembershipEntitlements = {
@@ -40,8 +36,6 @@ const FOUNDING: MembershipEntitlements = {
   fullRecommendationHistory: true,
   expandedIntroductions: true,
   foundingBadge: true,
-  unlimitedMessaging: true,
-  contactDetailSharing: true,
 };
 
 function asIso(value: unknown) {

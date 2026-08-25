@@ -4,37 +4,8 @@ import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { requireActiveMatch, messagingStatusCode } from "@/lib/server/messaging";
 import { safeProjectionFor } from "@/lib/server/discovery";
 import { createNotification } from "@/lib/server/notifications";
-import { membershipFor } from "@/lib/server/membership";
 
 type SendBody = { matchId?: string; text?: string };
-
-const FREE_MESSAGE_LIMIT = 5;
-
-function containsContactDetails(text: string) {
-  const phone = /(?:\+?\d[\d\s().-]{7,}\d)/;
-  const email = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
-  const url = /\b(?:https?:\/\/|www\.)\S+/i;
-  const social = /(?:^|\s)@[A-Za-z0-9._]{3,}/;
-  return phone.test(text) || email.test(text) || url.test(text) || social.test(text);
-}
-
-async function messagingEntitlement(matchId: string, uid: string) {
-  if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
-  const membership = await membershipFor(uid);
-  const unlimited = membership.entitlements.unlimitedMessaging;
-  const sent = await adminDb.collection("conversations").doc(matchId)
-    .collection("messages").where("senderUid", "==", uid).get();
-  const sentCount = sent.size;
-  return {
-    plan: membership.plan,
-    unlimited,
-    contactDetailSharing: membership.entitlements.contactDetailSharing,
-    freeLimit: FREE_MESSAGE_LIMIT,
-    sentCount,
-    remaining: unlimited ? null : Math.max(0, FREE_MESSAGE_LIMIT - sentCount),
-    locked: !unlimited && sentCount >= FREE_MESSAGE_LIMIT,
-  };
-}
 
 function asIso(value: unknown) {
   const maybe = value as { toDate?: () => Date } | null | undefined;
@@ -63,8 +34,7 @@ export async function GET(request: Request) {
         createdAt: asIso(data.createdAt),
       };
     });
-    const messaging = await messagingEntitlement(matchId, user.uid);
-    return NextResponse.json({ matchId, other, messages, messaging });
+    return NextResponse.json({ matchId, other, messages });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json({ error: message }, { status: messagingStatusCode(message) });
@@ -82,11 +52,6 @@ export async function POST(request: Request) {
     if (!text) throw new Error("MESSAGE_EMPTY");
     if (text.length > 1000) throw new Error("MESSAGE_TOO_LONG");
     const match = await requireActiveMatch(matchId, user.uid);
-    const messaging = await messagingEntitlement(matchId, user.uid);
-    if (messaging.locked) throw new Error("MESSAGE_LIMIT_REACHED");
-    if (!messaging.contactDetailSharing && containsContactDetails(text)) {
-      throw new Error("CONTACT_DETAILS_MEMBERSHIP_REQUIRED");
-    }
 
     const conversationRef = adminDb.collection("conversations").doc(matchId);
     const messageRef = conversationRef.collection("messages").doc();
@@ -122,16 +87,7 @@ export async function POST(request: Request) {
       actorUid: user.uid,
       matchId,
     });
-    return NextResponse.json({
-      ok: true,
-      id: messageRef.id,
-      messaging: {
-        ...messaging,
-        sentCount: messaging.sentCount + 1,
-        remaining: messaging.unlimited ? null : Math.max(0, messaging.freeLimit - messaging.sentCount - 1),
-        locked: !messaging.unlimited && messaging.sentCount + 1 >= messaging.freeLimit,
-      },
-    });
+    return NextResponse.json({ ok: true, id: messageRef.id });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json({ error: message }, { status: messagingStatusCode(message) });

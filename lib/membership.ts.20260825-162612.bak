@@ -12,8 +12,6 @@ export type Membership = {
     fullRecommendationHistory: boolean;
     expandedIntroductions: boolean;
     foundingBadge: boolean;
-    unlimitedMessaging: boolean;
-    contactDetailSharing: boolean;
   };
 };
 
@@ -30,7 +28,5 @@ export const freeMembership: Membership = {
     fullRecommendationHistory: false,
     expandedIntroductions: false,
     foundingBadge: false,
-    unlimitedMessaging: false,
-    contactDetailSharing: false,
   },
 };

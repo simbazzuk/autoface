@@ -32,7 +32,6 @@ export function messagingStatusCode(message: string) {
   if (message === "FORBIDDEN") return 403;
   if (["MATCH_NOT_FOUND", "TARGET_NOT_AVAILABLE"].includes(message)) return 404;
   if (["MATCH_INACTIVE", "MATCH_BLOCKED", "MATCH_INVALID"].includes(message)) return 409;
-  if (["MESSAGE_LIMIT_REACHED", "CONTACT_DETAILS_MEMBERSHIP_REQUIRED", "MEMBERSHIP_REQUIRED"].includes(message)) return 402;
   if (["INVALID_REQUEST", "MESSAGE_EMPTY", "MESSAGE_TOO_LONG", "INVALID_ACTION"].includes(message)) return 400;
   return 500;
 }

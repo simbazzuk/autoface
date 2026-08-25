@@ -122,7 +122,7 @@ export default function AccountPage() {
 
   async function unblockProfile(profile: BlockedProfile) {
     if (!user || busy) return;
-    if (!window.confirm(`Unblock ${profile.firstName}? This removes your block, but it will not automatically restore the previous introduction or conversation. You may become eligible to discover each other again.`)) return;
+    if (!window.confirm(`Unblock ${profile.firstName}? ${profile.matchId ? "If this introduction is still valid and they have not blocked you, messaging will become available again." : "They may become eligible for future AutoFace interactions again."}`)) return;
     try {
       setBusy(true);
       setMessage("");
@@ -135,7 +135,11 @@ export default function AccountPage() {
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error ?? "Unable to unblock this profile.");
       setBlockedProfiles((current) => current.filter((item) => item.uid !== profile.uid));
-      setMessage(`${profile.firstName} has been unblocked. The previous introduction was not automatically restored. You may become eligible to discover each other again.`);
+      setMessage(
+        body.conversationRestored
+          ? `${profile.firstName} has been unblocked. Your introduction and messaging have been restored.`
+          : `${profile.firstName} has been unblocked. Any previous introduction remains subject to its current availability and the other member's safety controls.`,
+      );
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to unblock this profile.");
     } finally {
@@ -421,7 +425,7 @@ export default function AccountPage() {
                 <div><span className="privacy-kicker">SAFETY & BLOCKING</span><h2>Blocked profiles</h2></div>
                 <span className="status-pill">{blockedProfiles.length} BLOCKED</span>
               </div>
-              <p>Profiles you block cannot message you, appear in your active introductions or interact with you through that connection. The other person is not told that you blocked them.</p>
+              <p>Profiles you block cannot message you or interact with you through that introduction. The other person is not told that you blocked them.</p>
 
               {blockedLoading ? (
                 <div className="blocked-empty"><b>Loading blocked profiles…</b></div>
@@ -451,7 +455,7 @@ export default function AccountPage() {
 
               <div className="blocked-privacy-note">
                 <b>What happens when you unblock?</b>
-                <span>Unblocking removes your block but does not automatically restore the previous introduction or conversation. You may become eligible to discover each other again. Safety reports remain on record and are not removed by unblocking.</span>
+                <span>Unblocking removes your block. If the same mutual introduction is still valid and the other member has not blocked you, AutoFace restores that conversation. Safety reports remain on record and are not removed by unblocking.</span>
               </div>
             </div>
 

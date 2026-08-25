@@ -8,12 +8,7 @@ import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
 import { Clock3, HeartHandshake, MessageCircle, Bookmark, Sparkles, ArrowRight } from "lucide-react";
 
 type Pending=SafeDiscoveryProfile&{interestId:string;state:"waiting"};
-type Mutual=SafeDiscoveryProfile&{
-  matchId:string;
-  state:"introduced"|"talking"|"getting_to_know"|"met"|"progressing";
-  createdAt:string|null;
-  chatStatus:{unlimited:boolean;freeLimit:number;sentCount:number;remaining:number|null;locked:boolean};
-};
+type Mutual=SafeDiscoveryProfile&{matchId:string;state:"introduced"|"talking"|"getting_to_know"|"met"|"progressing";createdAt:string|null};
 type Response={waiting:Pending[];mutual:Mutual[];saved:Pending[];counts:{waiting:number;mutual:number;saved:number};error?:string};
 const stageLabels={introduced:"Introduced",talking:"Talking",getting_to_know:"Getting to know",met:"Met",progressing:"Connection progressing"} as const;
 
@@ -75,10 +70,7 @@ export default function IntroductionsPage(){
         <p>{tab==="mutual"?"When someone you chose also independently chooses you, they will appear here and your private Connection space will open.":tab==="waiting"?"Choosing Interested remains private here until it becomes mutual. The other person cannot message you from this state.":"Save profiles in Discovery when you want more time before making a decision."}</p>
         <a className="btn btn-primary" href="/discover">Open Discovery</a>
       </div>:<div className="intro-journey-grid">
-        {items.map(item=>{
-          const mutualItem=tab==="mutual" ? item as Mutual : null;
-          const chatLocked=Boolean(mutualItem?.chatStatus?.locked);
-          return <article className={`card intro-journey-card ${chatLocked?"intro-chat-paused":""}`} key={"matchId" in item?item.matchId:item.interestId}>
+        {items.map(item=><article className="card intro-journey-card" key={"matchId" in item?item.matchId:item.interestId}>
           <div className="intro-card-top">
             <div className="candidate-identity">
               <ProfilePhoto uid={item.uid} name={item.firstName} className="intro-profile-photo"/>
@@ -86,25 +78,13 @@ export default function IntroductionsPage(){
             </div>
             {item.isTestProfile&&<span className="status-pill test-profile-pill">TEST</span>}
           </div>
-          <div className={`intro-card-status ${chatLocked?"intro-card-status-paused":""}`}>
-            {tab==="mutual"
-              ? chatLocked
-                ? <><MessageCircle size={16}/><div><small>CONVERSATION PAUSED</small><b>Free message allowance used</b></div></>
-                : <><HeartHandshake size={16}/><div><small>MUTUAL INTRODUCTION</small><b>{stageLabels[(item as Mutual).state]}</b></div></>
-              : tab==="waiting"
-                ? <><Clock3 size={16}/><div><small>INTEREST SAVED PRIVATELY</small><b>Waiting for mutual choice</b></div></>
-                : <><Bookmark size={16}/><div><small>SAVED FOR LATER</small><b>No interest sent</b></div></>}
+          <div className="intro-card-status">
+            {tab==="mutual"?<><HeartHandshake size={16}/><div><small>MUTUAL INTRODUCTION</small><b>{stageLabels[(item as Mutual).state]}</b></div></>:tab==="waiting"?<><Clock3 size={16}/><div><small>INTEREST SAVED PRIVATELY</small><b>Waiting for mutual choice</b></div></>:<><Bookmark size={16}/><div><small>SAVED FOR LATER</small><b>No interest sent</b></div></>}
           </div>
           <div className="intro-mini-signals">
             <span><b>{item.compatibilityScore}%</b><small>Compatibility</small></span>
             <span><b>{item.authenticityScore}%</b><small>Authenticity</small></span>
           </div>
-          {mutualItem&&!mutualItem.chatStatus.unlimited&&<div className={`intro-chat-entitlement ${mutualItem.chatStatus.locked?"locked":""}`}>
-            <MessageCircle size={13}/>
-            <span>{mutualItem.chatStatus.locked
-              ? `${mutualItem.chatStatus.sentCount}/${mutualItem.chatStatus.freeLimit} free messages sent · You can still read this conversation`
-              : `${mutualItem.chatStatus.remaining ?? 0} free messages remaining`}</span>
-          </div>}
           {tab==="mutual"?<>
             <div className="intro-progress">
               {(["introduced","talking","getting_to_know","met","progressing"] as const).map((stage,index)=>{
@@ -112,11 +92,9 @@ export default function IntroductionsPage(){
                 return <span className={index<=current?"complete":""} key={stage}><i/><small>{stageLabels[stage]}</small></span>
               })}
             </div>
-            {chatLocked
-              ? <a className="btn btn-relationship intro-open-button intro-view-conversation" href={`/messages/${(item as Mutual).matchId}`}><MessageCircle size={15}/>View conversation <ArrowRight size={15}/></a>
-              : <a className="btn btn-relationship intro-open-button" href={`/connections/${(item as Mutual).matchId}`}><MessageCircle size={15}/>Open introduction <ArrowRight size={15}/></a>}
+            <a className="btn btn-relationship intro-open-button" href={`/connections/${(item as Mutual).matchId}`}><MessageCircle size={15}/>Open introduction <ArrowRight size={15}/></a>
           </>:tab==="waiting"?<p className="intro-reassurance"><Sparkles size={14}/>Nothing else is required. If interest becomes mutual, AutoFace will move this person into Introductions and notify you.</p>:<a className="btn intro-review-button" href={`/recommendations/${item.uid}`}>Review recommendation</a>}
-        </article>})}
+        </article>)}
       </div>}
 
       <div className="card intro-principle"><HeartHandshake size={20}/><div><small>AUTOFACE PRINCIPLE</small><h3>Interested is not a match. Mutual interest creates an introduction.</h3><p>Your choices remain controlled and private until both people independently decide they would like to be introduced.</p></div></div>

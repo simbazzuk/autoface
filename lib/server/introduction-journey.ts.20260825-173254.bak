@@ -1,6 +1,5 @@
 import { adminDb } from "@/lib/server/firebase-admin";
 import { safeProjectionFor, type SafeDiscoveryProfile } from "@/lib/server/discovery";
-import { membershipFor } from "@/lib/server/membership";
 
 export type PendingIntroduction = SafeDiscoveryProfile & {
   interestId:string;
@@ -11,13 +10,6 @@ export type MutualIntroduction = SafeDiscoveryProfile & {
   matchId:string;
   state:"introduced"|"talking"|"getting_to_know"|"met"|"progressing";
   createdAt:string|null;
-  chatStatus:{
-    unlimited:boolean;
-    freeLimit:number;
-    sentCount:number;
-    remaining:number|null;
-    locked:boolean;
-  };
 };
 
 function iso(value:unknown){
@@ -35,9 +27,6 @@ export async function introductionJourneyFor(uid:string){
 
   const mutualOtherUids=new Set<string>();
   const mutual:MutualIntroduction[]=[];
-  const membership=await membershipFor(uid);
-  const unlimitedMessaging=membership.entitlements.unlimitedMessaging;
-  const freeMessageLimit=5;
 
   for(const match of matches.docs){
     const data=match.data();
@@ -51,17 +40,7 @@ export async function introductionJourneyFor(uid:string){
     const journeyState=["introduced","talking","getting_to_know","met","progressing"].includes(String(data.journeyState))
       ? data.journeyState as MutualIntroduction["state"]
       : "introduced";
-    const sentMessages=await adminDb.collection("conversations").doc(match.id)
-      .collection("messages").where("senderUid","==",uid).get();
-    const sentCount=sentMessages.size;
-    const chatStatus={
-      unlimited:unlimitedMessaging,
-      freeLimit:freeMessageLimit,
-      sentCount,
-      remaining:unlimitedMessaging?null:Math.max(0,freeMessageLimit-sentCount),
-      locked:!unlimitedMessaging&&sentCount>=freeMessageLimit,
-    };
-    mutual.push({matchId:match.id,state:journeyState,createdAt:iso(data.createdAt),chatStatus,...profile});
+    mutual.push({matchId:match.id,state:journeyState,createdAt:iso(data.createdAt),...profile});
   }
 
   const waiting:PendingIntroduction[]=[];
