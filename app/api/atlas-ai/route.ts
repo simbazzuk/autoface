@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { atlasApiError } from "@/lib/server/atlas-api-errors";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
-import { atlasAiEnabled, generateCompatibilityReflection, generateProfileReflection } from "@/lib/server/atlas-ai";
+import { atlasAiEnabled, atlasAiStatus, generateCompatibilityReflection, generateProfileReflection } from "@/lib/server/atlas-ai";
 import { calculateCompatibility } from "@/lib/compatibility";
 import { demoCompatibilityProfiles } from "@/lib/demo-compatibility-profiles";
 import type { RelationshipProfile } from "@/lib/relationship-profile";
@@ -15,7 +15,12 @@ type RequestBody = {
 };
 
 export async function GET() {
-  return NextResponse.json({ enabled: atlasAiEnabled() });
+  const status = atlasAiStatus();
+  return NextResponse.json({
+    enabled: status.enabled,
+    reason: status.reason,
+    model: status.model,
+  });
 }
 
 export async function POST(request: Request) {

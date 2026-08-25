@@ -88,6 +88,7 @@ export default function RelationshipProfilePage() {
   const [message, setMessage] = useState("");
   const [journeySaved,setJourneySaved]=useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiConfigReason, setAiConfigReason] = useState<"loading" | "ready" | "disabled" | "api_key_missing" | "model_missing" | "unreachable">("loading");
   const [aiBusy, setAiBusy] = useState(false);
   const [aiInsight, setAiInsight] = useState("");
   const [aiError, setAiError] = useState("");
@@ -99,9 +100,24 @@ export default function RelationshipProfilePage() {
   useEffect(() => {
     let active = true;
     fetch("/api/atlas-ai", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((body) => { if (active) setAiEnabled(body.enabled === true); })
-      .catch(() => { if (active) setAiEnabled(false); });
+      .then(async (response) => {
+        const body = await response.json().catch(() => ({}));
+        if (!active) return;
+        setAiEnabled(body.enabled === true);
+        setAiConfigReason(
+          body.enabled === true
+            ? "ready"
+            : body.reason === "disabled" || body.reason === "api_key_missing" || body.reason === "model_missing"
+              ? body.reason
+              : "unreachable"
+        );
+      })
+      .catch(() => {
+        if (active) {
+          setAiEnabled(false);
+          setAiConfigReason("unreachable");
+        }
+      });
     return () => { active = false; };
   }, []);
 
@@ -361,8 +377,18 @@ export default function RelationshipProfilePage() {
                 </>
               ) : (
                 <div className="ai-disabled-note atlas-reflection-unavailable">
-                  <b>Atlas Reflection is not available right now.</b>
-                  <span>Your Atlas Profile and deterministic compatibility continue to work normally.</span>
+                  <b>{aiConfigReason === "loading" ? "Checking Atlas Reflection…" : "Atlas Reflection is not available right now."}</b>
+                  <span>
+                    {aiConfigReason === "api_key_missing"
+                      ? "The AI service is switched on, but the production API key is not configured."
+                      : aiConfigReason === "disabled"
+                        ? "Atlas Reflection is currently switched off for this environment."
+                        : aiConfigReason === "model_missing"
+                          ? "The AI service needs a model configuration before reflections can be generated."
+                          : aiConfigReason === "loading"
+                            ? "This should only take a moment."
+                            : "Your Atlas Profile and deterministic compatibility continue to work normally."}
+                  </span>
                 </div>
               )}
             </div>

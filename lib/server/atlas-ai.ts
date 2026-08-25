@@ -1,10 +1,33 @@
 import type { RelationshipProfile } from "@/lib/relationship-profile";
 import type { CompatibilityResult } from "@/lib/compatibility";
 
+function configuredGeminiApiKey() {
+  return (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "").trim();
+}
+
+function configuredGeminiModel() {
+  return (process.env.GEMINI_MODEL || "gemini-3.6-flash").trim();
+}
+
+export function atlasAiStatus() {
+  const enabledFlag = (process.env.ATLAS_AI_ENABLED || "").trim().toLowerCase() === "true";
+  const hasApiKey = Boolean(configuredGeminiApiKey());
+  const model = configuredGeminiModel();
+
+  let reason: "ready" | "disabled" | "api_key_missing" | "model_missing" = "ready";
+  if (!enabledFlag) reason = "disabled";
+  else if (!hasApiKey) reason = "api_key_missing";
+  else if (!model) reason = "model_missing";
+
+  return {
+    enabled: enabledFlag && hasApiKey && Boolean(model),
+    reason,
+    model,
+  };
+}
+
 export function atlasAiEnabled() {
-  return process.env.ATLAS_AI_ENABLED === "true"
-    && Boolean(process.env.GEMINI_API_KEY)
-    && Boolean(process.env.GEMINI_MODEL);
+  return atlasAiStatus().enabled;
 }
 
 type GeminiJsonSchema = Record<string, unknown>;
@@ -96,8 +119,8 @@ ${dimensions}
 async function requestGeminiText(prompt: string) {
   if (!atlasAiEnabled()) throw new Error("ATLAS_AI_NOT_CONFIGURED");
 
-  const apiKey = process.env.GEMINI_API_KEY!;
-  const model = process.env.GEMINI_MODEL!;
+  const apiKey = configuredGeminiApiKey();
+  const model = configuredGeminiModel();
   const base = (process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com/v1beta").replace(/\/$/, "");
   const url = `${base}/models/${encodeURIComponent(model)}:generateContent`;
   const controller = new AbortController();
@@ -434,8 +457,8 @@ const introductionCoachResponseSchema: GeminiJsonSchema = {
 async function requestGeminiJson(prompt: string, responseJsonSchema?: GeminiJsonSchema) {
   if (!atlasAiEnabled()) throw new Error("ATLAS_AI_NOT_CONFIGURED");
 
-  const apiKey = process.env.GEMINI_API_KEY!;
-  const model = process.env.GEMINI_MODEL!;
+  const apiKey = configuredGeminiApiKey();
+  const model = configuredGeminiModel();
   const base = (process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com/v1beta").replace(/\/$/, "");
   const url = `${base}/models/${encodeURIComponent(model)}:generateContent`;
 

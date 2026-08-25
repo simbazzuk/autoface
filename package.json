@@ -1,6 +1,6 @@
 {
   "name": "autoface-web",
-  "version": "0.35.9.6",
+  "version": "0.35.9.7",
   "private": true,
   "scripts": {
     "dev": "next dev",

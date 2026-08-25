@@ -61,7 +61,7 @@ Adds an optional Gemini explanation layer without changing AutoFace's determinis
 - The server loads the user's saved relationship profile itself rather than accepting arbitrary profile data from the browser.
 - Gemini cannot change authenticity or compatibility scores.
 - AI reflections are not persisted in Firestore in v0.9.2.
-- Set `ATLAS_AI_ENABLED=true`, `GEMINI_API_KEY`, and `GEMINI_MODEL` to enable the feature.
+- Set `ATLAS_AI_ENABLED=true` and `GEMINI_API_KEY` to enable Atlas AI. `GEMINI_MODEL` defaults to `gemini-3.6-flash` when omitted.
 
 
 ## v0.9.2.1 — Atlas AI UI Patch
