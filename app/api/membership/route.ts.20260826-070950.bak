@@ -1,19 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/server/firebase-admin";
 import { membershipFor } from "@/lib/server/membership";
-import { ensureFoundingMembership } from "@/lib/server/founding-program";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   try {
     const user = await requireUser(request);
-
-    // If this account is still Free, automatically check whether it now
-    // qualifies for one of the first 20 permanent Founding Member places.
-    // The allocation itself is transactional and safe against concurrent signups.
-    await ensureFoundingMembership(user.uid);
-
     return NextResponse.json({ membership: await membershipFor(user.uid) });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
