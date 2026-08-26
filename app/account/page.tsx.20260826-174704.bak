@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
@@ -285,7 +285,7 @@ export default function AccountPage() {
   }
 
   if (loading || !user || !data) {
-    return <main><section className="section"><div className="container"><p className="muted">Loading account & privacy controlsâ€¦</p>{message && <p className="notice">{message}</p>}</div></section></main>;
+    return <main><section className="section"><div className="container"><p className="muted">Loading account & privacy controls…</p>{message && <p className="notice">{message}</p>}</div></section></main>;
   }
 
   return (
@@ -339,7 +339,7 @@ export default function AccountPage() {
                 </label>
                 <label className="toggle-row">
                   <input type="checkbox" checked={data.privacy.showLocation} disabled={busy} onChange={(e) => void updateVisibility("showLocation", e.target.checked)} />
-                  <span><b>Show my general location</b><small>Only the broad area from your profile â€” never a home address.</small></span>
+                  <span><b>Show my general location</b><small>Only the broad area from your profile — never a home address.</small></span>
                 </label>
                 <label className="toggle-row">
                   <input type="checkbox" checked={data.privacy.showOccupation} disabled={busy} onChange={(e) => void updateVisibility("showOccupation", e.target.checked)} />
@@ -362,7 +362,7 @@ export default function AccountPage() {
 
               <div className="notification-channel-grid">
                 <section className="notification-channel notification-channel-app">
-                  <div className="notification-channel-head"><span>â—</span><div><b>In-app activity</b><small>Shown in your AutoFace Activity centre.</small></div></div>
+                  <div className="notification-channel-head"><span>●</span><div><b>In-app activity</b><small>Shown in your AutoFace Activity centre.</small></div></div>
                   <div className="privacy-control-stack">
                     <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.introductions} disabled={busy} onChange={(e) => void updateNotificationPreference("introductions", e.target.checked)} /><span><b>New introductions</b><small>Mutual-interest and introduction activity.</small></span></label>
                     <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.messages} disabled={busy} onChange={(e) => void updateNotificationPreference("messages", e.target.checked)} /><span><b>New messages</b><small>Conversation activity from mutual introductions.</small></span></label>
@@ -373,7 +373,7 @@ export default function AccountPage() {
                 </section>
 
                 <section className="notification-channel notification-channel-email">
-                  <div className="notification-channel-head"><span>âœ‰</span><div><b>Email notifications</b><small>Privacy-safe alerts sent to {data.account.email}.</small></div></div>
+                  <div className="notification-channel-head"><span>✉</span><div><b>Email notifications</b><small>Privacy-safe alerts sent to {data.account.email}.</small></div></div>
                   <div className="privacy-control-stack">
                     <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.emailIntroductions} disabled={busy} onChange={(e) => void updateNotificationPreference("emailIntroductions", e.target.checked)} /><span><b>Mutual introductions</b><small>Recommended: know when a private introduction becomes mutual.</small></span></label>
                     <label className="toggle-row"><input type="checkbox" checked={data.notificationPreferences.emailMessages} disabled={busy} onChange={(e) => void updateNotificationPreference("emailMessages", e.target.checked)} /><span><b>Unread-message alerts</b><small>Optional. At most one email per conversation every 30 minutes.</small></span></label>
@@ -424,7 +424,7 @@ export default function AccountPage() {
               <p>Profiles you block cannot message you, appear in your active introductions or interact with you through that connection. The other person is not told that you blocked them.</p>
 
               {blockedLoading ? (
-                <div className="blocked-empty"><b>Loading blocked profilesâ€¦</b></div>
+                <div className="blocked-empty"><b>Loading blocked profiles…</b></div>
               ) : blockedProfiles.length === 0 ? (
                 <div className="blocked-empty">
                   <b>No blocked profiles</b>
@@ -440,7 +440,7 @@ export default function AccountPage() {
                         <span>{profile.location || "AutoFace member"}</span>
                         <small>
                           Blocked {profile.blockedAt ? new Date(profile.blockedAt).toLocaleDateString() : "previously"}
-                          {profile.source === "report" ? " Â· blocked with a safety report" : ""}
+                          {profile.source === "report" ? " · blocked with a safety report" : ""}
                         </small>
                       </div>
                       <button className="btn unblock-button" disabled={busy} onClick={() => void unblockProfile(profile)}>Unblock</button>
@@ -469,7 +469,7 @@ export default function AccountPage() {
                   <div className="delete-actions">
                     <button className="btn" onClick={() => { setShowDelete(false); setDeleteText(""); }}>Cancel</button>
                     <button className="btn danger-button destructive-fill" disabled={busy || deleteText !== DELETE_PHRASE} onClick={() => void deleteAccount()}>
-                      {busy ? "Deletingâ€¦" : "Permanently delete account"}
+                      {busy ? "Deleting…" : "Permanently delete account"}
                     </button>
                   </div>
                 </div>
@@ -511,15 +511,6 @@ export default function AccountPage() {
           </aside>
         </div>
       </section>
-    
-      <section className="membership-account-link">
-        <div>
-          <span className="privacy-kicker">MEMBERSHIP & BILLING</span>
-          <h3>Membership Centre</h3>
-          <p>View your Free, Founding or Plus membership, Founder number and feature access.</p>
-        </div>
-        <a className="btn" href="/membership">View membership</a>
-      </section></main>
+    </main>
   );
 }
-
