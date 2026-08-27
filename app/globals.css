@@ -6107,3 +6107,33 @@ body{
 
 /* v0.36.1.8.3.1 conversation corrective */
 .conversation-history-card{max-width:900px;margin:30px auto;padding:28px}.conversation-history-card h1{font-size:30px}.conversation-history-card>p{color:#9aa8bc;font-size:14px;line-height:1.6}.conversation-history-lock{margin:18px 0;padding:15px;border:1px solid rgba(154,164,186,.18);border-radius:12px}.conversation-history-lock p{margin:4px 0 0;color:#8997aa}
+
+
+/* v0.36.1.8.4 - Notification chat lifecycle routing */
+.notification-chat-resolver{
+  min-height:70vh;
+  display:grid;
+  align-items:center;
+}
+.notification-chat-resolver-card{
+  max-width:650px;
+  margin:50px auto;
+  padding:30px;
+  text-align:center;
+  border-color:rgba(104,147,223,.18)!important;
+  background:
+    radial-gradient(360px 160px at 50% 0%,rgba(113,82,223,.10),transparent 72%),
+    rgba(16,28,56,.88)!important;
+}
+.notification-chat-resolver-card h1{
+  margin:8px 0 10px;
+  color:#fff;
+  font-size:25px;
+}
+.notification-chat-resolver-card p{
+  margin:0;
+  color:#96a4b7;
+  font-size:12px;
+  line-height:1.6;
+}
+
