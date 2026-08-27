@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, Check, Heart, HeartHandshake, MessageCircle, Search, ShieldCheck, Sparkles, UserRound } from "lucide-react";
-import { FounderDiscovery } from "@/components/FounderDiscovery";
 
 const alignments = [
   { label: "Family outlook", value: 92, tone: "Strong alignment" },
@@ -10,7 +9,6 @@ const alignments = [
 
 export default function Home() {
   return <main className="experience-home">
-      <FounderDiscovery />
     <section className="experience-hero">
       <div className="experience-glow experience-glow-one" />
       <div className="experience-glow experience-glow-two" />
