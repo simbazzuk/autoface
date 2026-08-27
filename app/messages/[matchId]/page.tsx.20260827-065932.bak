@@ -6,7 +6,6 @@ import { useAuth } from "@/components/AuthProvider";
 import type { SafeDiscoveryProfile } from "@/lib/server/discovery";
 
 type Message = { id: string; senderUid: string; text: string; createdAt: string | null };
-type InactiveConversationHistory = { matchId:string; other:{uid:string;firstName:string}; messages:Message[] };
 type MessagingEntitlement = {
   plan: "free" | "founding" | "plus";
   unlimited: boolean;
@@ -26,7 +25,6 @@ export default function MessagePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [data, setData] = useState<Conversation | null>(null);
-  const [inactiveHistory, setInactiveHistory] = useState<InactiveConversationHistory | null>(null);
   const [error, setError] = useState("");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -53,21 +51,12 @@ export default function MessagePage() {
         headers: { Authorization: `Bearer ${token}` }, cache: "no-store",
       });
       const body = await response.json().catch(() => ({ error: `Messages request failed (${response.status})` }));
-      if (!response.ok) {
-        if (body.error === "MATCH_INACTIVE") {
-          const hr=await fetch(`/api/message-history?matchId=${encodeURIComponent(matchId)}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});
-          const hb=await hr.json().catch(()=>({}));
-          if(hr.ok&&hb.history){setInactiveHistory(hb.history);setData(null);setError("");return;}
-          throw new Error("CONVERSATION_UNAVAILABLE");
-        }
-        throw new Error(body.error ?? "Unable to load messages.");
-      }
+      if (!response.ok) throw new Error(body.error ?? "Unable to load messages.");
       setData(body);
       setError("");
       if (!quiet) setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 20);
     } catch (err) {
-      const raw=err instanceof Error ? err.message : "Unable to load messages.";
-      setError(raw === "MATCH_INACTIVE" ? "This conversation has ended." : raw === "CONVERSATION_UNAVAILABLE" ? "This conversation is unavailable." : raw);
+      setError(err instanceof Error ? err.message : "Unable to load messages.");
     }
   }, [user, matchId]);
 
@@ -179,9 +168,7 @@ export default function MessagePage() {
     finally { setActionBusy(false); }
   }
 
-  if (loading || !user) return <main><section className="section"><div className="container"><p className="muted">Loading secure conversation...</p></div></section></main>;
-  if (inactiveHistory) return <main><section className="section"><div className="container"><div className="card conversation-history-card"><span className="eyebrow">READ-ONLY CONVERSATION</span><h1>This conversation has ended</h1><p>Previous messages remain available for reference, but new messages cannot be sent.</p><div className="message-list">{inactiveHistory.messages.map(message=>{const mine=message.senderUid===user.uid;return <div className={`message-row ${mine?"mine":"theirs"}`} key={message.id}><div className="message-bubble"><p>{message.text}</p>{message.createdAt&&<small>{new Date(message.createdAt).toLocaleString()}</small>}</div></div>})}</div><div className="conversation-history-lock"><b>Messaging is closed</b><p>This history is read-only.</p></div><a className="btn btn-primary" href="/introductions">Back to My Introductions</a></div></div></section></main>;
-  if (!data) return <main><section className="section"><div className="container"><div className="card conversation-history-card"><span className="eyebrow">Conversation unavailable</span><h1>{error || "This conversation is no longer available."}</h1><p>For privacy and safety, this conversation cannot be opened.</p><a className="btn btn-primary" href="/introductions">Back to My Introductions</a></div></div></section></main>;
+  if (loading || !user || !data) return <main><section className="section"><div className="container"><p className="muted">Loading secure conversation…</p>{error && <p className="notice messaging-error">{error}</p>}</div></section></main>;
   const other = data.other;
 
   return <main>
