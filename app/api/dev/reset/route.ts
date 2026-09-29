@@ -288,7 +288,10 @@ async function validateSeedCommunity(){
       atlas:relationship.exists,
       visible:profileData.visibility==="future_matches",
       compatibility:relationshipData.consentForCompatibility===true,
-      authenticity:identityData.identityVerified===true&&identityData.livenessVerified===true,
+      verificationState:
+        identityData.identityVerified!==true &&
+        identityData.livenessVerified!==true &&
+        identityData.photoVerified!==true,
       testMarker:demo.data()?.isTestProfile===true,
       preferences:prefs.exists,
     };
