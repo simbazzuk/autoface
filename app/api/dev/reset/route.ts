@@ -191,7 +191,7 @@ async function seedCommunity() {
       developmentSeed:true,updatedAt:FieldValue.serverTimestamp(),createdAt:FieldValue.serverTimestamp(),
     },{merge:true});
     batch.set(adminDb.collection("identity").doc(seed.uid),{
-      identityVerified:false,livenessVerified:false,photoVerified:false,developmentSeed:true,
+      identityVerified:true,livenessVerified:true,photoVerified:false,developmentSeed:true,
       updatedAt:FieldValue.serverTimestamp(),
     },{merge:true});
     batch.set(adminDb.collection("demoProfiles").doc(seed.uid),{
@@ -289,8 +289,8 @@ async function validateSeedCommunity(){
       visible:profileData.visibility==="future_matches",
       compatibility:relationshipData.consentForCompatibility===true,
       verificationState:
-        identityData.identityVerified!==true &&
-        identityData.livenessVerified!==true &&
+        identityData.identityVerified===true &&
+        identityData.livenessVerified===true &&
         identityData.photoVerified!==true,
       testMarker:demo.data()?.isTestProfile===true,
       preferences:prefs.exists,
