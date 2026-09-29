@@ -67,11 +67,30 @@ export async function getEligibleMember(uid:string,options?:{strictAuth?:boolean
     authenticityFor(uid,options?.strictAuth===true)
   ]);
   if(!authenticity||!profileSnap.exists||!relationshipSnap.exists)return null;
+
   const profile=profileSnap.data() as AutoFaceProfile;
   const relationship=relationshipSnap.data() as RelationshipProfile;
-  if(profile.visibility!=="future_matches"||relationship.consentForCompatibility!==true||authenticity.score<DISCOVERY_AUTHENTICITY_THRESHOLD)return null;
+
+  if(
+    profile.visibility!=="future_matches" ||
+    relationship.consentForCompatibility!==true
+  )return null;
+
   const demoSnap=await adminDb.collection("demoProfiles").doc(uid).get();
-  return{profile,relationship,authenticity,isTestProfile:demoSnap.exists&&demoSnap.data()?.isTestProfile===true}
+  const isTestProfile=
+    demoSnap.exists &&
+    demoSnap.data()?.isTestProfile===true;
+
+  // Synthetic demo profiles are allowed into Discovery without satisfying the
+  // real-member authenticity threshold. Their actual authenticity score and
+  // Face Verified state are still returned unchanged, so demo data cannot
+  // falsely appear verified.
+  if(
+    !isTestProfile &&
+    authenticity.score<DISCOVERY_AUTHENTICITY_THRESHOLD
+  )return null;
+
+  return{profile,relationship,authenticity,isTestProfile}
 }
 async function preferencesFor(uid:string){
   if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
