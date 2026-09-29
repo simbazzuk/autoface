@@ -38,6 +38,7 @@ export async function POST(request: Request) {
     }, { merge: true });
 
     let matched = false;
+    let matchedId: string | null = null;
     if (body.action === "interested") {
       const reverse = await db.collection("interests").doc(`${body.toUid}_${user.uid}`).get();
       if (reverse.exists && reverse.data()?.status === "interested") {
@@ -54,9 +55,15 @@ export async function POST(request: Request) {
           createNotification({ recipientUid: body.toUid, type: "introduction", title: `New introduction with ${fromMember.profile.firstName}`, body: "You both independently expressed interest. Your private Connection space is ready.", actionUrl: `/connections/${matchId}`, actorUid: user.uid, matchId }),
         ]);
         matched = true;
+        matchedId = matchId;
       }
     }
-    return NextResponse.json({ ok: true, matched });
+
+    return NextResponse.json({
+      ok: true,
+      matched,
+      matchId: matchedId,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : 500 });
