@@ -191,7 +191,7 @@ async function seedCommunity() {
       developmentSeed:true,updatedAt:FieldValue.serverTimestamp(),createdAt:FieldValue.serverTimestamp(),
     },{merge:true});
     batch.set(adminDb.collection("identity").doc(seed.uid),{
-      identityVerified:true,livenessVerified:true,photoVerified:true,developmentSeed:true,
+      identityVerified:false,livenessVerified:false,photoVerified:false,developmentSeed:true,
       updatedAt:FieldValue.serverTimestamp(),
     },{merge:true});
     batch.set(adminDb.collection("demoProfiles").doc(seed.uid),{
