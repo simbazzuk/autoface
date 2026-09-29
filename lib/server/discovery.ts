@@ -21,11 +21,19 @@ function isMissingAuthUser(error:unknown){
 async function authenticityFor(uid:string,strictAuth=false){
   if(!adminAuth||!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
   try{
-    const [authUser,identitySnap]=await Promise.all([
+    const [authUser,identitySnap,photoSnap]=await Promise.all([
       adminAuth.getUser(uid),
-      adminDb.collection("identity").doc(uid).get()
+      adminDb.collection("identity").doc(uid).get(),
+      adminDb.collection("profilePhotos").doc(uid).get()
     ]);
+
     const identity=identitySnap.data()??{};
+
+    const activeProfilePhoto=
+      photoSnap.exists &&
+      photoSnap.data()?.active===true &&
+      Boolean(photoSnap.data()?.storagePath);
+
     const authenticity=calculateAuthenticity({
       emailVerified:authUser.emailVerified===true,
       phoneVerified:Boolean(authUser.phoneNumber),
@@ -39,7 +47,8 @@ async function authenticityFor(uid:string,strictAuth=false){
       ...authenticity,
       faceVerified:
         identity.livenessVerified===true &&
-        identity.photoVerified===true
+        identity.photoVerified===true &&
+        activeProfilePhoto
     };
   }catch(error){
     if(isMissingAuthUser(error)){
