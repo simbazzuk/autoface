@@ -531,15 +531,12 @@ async function requestGeminiJson(prompt: string, responseJsonSchema?: GeminiJson
   }
 }
 
-async function callGeminiJson(prompt: string, schema?: GeminiJsonSchema) {
+async function callGeminiJson(prompt: string, _schema?: GeminiJsonSchema) {
   const apiKey = configuredGeminiApiKey();
   const model = configuredGeminiModel();
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-  async function request(
-    body: Record<string, unknown>,
-    mode: "schema" | "json_fallback",
-  ) {
+  async function request(body: Record<string, unknown>) {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -549,6 +546,7 @@ async function callGeminiJson(prompt: string, schema?: GeminiJsonSchema) {
 
     const raw = await response.text();
     let payload: any = {};
+
     try {
       payload = raw ? JSON.parse(raw) : {};
     } catch {
@@ -557,11 +555,12 @@ async function callGeminiJson(prompt: string, schema?: GeminiJsonSchema) {
 
     if (!response.ok) {
       atlasLog("provider_request_failed", {
-        mode,
+        mode: "json",
         status: response.status,
         statusText: response.statusText,
         providerMessage: safeProviderMessage(payload?.error?.message ?? raw),
       });
+
       throw new Error(providerErrorCode(response.status));
     }
 
@@ -571,96 +570,71 @@ async function callGeminiJson(prompt: string, schema?: GeminiJsonSchema) {
       .trim();
 
     if (!output) {
-      atlasLog("provider_empty_response", { mode });
+      atlasLog("provider_empty_response", { mode: "json" });
       throw new Error("GEMINI_EMPTY_RESPONSE");
     }
 
     return output;
   }
 
-  // Preferred path: schema-guided JSON.
-  try {
-    const output = await request({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.35,
-        responseMimeType: "application/json",
-        ...(schema ? { responseJsonSchema: schema } : {}),
-      },
-    }, "schema");
+  // responseJsonSchema is intentionally not sent here.
+  // Gemini 3.8 Flash currently succeeds with normal JSON mode while
+  // schema-guided requests can return provider 503 responses.
+  const jsonPrompt = `${prompt}
 
-    try {
-      return JSON.parse(output);
-    } catch (error) {
-      atlasLog("schema_json_parse_failed", {
-        providerMessage: safeProviderMessage(error),
-      });
-      throw new Error("ATLAS_AI_INVALID_JSON");
-    }
-  } catch (error) {
-    if (isTemporaryAtlasError(error)) {
-      atlasLog("schema_mode_temporary_failure", {
-        providerMessage: safeProviderMessage(error),
-      });
+Return ONLY valid JSON.
+Do not include Markdown fences, commentary, or any text before or after the JSON object.`;
 
-      // One short retry for transient Gemini capacity/rate-limit failures.
-      await sleep(1000);
-
-      try {
-        const output = await request({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.35,
-            responseMimeType: "application/json",
-            ...(schema ? { responseJsonSchema: schema } : {}),
-          },
-        }, "schema");
-
-        try {
-          return JSON.parse(output);
-        } catch (parseError) {
-          atlasLog("schema_retry_json_parse_failed", {
-            providerMessage: safeProviderMessage(parseError),
-          });
-          throw new Error("ATLAS_AI_INVALID_JSON");
-        }
-      } catch (retryError) {
-        if (isTemporaryAtlasError(retryError)) {
-          throw retryError;
-        }
-
-        atlasLog("schema_retry_fallback", {
-          providerMessage: safeProviderMessage(retryError),
-        });
-      }
-    } else {
-      atlasLog("schema_mode_fallback", {
-        providerMessage: safeProviderMessage(error),
-      });
-    }
-  }
-
-  // Fallback path: plain JSON output with local validation/sanitisation.
-  const fallbackPrompt = `${prompt}
-
-Return ONLY valid JSON. Do not include Markdown fences, commentary or any text before or after the JSON object.`;
-
-  const output = await request({
-    contents: [{ role: "user", parts: [{ text: fallbackPrompt }] }],
+  const body = {
+    contents: [{ role: "user", parts: [{ text: jsonPrompt }] }],
     generationConfig: {
       temperature: 0.35,
       responseMimeType: "application/json",
     },
-  }, "json_fallback");
+  };
 
-  try {
-    return JSON.parse(output);
-  } catch (error) {
-    atlasLog("fallback_json_parse_failed", {
-      providerMessage: safeProviderMessage(error),
-    });
-    throw new Error("ATLAS_AI_INVALID_JSON");
+  const delays = [0, 1000, 2000];
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < delays.length; attempt += 1) {
+    if (delays[attempt] > 0) {
+      await sleep(delays[attempt]);
+    }
+
+    try {
+      atlasLog("json_mode_request", {
+        attempt: attempt + 1,
+      });
+
+      const output = await request(body);
+
+      try {
+        return JSON.parse(output);
+      } catch (error) {
+        atlasLog("json_mode_parse_failed", {
+          attempt: attempt + 1,
+          providerMessage: safeProviderMessage(error),
+        });
+
+        throw new Error("ATLAS_AI_INVALID_JSON");
+      }
+    } catch (error) {
+      lastError = error;
+
+      if (!isTemporaryAtlasError(error)) {
+        throw error;
+      }
+
+      atlasLog("json_mode_temporary_failure", {
+        attempt: attempt + 1,
+        providerMessage: safeProviderMessage(error),
+      });
+    }
   }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("ATLAS_AI_TEMPORARILY_UNAVAILABLE");
 }
 
 export async function generateAiDiscoveryInsight(
