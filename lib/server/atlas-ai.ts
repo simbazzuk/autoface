@@ -562,9 +562,7 @@ async function callGeminiJson(prompt: string, schema?: GeminiJsonSchema) {
         statusText: response.statusText,
         providerMessage: safeProviderMessage(payload?.error?.message ?? raw),
       });
-      const error = new Error(`GEMINI_HTTP_${response.status}`);
-      (error as Error & { status?: number }).status = response.status;
-      throw error;
+      throw new Error(providerErrorCode(response.status));
     }
 
     const output = payload?.candidates?.[0]?.content?.parts
@@ -600,9 +598,46 @@ async function callGeminiJson(prompt: string, schema?: GeminiJsonSchema) {
       throw new Error("ATLAS_AI_INVALID_JSON");
     }
   } catch (error) {
-    atlasLog("schema_mode_fallback", {
-      providerMessage: safeProviderMessage(error),
-    });
+    if (isTemporaryAtlasError(error)) {
+      atlasLog("schema_mode_temporary_failure", {
+        providerMessage: safeProviderMessage(error),
+      });
+
+      // One short retry for transient Gemini capacity/rate-limit failures.
+      await sleep(1000);
+
+      try {
+        const output = await request({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.35,
+            responseMimeType: "application/json",
+            ...(schema ? { responseJsonSchema: schema } : {}),
+          },
+        }, "schema");
+
+        try {
+          return JSON.parse(output);
+        } catch (parseError) {
+          atlasLog("schema_retry_json_parse_failed", {
+            providerMessage: safeProviderMessage(parseError),
+          });
+          throw new Error("ATLAS_AI_INVALID_JSON");
+        }
+      } catch (retryError) {
+        if (isTemporaryAtlasError(retryError)) {
+          throw retryError;
+        }
+
+        atlasLog("schema_retry_fallback", {
+          providerMessage: safeProviderMessage(retryError),
+        });
+      }
+    } else {
+      atlasLog("schema_mode_fallback", {
+        providerMessage: safeProviderMessage(error),
+      });
+    }
   }
 
   // Fallback path: plain JSON output with local validation/sanitisation.
