@@ -604,6 +604,7 @@ Do not include Markdown fences, commentary, or any text before or after the JSON
     try {
       atlasLog("json_mode_request", {
         attempt: attempt + 1,
+        promptChars: jsonPrompt.length,
       });
 
       const output = await request(body);
