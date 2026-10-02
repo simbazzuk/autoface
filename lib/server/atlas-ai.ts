@@ -768,6 +768,131 @@ function sanitiseCoach(value: unknown): AtlasIntroductionCoachResult {
   };
 }
 
+
+export type AtlasReplyCoachMessage = {
+  sender: "viewer" | "other";
+  text: string;
+};
+
+export type AtlasReplySuggestion = {
+  tone: "natural" | "curious" | "playful";
+  text: string;
+};
+
+export type AtlasReplyCoachResult = {
+  intro: string;
+  replies: AtlasReplySuggestion[];
+};
+
+function replyCoachPrompt(
+  otherName: string,
+  messages: AtlasReplyCoachMessage[],
+) {
+  const conversation = messages
+    .map((message) =>
+      `${message.sender === "viewer" ? "Viewer" : otherName}: ${message.text}`
+    )
+    .join("\n");
+
+  return `
+You are Atlas Reply Coach inside AutoFace.
+
+Two adults have mutually chosen to have a conversation.
+Help the viewer compose a possible reply to the recent conversation.
+
+RULES:
+- Suggestions are drafts only. Never claim that a message has been sent.
+- Never impersonate the viewer or claim facts, experiences, feelings or intentions that the viewer has not expressed.
+- Never tell the viewer what they should feel, disclose or decide.
+- Do not infer religion, ethnicity, caste, sexuality, health, disability, politics, finances or other sensitive traits.
+- Do not request contact details, precise location, workplace, sexual information, financial information or other sensitive/private information.
+- Do not make replies manipulative, coercive, judgemental or diagnostic.
+- Keep every reply natural, respectful and easy to edit.
+- Use the conversation context, but do not invent personal facts.
+- Each reply must be at most 35 words.
+- "natural" should sound relaxed and conversational.
+- "curious" should encourage the conversation with a relevant open question.
+- "playful" may be light and warm, but must not be sexual or overly familiar.
+- If the conversation is too limited for personalisation, produce safe general replies rather than inventing context.
+
+Return one complete valid JSON object only.
+Do not wrap it in Markdown or add commentary.
+
+Use exactly this structure:
+{
+  "intro": "one short sentence",
+  "replies": [
+    {"tone":"natural","text":"reply"},
+    {"tone":"curious","text":"reply"},
+    {"tone":"playful","text":"reply"}
+  ]
+}
+
+Return exactly 3 replies in this order:
+natural, curious, playful.
+
+Recent conversation:
+${conversation || "(No previous messages yet.)"}
+`.trim();
+}
+
+function sanitiseReplyCoach(value: unknown): AtlasReplyCoachResult {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("ATLAS_AI_INVALID_REPLY_COACH_OBJECT");
+  }
+
+  const raw = value as Record<string, unknown>;
+
+  if (typeof raw.intro !== "string" || raw.intro.trim().length < 3) {
+    throw new Error("ATLAS_AI_INVALID_REPLY_INTRO");
+  }
+
+  if (!Array.isArray(raw.replies) || raw.replies.length !== 3) {
+    throw new Error("ATLAS_AI_INVALID_REPLIES");
+  }
+
+  const expected = ["natural", "curious", "playful"] as const;
+
+  const replies: AtlasReplySuggestion[] = raw.replies.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      throw new Error("ATLAS_AI_INVALID_REPLY");
+    }
+
+    const x = item as Record<string, unknown>;
+    const expectedTone = expected[index];
+    const replyText = typeof x.text === "string" ? x.text.trim() : "";
+
+    if (x.tone !== expectedTone) {
+      throw new Error("ATLAS_AI_INVALID_REPLY_TONE");
+    }
+
+    if (replyText.length < 2) {
+      throw new Error("ATLAS_AI_INVALID_REPLY_TEXT");
+    }
+
+    return {
+      tone: expectedTone,
+      text: replyText.slice(0, 320),
+    };
+  });
+
+  return {
+    intro: raw.intro.trim().slice(0, 180),
+    replies,
+  };
+}
+
+export async function generateReplyCoach(
+  otherName: string,
+  messages: AtlasReplyCoachMessage[],
+) {
+  const raw = await callGeminiJson(
+    replyCoachPrompt(otherName, messages),
+  );
+
+  return sanitiseReplyCoach(raw);
+}
+
 export async function generateIntroductionCoach(
   otherName: string,
   viewer: RelationshipProfile,
