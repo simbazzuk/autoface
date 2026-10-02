@@ -7,6 +7,8 @@ export type Membership = {
   activatedAt: string | null;
   entitlements: {
     atlasReflection: boolean;
+    atlasConversationCoach: boolean;
+    atlasReplyCoach: boolean;
     fullAtlasExplanations: boolean;
     advancedIntroductionPreferences: boolean;
     fullRecommendationHistory: boolean;
@@ -25,6 +27,8 @@ export const freeMembership: Membership = {
   activatedAt: null,
   entitlements: {
     atlasReflection: false,
+    atlasConversationCoach: true,
+    atlasReplyCoach: true,
     fullAtlasExplanations: false,
     advancedIntroductionPreferences: false,
     fullRecommendationHistory: false,
