@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { atlasApiError } from "@/lib/server/atlas-api-errors";
-import { adminDb, requireUser, requireVerifiedUser } from "@/lib/server/firebase-admin";
+import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { requireActiveMatch } from "@/lib/server/messaging";
 import {
   atlasAiEnabled,
@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireVerifiedUser(request);
+    const user = await requireUser(request);
 
     if (!adminDb) {
       throw new Error("SERVER_NOT_CONFIGURED");

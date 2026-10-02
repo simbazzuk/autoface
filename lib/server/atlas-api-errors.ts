@@ -3,8 +3,35 @@ import { NextResponse } from "next/server";
 export function atlasApiError(error: unknown) {
   const code = error instanceof Error ? error.message : "UNKNOWN_ERROR";
 
-  if (code === "UNAUTHENTICATED") return NextResponse.json({ error: code }, { status: 401 });
-  if (code === "ATLAS_AI_NOT_CONFIGURED") return NextResponse.json({ error: code }, { status: 503 });
+  if (code === "UNAUTHENTICATED") {
+    return NextResponse.json({ error: code }, { status: 401 });
+  }
+
+  if (code === "EMAIL_VERIFICATION_REQUIRED") {
+    return NextResponse.json(
+      {
+        error: code,
+        message: "Verify your email address before using Atlas.",
+        retryable: false,
+      },
+      { status: 403 }
+    );
+  }
+
+  if (code === "MEMBERSHIP_REQUIRED") {
+    return NextResponse.json(
+      {
+        error: code,
+        message: "Your current membership does not include this Atlas feature.",
+        retryable: false,
+      },
+      { status: 403 }
+    );
+  }
+
+  if (code === "ATLAS_AI_NOT_CONFIGURED") {
+    return NextResponse.json({ error: code }, { status: 503 });
+  }
   if (code.includes("OPT_IN_REQUIRED") || code === "AI_CONSENT_REQUIRED") {
     return NextResponse.json({ error: code }, { status: 409 });
   }

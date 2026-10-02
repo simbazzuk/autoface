@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { atlasApiError } from "@/lib/server/atlas-api-errors";
-import { adminDb, requireUser } from "@/lib/server/firebase-admin";
+import { adminDb, requireUser, requireVerifiedUser } from "@/lib/server/firebase-admin";
 import { atlasAiEnabled, generateAiDiscoveryInsight } from "@/lib/server/atlas-ai";
 import { recommendationFor } from "@/lib/server/discovery";
 import { calculateCompatibility } from "@/lib/compatibility";
@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: Promise<{ uid: string }> },
 ) {
   try {
-    const user = await requireUser(request);
+    const user = await requireVerifiedUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
     const { uid } = await params;
 
@@ -35,7 +35,7 @@ export async function GET(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : 500 });
+    return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : message === "EMAIL_VERIFICATION_REQUIRED" ? 403 : 500 });
   }
 }
 
@@ -44,7 +44,7 @@ export async function POST(
   { params }: { params: Promise<{ uid: string }> },
 ) {
   try {
-    const user = await requireUser(request);
+    const user = await requireVerifiedUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
     if (!atlasAiEnabled()) return NextResponse.json({ error: "ATLAS_AI_NOT_CONFIGURED" }, { status: 503 });
 

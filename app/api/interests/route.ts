@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { adminDb, requireUser } from "@/lib/server/firebase-admin";
+import { adminDb, requireUser, requireVerifiedUser } from "@/lib/server/firebase-admin";
 import { getEligibleMember } from "@/lib/server/discovery";
 import { createNotification } from "@/lib/server/notifications";
 
@@ -8,7 +8,7 @@ type Body = { toUid?: string; action?: "interested" | "saved" | "pass" };
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(request);
+    const user = await requireVerifiedUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
     const db = adminDb;
     const body = (await request.json()) as Body;
@@ -66,6 +66,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : 500 });
+    return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : message === "EMAIL_VERIFICATION_REQUIRED" ? 403 : 500 });
   }
 }

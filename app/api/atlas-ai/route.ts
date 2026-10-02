@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { atlasApiError } from "@/lib/server/atlas-api-errors";
-import { adminDb, requireUser } from "@/lib/server/firebase-admin";
+import { adminDb, requireUser, requireVerifiedUser } from "@/lib/server/firebase-admin";
 import { atlasAiEnabled, atlasAiStatus, generateCompatibilityReflection, generateProfileReflection } from "@/lib/server/atlas-ai";
 import { calculateCompatibility } from "@/lib/compatibility";
 import { demoCompatibilityProfiles } from "@/lib/demo-compatibility-profiles";
@@ -26,7 +26,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(request);
+    const user = await requireVerifiedUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
     if (!atlasAiEnabled()) {
       return NextResponse.json({ error: "ATLAS_AI_NOT_CONFIGURED" }, { status: 503 });

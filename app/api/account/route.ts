@@ -73,6 +73,14 @@ export async function PATCH(request: Request) {
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
 
     const body = await request.json() as {
+      profile?: {
+        firstName?: string;
+        preferredName?: string;
+        age?: number;
+        generalLocation?: string;
+        occupation?: string;
+        aboutMe?: string;
+      };
       discoveryEnabled?: boolean;
       showAge?: boolean;
       showLocation?: boolean;
@@ -89,12 +97,98 @@ export async function PATCH(request: Request) {
       };
     };
 
+    const hasProfileChange =
+      body.profile &&
+      typeof body.profile === "object";
+
     const hasDiscoveryChange = typeof body.discoveryEnabled === "boolean";
+
+    // An authenticated account may manage its profile while unverified,
+    // but it must not become discoverable until the email address is verified.
+    if (
+      body.discoveryEnabled === true &&
+      user.email_verified !== true
+    ) {
+      return NextResponse.json(
+        { error: "EMAIL_VERIFICATION_REQUIRED" },
+        { status: 403 }
+      );
+    }
+
     const hasVisibilityChange = [body.showAge, body.showLocation, body.showOccupation].some((value) => typeof value === "boolean");
     const hasNotificationChange = body.notificationPreferences && typeof body.notificationPreferences === "object";
 
-    if (!hasDiscoveryChange && !hasVisibilityChange && !hasNotificationChange) {
+    if (!hasProfileChange && !hasDiscoveryChange && !hasVisibilityChange && !hasNotificationChange) {
       return NextResponse.json({ error: "INVALID_REQUEST" }, { status: 400 });
+    }
+
+    if (hasProfileChange) {
+      const profile = body.profile ?? {};
+
+      const firstName =
+        typeof profile.firstName === "string"
+          ? profile.firstName.trim()
+          : "";
+
+      const preferredName =
+        typeof profile.preferredName === "string"
+          ? profile.preferredName.trim()
+          : "";
+
+      const generalLocation =
+        typeof profile.generalLocation === "string"
+          ? profile.generalLocation.trim()
+          : "";
+
+      const occupation =
+        typeof profile.occupation === "string"
+          ? profile.occupation.trim()
+          : "";
+
+      const aboutMe =
+        typeof profile.aboutMe === "string"
+          ? profile.aboutMe.trim()
+          : "";
+
+      const age = Number(profile.age);
+
+      if (
+        !firstName ||
+        !generalLocation ||
+        !aboutMe ||
+        !Number.isInteger(age) ||
+        age < 18 ||
+        age > 100
+      ) {
+        return NextResponse.json(
+          { error: "INVALID_PROFILE" },
+          { status: 400 }
+        );
+      }
+
+      const ref = adminDb.collection("profiles").doc(user.uid);
+      const existing = await ref.get();
+
+      const updates: Record<string, unknown> = {
+        uid: user.uid,
+        firstName,
+        preferredName,
+        age,
+        generalLocation,
+        occupation,
+        aboutMe,
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      if (!existing.exists) {
+        updates.visibility = "private";
+        updates.showAge = true;
+        updates.showLocation = true;
+        updates.showOccupation = true;
+        updates.createdAt = FieldValue.serverTimestamp();
+      }
+
+      await ref.set(updates, { merge: true });
     }
 
     if (hasDiscoveryChange || hasVisibilityChange) {
@@ -143,7 +237,9 @@ export async function PATCH(request: Request) {
 
     await adminDb.collection("securityEvents").add({
       uid: user.uid,
-      eventType: hasDiscoveryChange
+      eventType: hasProfileChange
+        ? "profile_updated"
+        : hasDiscoveryChange
         ? body.discoveryEnabled ? "discovery_enabled" : "discovery_disabled"
         : hasVisibilityChange
           ? "profile_visibility_preferences_updated"
@@ -154,6 +250,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({
       ok: true,
+      profileUpdated: Boolean(hasProfileChange),
       discoveryEnabled: body.discoveryEnabled,
       showAge: body.showAge,
       showLocation: body.showLocation,

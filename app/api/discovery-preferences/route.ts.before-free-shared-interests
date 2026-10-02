@@ -1,6 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
-import { adminDb, requireUser, requireVerifiedUser } from "@/lib/server/firebase-admin";
+import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { defaultDiscoveryPreferences, type DiscoveryPreferences } from "@/lib/discovery-preferences";
 import { membershipFor } from "@/lib/server/membership";
 
@@ -12,19 +12,19 @@ const educationPreferences=["doesnt_matter","similar_background","graduate_prefe
 
 export async function GET(request:Request){
  try{
-  const user=await requireVerifiedUser(request); if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
+  const user=await requireUser(request); if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
   const [snap,membership]=await Promise.all([
     adminDb.collection("discoveryPreferences").doc(user.uid).get(),
     membershipFor(user.uid)
   ]);
   const data=snap.exists?snap.data():{};
   return NextResponse.json({preferences:{uid:user.uid,...defaultDiscoveryPreferences,...data},membership});
- }catch(error){const message=error instanceof Error?error.message:"UNKNOWN_ERROR";return NextResponse.json({error:message},{status:message==="UNAUTHENTICATED"?401:message==="EMAIL_VERIFICATION_REQUIRED"?403:500})}
+ }catch(error){const message=error instanceof Error?error.message:"UNKNOWN_ERROR";return NextResponse.json({error:message},{status:message==="UNAUTHENTICATED"?401:500})}
 }
 
 export async function POST(request:Request){
  try{
-  const user=await requireVerifiedUser(request); if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
+  const user=await requireUser(request); if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
   const body=await request.json() as Partial<DiscoveryPreferences>;
   const minAge=Number(body.minAge),maxAge=Number(body.maxAge);
   if(!Number.isInteger(minAge)||!Number.isInteger(maxAge)||minAge<18||maxAge>100||minAge>maxAge)return NextResponse.json({error:"INVALID_AGE_RANGE"},{status:400});
@@ -48,7 +48,7 @@ export async function POST(request:Request){
       ? body.introductionLocation
       : "doesnt_matter";
   const sharedInterestPreference =
-    typeof body.sharedInterestPreference === "string" &&
+    advanced && typeof body.sharedInterestPreference === "string" &&
     ["doesnt_matter","preference","important"].includes(body.sharedInterestPreference)
       ? body.sharedInterestPreference
       : "doesnt_matter";
@@ -60,8 +60,8 @@ export async function POST(request:Request){
     advanced && typeof body.preferredHeightMaxCm === "number" && Number.isFinite(body.preferredHeightMaxCm)
       ? Math.max(120,Math.min(220,body.preferredHeightMaxCm))
       : null;
-  const preferredSharedInterests=Array.isArray(body.preferredSharedInterests)?body.preferredSharedInterests.filter((x:unknown)=>typeof x==="string").slice(0,20):[];
+  const preferredSharedInterests=advanced&&Array.isArray(body.preferredSharedInterests)?body.preferredSharedInterests.filter((x:unknown)=>typeof x==="string").slice(0,20):[];
   await ref.set({uid:user.uid,minAge,maxAge,locationPreference:body.locationPreference,relationshipIntents,requireRelocationOpen:advanced&&body.requireRelocationOpen===true,professionPreferenceMode,preferredProfessionAreas,educationPreference,preferredHeightMinCm,preferredHeightMaxCm,heightPreferenceImportance,introductionLocation,sharedInterestPreference,preferredSharedInterests,createdAt:existing.exists?(existing.data()?.createdAt??FieldValue.serverTimestamp()):FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()},{merge:true});
   return NextResponse.json({ok:true});
- }catch(error){const message=error instanceof Error?error.message:"UNKNOWN_ERROR";return NextResponse.json({error:message},{status:message==="UNAUTHENTICATED"?401:message==="EMAIL_VERIFICATION_REQUIRED"?403:500})}
+ }catch(error){const message=error instanceof Error?error.message:"UNKNOWN_ERROR";return NextResponse.json({error:message},{status:message==="UNAUTHENTICATED"?401:500})}
 }

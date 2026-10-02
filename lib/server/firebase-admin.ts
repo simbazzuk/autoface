@@ -31,3 +31,13 @@ export async function requireUser(request: Request) {
   if (!token) throw new Error("UNAUTHENTICATED");
   return adminAuth.verifyIdToken(token, true);
 }
+
+export async function requireVerifiedUser(request: Request) {
+  const user = await requireUser(request);
+
+  if (user.email_verified !== true) {
+    throw new Error("EMAIL_VERIFICATION_REQUIRED");
+  }
+
+  return user;
+}

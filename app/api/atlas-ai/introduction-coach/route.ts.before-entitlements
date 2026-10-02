@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { atlasApiError } from "@/lib/server/atlas-api-errors";
-import { adminDb, requireUser, requireVerifiedUser } from "@/lib/server/firebase-admin";
+import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { requireActiveMatch } from "@/lib/server/messaging";
-import {
-  atlasUsageFor,
-  consumeAtlasUsage,
-} from "@/lib/server/membership";
 import { atlasAiEnabled, generateIntroductionCoach } from "@/lib/server/atlas-ai";
 import { calculateCompatibility } from "@/lib/compatibility";
 import type { RelationshipProfile } from "@/lib/relationship-profile";
@@ -14,17 +10,11 @@ export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   try {
-    const user = await requireVerifiedUser(request);
+    const user = await requireUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
     const matchId = new URL(request.url).searchParams.get("matchId") ?? "";
     if (!matchId) throw new Error("INVALID_REQUEST");
     const match = await requireActiveMatch(matchId, user.uid);
-
-    const [conversationUsage, replyUsage] = await Promise.all([
-      atlasUsageFor(user.uid, "atlasConversationCoach"),
-      atlasUsageFor(user.uid, "atlasReplyCoach"),
-    ]);
-
     const [viewerSnap, otherSnap] = await Promise.all([
       adminDb.collection("relationshipProfiles").doc(user.uid).get(),
       adminDb.collection("relationshipProfiles").doc(match.otherUid).get(),
@@ -33,47 +23,22 @@ export async function GET(request: Request) {
     const other = otherSnap.data() as Partial<RelationshipProfile> | undefined;
     const viewerOptIn = viewer?.consentForAiDiscovery === true;
     const otherOptIn = other?.consentForAiDiscovery === true;
-    return NextResponse.json({
-      enabled: atlasAiEnabled(),
-      viewerOptIn,
-      otherOptIn,
-      available: atlasAiEnabled() && viewerOptIn && otherOptIn,
-      usage: {
-        conversationCoach: conversationUsage,
-        replyCoach: replyUsage,
-      },
-    });
+    return NextResponse.json({ enabled: atlasAiEnabled(), viewerOptIn, otherOptIn, available: atlasAiEnabled() && viewerOptIn && otherOptIn });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : message === "EMAIL_VERIFICATION_REQUIRED" ? 403 : 500 });
+    return NextResponse.json({ error: message }, { status: message === "UNAUTHENTICATED" ? 401 : 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const user = await requireVerifiedUser(request);
+    const user = await requireUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
     if (!atlasAiEnabled()) return NextResponse.json({ error: "ATLAS_AI_NOT_CONFIGURED" }, { status: 503 });
     const body = await request.json() as { matchId?: string; consent?: boolean };
     const matchId = body.matchId?.trim() ?? "";
     if (!matchId || body.consent !== true) return NextResponse.json({ error: "AI_CONSENT_REQUIRED" }, { status: 400 });
     const match = await requireActiveMatch(matchId, user.uid);
-
-    const allowance = await atlasUsageFor(
-      user.uid,
-      "atlasConversationCoach",
-    );
-
-    if (allowance.remaining <= 0) {
-      return NextResponse.json(
-        {
-          error: "ATLAS_DAILY_LIMIT_REACHED",
-          usage: allowance,
-        },
-        { status: 429 },
-      );
-    }
-
     const [viewerSnap, otherSnap, otherProfileSnap] = await Promise.all([
       adminDb.collection("relationshipProfiles").doc(user.uid).get(),
       adminDb.collection("relationshipProfiles").doc(match.otherUid).get(),
@@ -86,18 +51,7 @@ export async function POST(request: Request) {
     const result = calculateCompatibility(viewer, other);
     const otherName = String(otherProfileSnap.data()?.firstName ?? "your introduction").slice(0, 50);
     const coach = await generateIntroductionCoach(otherName, viewer, other, result);
-
-    const usage = await consumeAtlasUsage(
-      user.uid,
-      "atlasConversationCoach",
-    );
-
-    return NextResponse.json({
-      coach,
-      usage,
-      persisted: false,
-      notice: "Atlas generated editable conversation starters. Nothing was sent or saved.",
-    });
+    return NextResponse.json({ coach, persisted: false, notice: "Atlas generated editable conversation starters. Nothing was sent or saved." });
   } catch (error) {
     return atlasApiError(error);
 

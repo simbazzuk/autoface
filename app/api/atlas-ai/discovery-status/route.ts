@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminDb, requireUser } from "@/lib/server/firebase-admin";
+import { adminDb, requireUser, requireVerifiedUser } from "@/lib/server/firebase-admin";
 import { atlasAiEnabled } from "@/lib/server/atlas-ai";
 import type { RelationshipProfile } from "@/lib/relationship-profile";
 
@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(request);
+    const user = await requireVerifiedUser(request);
     if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
 
     const body = await request.json() as { candidateUids?: string[] };
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json(
       { error: message },
-      { status: message === "UNAUTHENTICATED" ? 401 : 500 },
+      { status: message === "UNAUTHENTICATED" ? 401 : message === "EMAIL_VERIFICATION_REQUIRED" ? 403 : 500 },
     );
   }
 }
