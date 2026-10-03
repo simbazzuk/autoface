@@ -1,6 +1,7 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/server/firebase-admin";
 import { sendEmailNotification } from "@/lib/server/email-notifications";
+import { sendPushNotification } from "@/lib/server/push-notifications";
 
 export type NotificationType = "introduction" | "message" | "connection" | "verification" | "safety";
 
@@ -29,6 +30,14 @@ export async function createNotification(input: {
   const jobs: Promise<unknown>[] = [];
 
   if (inAppEnabled) {
+    jobs.push(sendPushNotification({
+      recipientUid: input.recipientUid,
+      title: input.title,
+      body: input.body,
+      type: input.type,
+      matchId: input.matchId ?? null,
+    }));
+
     jobs.push(adminDb.collection("notifications").add({
       recipientUid: input.recipientUid,
       type: input.type,
