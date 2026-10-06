@@ -109,9 +109,7 @@ async function preferencesFor(uid:string){
       preferredHeightMinCm:null,
       preferredHeightMaxCm:null,
       heightPreferenceImportance:"doesnt_matter",
-      introductionLocation:"doesnt_matter",
-      sharedInterestPreference:"doesnt_matter",
-      preferredSharedInterests:[]
+      introductionLocation:"doesnt_matter"
     } as DiscoveryPreferences;
   }
   return prefs;
@@ -130,11 +128,22 @@ export async function buildDiscoveryFor(requesterUid:string){
   ]);
   if(!requester)return{eligible:false,candidates:[] as SafeDiscoveryProfile[],preferences:prefs};
 
-  const [decisions,blocksByMe,blocksOfMe]=await Promise.all([
+  const [decisions,incomingInterests,blocksByMe,blocksOfMe]=await Promise.all([
     adminDb.collection("interests").where("fromUid","==",requesterUid).get(),
+    adminDb.collection("interests").where("toUid","==",requesterUid).get(),
     adminDb.collection("blocks").where("blockerUid","==",requesterUid).get(),
     adminDb.collection("blocks").where("blockedUid","==",requesterUid).get()
   ]);
+
+  // Incoming interest remains private. It influences curation only:
+  // the viewer is never told that the candidate has already expressed interest.
+  // Normal eligibility, preferences and blocking rules still apply.
+  const incomingInterested=new Set(
+    incomingInterests.docs
+      .filter(d=>d.data().status==="interested")
+      .map(d=>String(d.data().fromUid))
+  );
+
   const excluded=new Set(decisions.docs.map(d=>String(d.data().toUid)));
   for(const d of blocksByMe.docs)excluded.add(String(d.data().blockedUid));
   for(const d of blocksOfMe.docs)excluded.add(String(d.data().blockerUid));
@@ -146,20 +155,67 @@ export async function buildDiscoveryFor(requesterUid:string){
 
   for(const docSnap of profiles.docs){
     const uid=docSnap.id;
-    if(excluded.has(uid))continue;
+    const isIncoming=incomingInterested.has(uid);
+
+    if(excluded.has(uid)){
+      if(isIncoming)console.log("[Discovery Debug] incoming candidate EXCLUDED",{
+        requesterUid,
+        candidateUid:uid,
+        reason:"excluded_by_decision_or_block"
+      });
+      continue;
+    }
+
     const target=await getEligibleMember(uid);
+
     if(!target){
+      if(isIncoming)console.log("[Discovery Debug] incoming candidate EXCLUDED",{
+        requesterUid,
+        candidateUid:uid,
+        reason:"not_eligible"
+      });
       // A Firestore profile can outlive its Firebase Authentication user during
       // development/admin cleanup. It must never break Discovery for everyone else.
       skippedStaleProfiles+=1;
       continue;
     }
-    if(!passesPreferences(requester,target,prefs))continue;
+
+    if(!passesPreferences(requester,target,prefs)){
+      if(isIncoming)console.log("[Discovery Debug] incoming candidate EXCLUDED",{
+        requesterUid,
+        candidateUid:uid,
+        reason:"preferences",
+        candidateAge:target.profile.age,
+        minAge:prefs.minAge,
+        maxAge:prefs.maxAge,
+        candidateRelationshipIntent:target.profile.relationshipIntent,
+        allowedRelationshipIntents:prefs.relationshipIntents,
+        requesterLocation:requester.profile.generalLocation,
+        candidateLocation:target.profile.generalLocation,
+        locationPreference:prefs.locationPreference,
+        requireRelocationOpen:prefs.requireRelocationOpen,
+        candidateRelocationFlexibility:target.relationship.relocationFlexibility
+      });
+      continue;
+    }
+
+    if(isIncoming)console.log("[Discovery Debug] incoming candidate INCLUDED",{
+      requesterUid,
+      candidateUid:uid
+    });
+
     const result=calculateCompatibility(requester.relationship,target.relationship);
     candidates.push(projection(uid,target,result,requester,prefs));
   }
 
-  candidates.sort((a,b)=>b.compatibilityScore-a.compatibilityScore||b.authenticityScore-a.authenticityScore);
+  candidates.sort((a,b)=>{
+    const aIncoming=incomingInterested.has(a.uid)?1:0;
+    const bIncoming=incomingInterested.has(b.uid)?1:0;
+
+    return bIncoming-aIncoming
+      || b.compatibilityScore-a.compatibilityScore
+      || b.authenticityScore-a.authenticityScore;
+  });
   return{
     eligible:true,
     candidates:candidates.slice(0,membership.entitlements.expandedIntroductions?8:3),
@@ -171,7 +227,7 @@ export async function buildDiscoveryFor(requesterUid:string){
 export async function safeProjectionFor(viewerUid:string,targetUid:string){const [viewer,target,prefs]=await Promise.all([getEligibleMember(viewerUid,{strictAuth:true}),getEligibleMember(targetUid),preferencesFor(viewerUid)]);if(!viewer||!target)return null;return projection(targetUid,target,calculateCompatibility(viewer.relationship,target.relationship),viewer,prefs)}
 
 export type ProfileAlignmentIndicator={
-  key:"lifestyle"|"career"|"sikh_lifestyle"|"shared_interests"|"location";
+  key:"lifestyle"|"career"|"sikh_lifestyle"|"shared_interests"|"location"|"stated_preferences";
   label:string;
   score:number;
   status:"STRONG"|"GOOD"|"NEUTRAL"|"EXPLORE";
@@ -192,6 +248,116 @@ function buildProfileIntelligence(
   const indicators:ProfileAlignmentIndicator[]=[];
 
   const sharedHobbies=sharedItems(viewer.profile.hobbies,target.profile.hobbies);
+
+  // Explicit "What I'm looking for" preferences are deterministic context.
+  // They do not alter the official relationship compatibility percentage.
+  const preferenceEvidence:string[]=[];
+  let preferencePoints=0;
+  let preferenceSignals=0;
+
+  function evaluatePreference(
+    label:string,
+    targetValue:string|undefined|null,
+    preferred:string[],
+    importance:"doesnt_matter"|"preference"|"important"|"essential"
+  ){
+    if(
+      importance==="doesnt_matter" ||
+      preferred.length===0 ||
+      !targetValue ||
+      targetValue==="prefer_not_to_say"
+    )return;
+
+    preferenceSignals+=1;
+
+    const matched=preferred.includes(targetValue);
+    const importanceLabel=
+      importance==="preference"
+        ?"Nice to have"
+        :labelValue(importance);
+
+    if(matched){
+      preferencePoints+=
+        importance==="essential"?3:
+        importance==="important"?2:1;
+
+      preferenceEvidence.push(
+        `${labelValue(targetValue)} matches your ${label.toLowerCase()} preference, which you marked ${importanceLabel}.`
+      );
+    }else{
+      preferencePoints+=
+        importance==="essential"?-2:
+        importance==="important"?-1:0;
+
+      if(importance==="important"||importance==="essential"){
+        preferenceEvidence.push(
+          `${label} does not match a preference you marked ${importanceLabel}.`
+        );
+      }
+    }
+  }
+
+  evaluatePreference(
+    "Religion / faith",
+    target.profile.religion,
+    prefs.preferredReligions,
+    prefs.religionImportance
+  );
+
+  evaluatePreference(
+    "Diet",
+    target.profile.diet,
+    prefs.preferredDiets,
+    prefs.dietImportance
+  );
+
+  evaluatePreference(
+    "Drinking",
+    target.profile.drinking,
+    prefs.preferredDrinking,
+    prefs.drinkingImportance
+  );
+
+  evaluatePreference(
+    "Smoking",
+    target.profile.smoking,
+    prefs.preferredSmoking,
+    prefs.smokingImportance
+  );
+
+  evaluatePreference(
+    "Children",
+    target.profile.children,
+    prefs.preferredChildren,
+    prefs.childrenImportance
+  );
+
+  evaluatePreference(
+    "Future children",
+    target.profile.wantsChildren,
+    prefs.preferredWantsChildren,
+    prefs.wantsChildrenImportance
+  );
+
+  if(preferenceSignals>0){
+    const preferenceScore=clampFive(
+      preferencePoints>=5?5:
+      preferencePoints>=2?4:
+      preferencePoints>=0?3:
+      preferencePoints>=-2?2:1
+    );
+
+    indicators.push({
+      key:"stated_preferences",
+      label:"Your preferences",
+      score:preferenceScore,
+      status:indicatorStatus(preferenceScore),
+      explanation:
+        preferenceEvidence[0] ??
+        "This introduction has been compared with the preferences you explicitly set.",
+      evidence:preferenceEvidence
+    });
+  }
   let lifestyleScore=3;
   const lifestyleEvidence:string[]=[];
   if(viewer.profile.diet&&target.profile.diet&&viewer.profile.diet!=="prefer_not_to_say"&&target.profile.diet!=="prefer_not_to_say"){
