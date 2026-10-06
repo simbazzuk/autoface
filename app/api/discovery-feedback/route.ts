@@ -29,6 +29,15 @@ type Body = {
   reasons?: string[];
 };
 
+const PERSONALISABLE_REASONS = new Set([
+  "shared_values",
+  "relationship_goals",
+  "lifestyle_alignment",
+  "shared_interests",
+  "not_enough_shared_interests",
+  "different_priorities",
+]);
+
 export async function POST(request: Request) {
   try {
     const user = await requireVerifiedUser(request);
@@ -88,6 +97,9 @@ export async function POST(request: Request) {
 
     const feedbackId = `${user.uid}_${candidateUid}`;
 
+    const usedForPersonalisation =
+      reasons.some(reason => PERSONALISABLE_REASONS.has(reason));
+
     await adminDb
       .collection("discoveryFeedback")
       .doc(feedbackId)
@@ -98,7 +110,7 @@ export async function POST(request: Request) {
           decision,
           reasons,
           source: "discovery_decision",
-          usedForPersonalisation: false,
+          usedForPersonalisation,
           createdAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
         },
@@ -108,7 +120,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       saved: true,
-      usedForPersonalisation: false,
+      usedForPersonalisation,
     });
   } catch (error) {
     const message =
