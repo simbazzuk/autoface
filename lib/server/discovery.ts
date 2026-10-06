@@ -150,7 +150,11 @@ export async function buildDiscoveryFor(requesterUid:string){
   excluded.add(requesterUid);
 
   const profiles=await adminDb.collection("profiles").where("visibility","==","future_matches").limit(60).get();
-  const candidates:SafeDiscoveryProfile[]=[];
+  const rankedCandidates:{
+    candidate:SafeDiscoveryProfile;
+    preferenceAdjustment:number;
+    preferenceSignalsCompared:number;
+  }[]=[];
   let skippedStaleProfiles=0;
 
   for(const docSnap of profiles.docs){
@@ -205,17 +209,31 @@ export async function buildDiscoveryFor(requesterUid:string){
     });
 
     const result=calculateCompatibility(requester.relationship,target.relationship);
-    candidates.push(projection(uid,target,result,requester,prefs));
+    const preferenceMatch=preferenceFit(target,prefs);
+
+    rankedCandidates.push({
+      candidate:projection(uid,target,result,requester,prefs),
+      preferenceAdjustment:preferenceMatch.adjustment,
+      preferenceSignalsCompared:preferenceMatch.signalsCompared
+    });
   }
 
-  candidates.sort((a,b)=>{
-    const aIncoming=incomingInterested.has(a.uid)?1:0;
-    const bIncoming=incomingInterested.has(b.uid)?1:0;
+  rankedCandidates.sort((a,b)=>{
+    const aIncoming=incomingInterested.has(a.candidate.uid)?1:0;
+    const bIncoming=incomingInterested.has(b.candidate.uid)?1:0;
+
+    const aRankingScore=
+      a.candidate.compatibilityScore+a.preferenceAdjustment;
+    const bRankingScore=
+      b.candidate.compatibilityScore+b.preferenceAdjustment;
 
     return bIncoming-aIncoming
-      || b.compatibilityScore-a.compatibilityScore
-      || b.authenticityScore-a.authenticityScore;
+      || bRankingScore-aRankingScore
+      || b.candidate.compatibilityScore-a.candidate.compatibilityScore
+      || b.candidate.authenticityScore-a.candidate.authenticityScore;
   });
+
+  const candidates=rankedCandidates.map(item=>item.candidate);
   return{
     eligible:true,
     candidates:candidates.slice(0,membership.entitlements.expandedIntroductions?8:3),
@@ -240,22 +258,15 @@ function indicatorStatus(score:number):ProfileAlignmentIndicator["status"]{retur
 function labelValue(value:string|undefined|null){return String(value??"").replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase())}
 function sharedItems(a:string[]|undefined,b:string[]|undefined){const set=new Set((a??[]).map(x=>x.toLowerCase()));return (b??[]).filter(x=>set.has(x.toLowerCase()))}
 
-function buildProfileIntelligence(
-  viewer:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,
+function preferenceFit(
   target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,
   prefs:DiscoveryPreferences
 ){
-  const indicators:ProfileAlignmentIndicator[]=[];
+  const evidence:string[]=[];
+  let adjustment=0;
+  let signalsCompared=0;
 
-  const sharedHobbies=sharedItems(viewer.profile.hobbies,target.profile.hobbies);
-
-  // Explicit "What I'm looking for" preferences are deterministic context.
-  // They do not alter the official relationship compatibility percentage.
-  const preferenceEvidence:string[]=[];
-  let preferencePoints=0;
-  let preferenceSignals=0;
-
-  function evaluatePreference(
+  function evaluate(
     label:string,
     targetValue:string|undefined|null,
     preferred:string[],
@@ -268,7 +279,7 @@ function buildProfileIntelligence(
       targetValue==="prefer_not_to_say"
     )return;
 
-    preferenceSignals+=1;
+    signalsCompared+=1;
 
     const matched=preferred.includes(targetValue);
     const importanceLabel=
@@ -277,74 +288,95 @@ function buildProfileIntelligence(
         :labelValue(importance);
 
     if(matched){
-      preferencePoints+=
+      adjustment+=
         importance==="essential"?3:
         importance==="important"?2:1;
 
-      preferenceEvidence.push(
+      evidence.push(
         `${labelValue(targetValue)} matches your ${label.toLowerCase()} preference, which you marked ${importanceLabel}.`
       );
     }else{
-      preferencePoints+=
+      adjustment+=
         importance==="essential"?-2:
         importance==="important"?-1:0;
 
       if(importance==="important"||importance==="essential"){
-        preferenceEvidence.push(
+        evidence.push(
           `${label} does not match a preference you marked ${importanceLabel}.`
         );
       }
     }
   }
 
-  evaluatePreference(
+  evaluate(
     "Religion / faith",
     target.profile.religion,
     prefs.preferredReligions,
     prefs.religionImportance
   );
 
-  evaluatePreference(
+  evaluate(
     "Diet",
     target.profile.diet,
     prefs.preferredDiets,
     prefs.dietImportance
   );
 
-  evaluatePreference(
+  evaluate(
     "Drinking",
     target.profile.drinking,
     prefs.preferredDrinking,
     prefs.drinkingImportance
   );
 
-  evaluatePreference(
+  evaluate(
     "Smoking",
     target.profile.smoking,
     prefs.preferredSmoking,
     prefs.smokingImportance
   );
 
-  evaluatePreference(
+  evaluate(
     "Children",
     target.profile.children,
     prefs.preferredChildren,
     prefs.childrenImportance
   );
 
-  evaluatePreference(
+  evaluate(
     "Future children",
     target.profile.wantsChildren,
     prefs.preferredWantsChildren,
     prefs.wantsChildrenImportance
   );
 
-  if(preferenceSignals>0){
+  return{
+    adjustment,
+    signalsCompared,
+    evidence
+  };
+}
+
+function buildProfileIntelligence(
+  viewer:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,
+  target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,
+  prefs:DiscoveryPreferences
+){
+  const indicators:ProfileAlignmentIndicator[]=[];
+
+  const sharedHobbies=sharedItems(viewer.profile.hobbies,target.profile.hobbies);
+
+  // Explicit preferences are deterministic context.
+  // Discovery ranking and Relationship Insight share this calculation.
+  // It never changes the official relationship compatibility percentage.
+  const statedPreferenceFit=preferenceFit(target,prefs);
+
+  if(statedPreferenceFit.signalsCompared>0){
     const preferenceScore=clampFive(
-      preferencePoints>=5?5:
-      preferencePoints>=2?4:
-      preferencePoints>=0?3:
-      preferencePoints>=-2?2:1
+      statedPreferenceFit.adjustment>=5?5:
+      statedPreferenceFit.adjustment>=2?4:
+      statedPreferenceFit.adjustment>=0?3:
+      statedPreferenceFit.adjustment>=-2?2:1
     );
 
     indicators.push({
@@ -353,11 +385,12 @@ function buildProfileIntelligence(
       score:preferenceScore,
       status:indicatorStatus(preferenceScore),
       explanation:
-        preferenceEvidence[0] ??
+        statedPreferenceFit.evidence[0] ??
         "This introduction has been compared with the preferences you explicitly set.",
-      evidence:preferenceEvidence
+      evidence:statedPreferenceFit.evidence
     });
   }
+
   let lifestyleScore=3;
   const lifestyleEvidence:string[]=[];
   if(viewer.profile.diet&&target.profile.diet&&viewer.profile.diet!=="prefer_not_to_say"&&target.profile.diet!=="prefer_not_to_say"){
