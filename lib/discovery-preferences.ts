@@ -6,6 +6,12 @@ export type ProfessionArea = "healthcare" | "technology" | "finance" | "engineer
 export type ProfessionPreferenceMode = "doesnt_matter" | "similar_outlook" | "preferred_areas";
 export type EducationPreference = "doesnt_matter" | "similar_background" | "graduate_preferred" | "postgraduate_preferred";
 
+export type PreferenceImportance =
+  | "doesnt_matter"
+  | "preference"
+  | "important"
+  | "essential";
+
 export type DiscoveryPreferences = {
   uid: string;
   minAge: number;
@@ -22,6 +28,25 @@ export type DiscoveryPreferences = {
   introductionLocation: "doesnt_matter" | "same_area" | "within_50_miles" | "uk_wide" | "international";
   sharedInterestPreference: "doesnt_matter" | "preference" | "important";
   preferredSharedInterests: string[];
+
+  preferredReligions: string[];
+  religionImportance: PreferenceImportance;
+
+  preferredDiets: string[];
+  dietImportance: PreferenceImportance;
+
+  preferredDrinking: string[];
+  drinkingImportance: PreferenceImportance;
+
+  preferredSmoking: string[];
+  smokingImportance: PreferenceImportance;
+
+  preferredChildren: string[];
+  childrenImportance: PreferenceImportance;
+
+  preferredWantsChildren: string[];
+  wantsChildrenImportance: PreferenceImportance;
+
   createdAt?: unknown;
   updatedAt?: unknown;
 };
@@ -41,4 +66,22 @@ export const defaultDiscoveryPreferences: Omit<DiscoveryPreferences,"uid"> = {
   introductionLocation: "doesnt_matter",
   sharedInterestPreference: "doesnt_matter",
   preferredSharedInterests: [],
+
+  preferredReligions: [],
+  religionImportance: "doesnt_matter",
+
+  preferredDiets: [],
+  dietImportance: "doesnt_matter",
+
+  preferredDrinking: [],
+  drinkingImportance: "doesnt_matter",
+
+  preferredSmoking: [],
+  smokingImportance: "doesnt_matter",
+
+  preferredChildren: [],
+  childrenImportance: "doesnt_matter",
+
+  preferredWantsChildren: [],
+  wantsChildrenImportance: "doesnt_matter",
 };

@@ -10,6 +10,15 @@ const professionModes=["doesnt_matter","similar_outlook","preferred_areas"] as c
 const professionAreas=["healthcare","technology","finance","engineering","education","legal","business","public_sector","creative","skilled_trades","other"] as const;
 const educationPreferences=["doesnt_matter","similar_background","graduate_preferred","postgraduate_preferred"] as const;
 
+const preferenceImportance=["doesnt_matter","preference","important","essential"] as const;
+
+const religions=["sikh","hindu","muslim","christian","buddhist","jewish","none","other","prefer_not_to_say"] as const;
+const diets=["vegetarian","vegan","pescatarian","non_vegetarian","other","prefer_not_to_say"] as const;
+const drinking=["never","occasionally","socially","regularly","prefer_not_to_say"] as const;
+const smoking=["never","occasionally","regularly","prefer_not_to_say"] as const;
+const children=["no_children","have_children","prefer_not_to_say"] as const;
+const wantsChildren=["yes","no","open","unsure","prefer_not_to_say"] as const;
+
 export async function GET(request:Request){
  try{
   const user=await requireVerifiedUser(request); if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
@@ -61,7 +70,62 @@ export async function POST(request:Request){
       ? Math.max(120,Math.min(220,body.preferredHeightMaxCm))
       : null;
   const preferredSharedInterests=Array.isArray(body.preferredSharedInterests)?body.preferredSharedInterests.filter((x:unknown)=>typeof x==="string").slice(0,20):[];
-  await ref.set({uid:user.uid,minAge,maxAge,locationPreference:body.locationPreference,relationshipIntents,requireRelocationOpen:advanced&&body.requireRelocationOpen===true,professionPreferenceMode,preferredProfessionAreas,educationPreference,preferredHeightMinCm,preferredHeightMaxCm,heightPreferenceImportance,introductionLocation,sharedInterestPreference,preferredSharedInterests,createdAt:existing.exists?(existing.data()?.createdAt??FieldValue.serverTimestamp()):FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()},{merge:true});
+
+  const cleanValues=<T extends string>(
+    value:unknown,
+    allowed:readonly T[],
+  ):T[] =>
+    Array.isArray(value)
+      ?value.filter((x):x is T=>
+          typeof x==="string" &&
+          allowed.includes(x as T)
+        )
+      :[];
+
+  const importance=(value:unknown)=>
+    typeof value==="string" &&
+    preferenceImportance.includes(
+      value as typeof preferenceImportance[number]
+    )
+      ?value as typeof preferenceImportance[number]
+      :"doesnt_matter";
+
+  const preferredReligions=cleanValues(body.preferredReligions,religions);
+  const religionImportance=
+    preferredReligions.length>0
+      ?importance(body.religionImportance)
+      :"doesnt_matter";
+
+  const preferredDiets=cleanValues(body.preferredDiets,diets);
+  const dietImportance=
+    preferredDiets.length>0
+      ?importance(body.dietImportance)
+      :"doesnt_matter";
+
+  const preferredDrinking=cleanValues(body.preferredDrinking,drinking);
+  const drinkingImportance=
+    preferredDrinking.length>0
+      ?importance(body.drinkingImportance)
+      :"doesnt_matter";
+
+  const preferredSmoking=cleanValues(body.preferredSmoking,smoking);
+  const smokingImportance=
+    preferredSmoking.length>0
+      ?importance(body.smokingImportance)
+      :"doesnt_matter";
+
+  const preferredChildren=cleanValues(body.preferredChildren,children);
+  const childrenImportance=
+    preferredChildren.length>0
+      ?importance(body.childrenImportance)
+      :"doesnt_matter";
+
+  const preferredWantsChildren=cleanValues(body.preferredWantsChildren,wantsChildren);
+  const wantsChildrenImportance=
+    preferredWantsChildren.length>0
+      ?importance(body.wantsChildrenImportance)
+      :"doesnt_matter";
+  await ref.set({uid:user.uid,minAge,maxAge,locationPreference:body.locationPreference,relationshipIntents,requireRelocationOpen:advanced&&body.requireRelocationOpen===true,professionPreferenceMode,preferredProfessionAreas,educationPreference,preferredHeightMinCm,preferredHeightMaxCm,heightPreferenceImportance,introductionLocation,sharedInterestPreference,preferredSharedInterests,preferredReligions,religionImportance,preferredDiets,dietImportance,preferredDrinking,drinkingImportance,preferredSmoking,smokingImportance,preferredChildren,childrenImportance,preferredWantsChildren,wantsChildrenImportance,createdAt:existing.exists?(existing.data()?.createdAt??FieldValue.serverTimestamp()):FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()},{merge:true});
   return NextResponse.json({ok:true});
  }catch(error){const message=error instanceof Error?error.message:"UNKNOWN_ERROR";return NextResponse.json({error:message},{status:message==="UNAUTHENTICATED"?401:message==="EMAIL_VERIFICATION_REQUIRED"?403:500})}
 }
