@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb, requireUser } from "@/lib/server/firebase-admin";
 import { requireActiveMatch, messagingStatusCode } from "@/lib/server/messaging";
-import { safeProjectionFor } from "@/lib/server/discovery";
+import { recommendationFor, safeProjectionFor } from "@/lib/server/discovery";
 import { createNotification } from "@/lib/server/notifications";
 import { membershipFor } from "@/lib/server/membership";
 
@@ -49,8 +49,32 @@ export async function GET(request: Request) {
     const matchId = url.searchParams.get("matchId") ?? "";
     if (!matchId) throw new Error("INVALID_REQUEST");
     const match = await requireActiveMatch(matchId, user.uid);
-    const other = await safeProjectionFor(user.uid, match.otherUid);
+    const [other, recommendation] = await Promise.all([
+      safeProjectionFor(user.uid, match.otherUid),
+      recommendationFor(user.uid, match.otherUid),
+    ]);
     if (!other) throw new Error("TARGET_NOT_AVAILABLE");
+
+    const relationshipInsight = recommendation ? {
+      available: true,
+      compatibilityScore: recommendation.candidate.compatibilityScore,
+      compatibilityLevel: recommendation.candidate.compatibilityLevel,
+      strongestAlignments: recommendation.candidate.strongestAlignments,
+      conversationPoints: recommendation.candidate.conversationPoints,
+      dimensions: recommendation.dimensions.map((dimension) => ({
+        code: dimension.code,
+        label: dimension.label,
+        score: dimension.score,
+        explanation: dimension.explanation,
+      })),
+      confidence: recommendation.intelligence.confidence,
+      confidenceScore: recommendation.intelligence.confidenceScore,
+      summary: recommendation.summary,
+      profileIntelligence: recommendation.profileIntelligence,
+      notice: "Relationship insight explains your existing deterministic AutoFace compatibility result. It does not predict relationship success.",
+    } : {
+      available: false,
+    };
 
     const snapshot = await adminDb.collection("conversations").doc(matchId)
       .collection("messages").orderBy("createdAt", "asc").limit(100).get();
@@ -64,7 +88,7 @@ export async function GET(request: Request) {
       };
     });
     const messaging = await messagingEntitlement(matchId, user.uid);
-    return NextResponse.json({ matchId, other, messages, messaging });
+    return NextResponse.json({ matchId, other, messages, messaging, relationshipInsight });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     return NextResponse.json({ error: message }, { status: messagingStatusCode(message) });
