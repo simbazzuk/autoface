@@ -24,7 +24,14 @@ export type AutoFaceProfile = {
   caste?: string;
   sikhAppearance?: "turbaned" | "clean_shaven" | "not_applicable" | "prefer_not_to_say";
   sikhPractice?: "amritdhari" | "practising" | "moderate" | "cultural_not_religious" | "prefer_not_to_say";
-  diet?: "vegetarian" | "non_vegetarian" | "vegan" | "prefer_not_to_say";
+  religion?: "sikh" | "hindu" | "muslim" | "christian" | "buddhist" | "jewish" | "none" | "other" | "prefer_not_to_say";
+  faithImportance?: "not_important" | "somewhat_important" | "important" | "very_important";
+  diet?: "vegetarian" | "vegan" | "pescatarian" | "non_vegetarian" | "other" | "prefer_not_to_say";
+  drinking?: "never" | "occasionally" | "socially" | "regularly" | "prefer_not_to_say";
+  smoking?: "never" | "occasionally" | "regularly" | "prefer_not_to_say";
+  children?: "no_children" | "have_children" | "prefer_not_to_say";
+  wantsChildren?: "yes" | "no" | "open" | "unsure" | "prefer_not_to_say";
+  languages?: string[];
   hobbies?: string[];
   relationshipIntent: RelationshipIntent;
   aboutMe: string;

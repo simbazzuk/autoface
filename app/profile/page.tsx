@@ -34,7 +34,7 @@ const emptyProfile = {
   caste: "",
   sikhAppearance: "prefer_not_to_say" as "turbaned" | "clean_shaven" | "not_applicable" | "prefer_not_to_say",
   sikhPractice: "prefer_not_to_say" as "amritdhari" | "practising" | "moderate" | "cultural_not_religious" | "prefer_not_to_say",
-  diet: "prefer_not_to_say" as "vegetarian" | "non_vegetarian" | "vegan" | "prefer_not_to_say",
+  diet: "prefer_not_to_say" as "vegetarian" | "vegan" | "pescatarian" | "non_vegetarian" | "other" | "prefer_not_to_say",
   hobbies: [] as string[],
   relationshipIntent: "marriage" as RelationshipIntent,
   aboutMe: "",
@@ -382,8 +382,10 @@ export default function ProfilePage() {
                   <select id="diet" value={form.diet} onChange={(e) => change("diet", e.target.value as typeof form.diet)}>
                     <option value="prefer_not_to_say">Prefer not to say</option>
                     <option value="vegetarian">Vegetarian</option>
-                    <option value="non_vegetarian">Non-vegetarian</option>
                     <option value="vegan">Vegan</option>
+                    <option value="pescatarian">Pescatarian</option>
+                    <option value="non_vegetarian">Non-vegetarian</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
                 <div className="field">

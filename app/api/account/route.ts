@@ -80,6 +80,15 @@ export async function PATCH(request: Request) {
         generalLocation?: string;
         occupation?: string;
         aboutMe?: string;
+        relationshipIntent?: "marriage" | "long_term_relationship" | "serious_relationship";
+        religion?: "sikh" | "hindu" | "muslim" | "christian" | "buddhist" | "jewish" | "none" | "other" | "prefer_not_to_say";
+        faithImportance?: "not_important" | "somewhat_important" | "important" | "very_important";
+        diet?: "vegetarian" | "vegan" | "pescatarian" | "non_vegetarian" | "other" | "prefer_not_to_say";
+        drinking?: "never" | "occasionally" | "socially" | "regularly" | "prefer_not_to_say";
+        smoking?: "never" | "occasionally" | "regularly" | "prefer_not_to_say";
+        children?: "no_children" | "have_children" | "prefer_not_to_say";
+        wantsChildren?: "yes" | "no" | "open" | "unsure" | "prefer_not_to_say";
+        languages?: string[];
       };
       discoveryEnabled?: boolean;
       showAge?: boolean;
@@ -152,10 +161,64 @@ export async function PATCH(request: Request) {
 
       const age = Number(profile.age);
 
+      const relationshipIntent =
+        profile.relationshipIntent === "marriage" ||
+        profile.relationshipIntent === "long_term_relationship" ||
+        profile.relationshipIntent === "serious_relationship"
+          ? profile.relationshipIntent
+          : null;
+
+      const oneOf = <T extends string>(
+        value: unknown,
+        allowed: readonly T[],
+      ): T | null =>
+        typeof value === "string" && allowed.includes(value as T)
+          ? value as T
+          : null;
+
+      const religion = oneOf(profile.religion, [
+        "sikh","hindu","muslim","christian","buddhist","jewish",
+        "none","other","prefer_not_to_say",
+      ] as const);
+
+      const faithImportance = oneOf(profile.faithImportance, [
+        "not_important","somewhat_important","important","very_important",
+      ] as const);
+
+      const diet = oneOf(profile.diet, [
+        "vegetarian","vegan","pescatarian","non_vegetarian",
+        "other","prefer_not_to_say",
+      ] as const);
+
+      const drinking = oneOf(profile.drinking, [
+        "never","occasionally","socially","regularly","prefer_not_to_say",
+      ] as const);
+
+      const smoking = oneOf(profile.smoking, [
+        "never","occasionally","regularly","prefer_not_to_say",
+      ] as const);
+
+      const children = oneOf(profile.children, [
+        "no_children","have_children","prefer_not_to_say",
+      ] as const);
+
+      const wantsChildren = oneOf(profile.wantsChildren, [
+        "yes","no","open","unsure","prefer_not_to_say",
+      ] as const);
+
+      const languages = Array.isArray(profile.languages)
+        ? profile.languages
+            .filter((value): value is string => typeof value === "string")
+            .map(value => value.trim())
+            .filter(Boolean)
+            .slice(0, 10)
+        : [];
+
       if (
         !firstName ||
         !generalLocation ||
         !aboutMe ||
+        !relationshipIntent ||
         !Number.isInteger(age) ||
         age < 18 ||
         age > 100
@@ -177,6 +240,15 @@ export async function PATCH(request: Request) {
         generalLocation,
         occupation,
         aboutMe,
+        relationshipIntent,
+        religion,
+        faithImportance,
+        diet,
+        drinking,
+        smoking,
+        children,
+        wantsChildren,
+        languages,
         updatedAt: FieldValue.serverTimestamp(),
       };
 
