@@ -8,7 +8,7 @@ import { membershipFor } from "@/lib/server/membership";
 
 export const DISCOVERY_AUTHENTICITY_THRESHOLD=50;
 export type RecommendationReason={code:string;label:string;score:number;kind:"strength"|"consideration"};
-export type SafeDiscoveryProfile={uid:string;firstName:string;age:number|null;generalLocation:string|null;heightCm:number|null;occupation:string|null;professionArea:AutoFaceProfile["professionArea"]|null;employmentType:AutoFaceProfile["employmentType"]|null;careerImportance:AutoFaceProfile["careerImportance"]|null;educationLevel:AutoFaceProfile["educationLevel"]|null;educationField:string|null;educationInstitution:string|null;sikhAppearance:AutoFaceProfile["sikhAppearance"]|null;sikhPractice:AutoFaceProfile["sikhPractice"]|null;diet:AutoFaceProfile["diet"]|null;caste:string|null;hobbies:string[];relationshipIntent:AutoFaceProfile["relationshipIntent"];aboutMe:string;authenticityScore:number;authenticityLevel:string;faceVerified:boolean;compatibilityScore:number;compatibilityLevel:string;careerPreferenceFit:"preferred"|"similar_outlook"|"neutral";strongestAlignments:string[];conversationPoints:string[];recommendationReasons:RecommendationReason[];isTestProfile:boolean};
+export type SafeDiscoveryProfile={uid:string;firstName:string;age:number|null;generalLocation:string|null;heightCm:number|null;occupation:string|null;professionArea:AutoFaceProfile["professionArea"]|null;employmentType:AutoFaceProfile["employmentType"]|null;careerImportance:AutoFaceProfile["careerImportance"]|null;educationLevel:AutoFaceProfile["educationLevel"]|null;educationField:string|null;educationInstitution:string|null;sikhAppearance:AutoFaceProfile["sikhAppearance"]|null;sikhPractice:AutoFaceProfile["sikhPractice"]|null;diet:AutoFaceProfile["diet"]|null;caste:string|null;hobbies:string[];relationshipIntent:AutoFaceProfile["relationshipIntent"];aboutMe:string;authenticityScore:number;authenticityLevel:string;faceVerified:boolean;compatibilityScore:number;compatibilityLevel:string;careerPreferenceFit:"preferred"|"similar_outlook"|"neutral";strongestAlignments:string[];conversationPoints:string[];recommendationReasons:RecommendationReason[];introductionReasons:string[];isTestProfile:boolean};
 
 function isMissingAuthUser(error:unknown){
   if(!error||typeof error!=="object")return false;
@@ -118,7 +118,47 @@ function area(value:string){return value.toLowerCase().split(",")[0].trim()}
 function passesPreferences(requester:Awaited<ReturnType<typeof getEligibleMember>>,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs:DiscoveryPreferences){if(!requester)return false;if(target.profile.age<prefs.minAge||target.profile.age>prefs.maxAge)return false;if(!prefs.relationshipIntents.includes(target.profile.relationshipIntent))return false;if(prefs.locationPreference==="same_general_area"&&area(requester.profile.generalLocation)!==area(target.profile.generalLocation))return false;if(prefs.requireRelocationOpen&&Number(target.relationship.relocationFlexibility)<3)return false;return true}
 function reasons(result:ReturnType<typeof calculateCompatibility>){const strengths=result.strongestAlignments.map(x=>({code:x.key,label:x.label,score:x.score,kind:"strength" as const}));const considerations=result.conversationPoints.map(x=>({code:x.key,label:x.label,score:x.score,kind:"consideration" as const}));return[...strengths,...considerations]}
 function careerFit(requester:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs:DiscoveryPreferences):SafeDiscoveryProfile["careerPreferenceFit"]{if(prefs.professionPreferenceMode==="preferred_areas"&&target.profile.professionArea&&prefs.preferredProfessionAreas.includes(target.profile.professionArea))return"preferred";if(prefs.professionPreferenceMode==="similar_outlook"&&requester.profile.careerImportance&&target.profile.careerImportance&&requester.profile.careerImportance===target.profile.careerImportance)return"similar_outlook";return"neutral"}
-function projection(targetUid:string,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,result:ReturnType<typeof calculateCompatibility>,requester?:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs?:DiscoveryPreferences):SafeDiscoveryProfile{return{uid:targetUid,firstName:target.profile.preferredName?.trim()||target.profile.firstName,age:target.profile.showAge?target.profile.age:null,generalLocation:target.profile.showLocation?target.profile.generalLocation:null,heightCm:target.profile.heightCm??null,occupation:target.profile.showOccupation?target.profile.occupation:null,professionArea:target.profile.professionArea??null,employmentType:target.profile.employmentType??null,careerImportance:target.profile.careerImportance??null,educationLevel:target.profile.educationLevel??null,educationField:target.profile.educationField?.trim()||null,educationInstitution:target.profile.educationInstitution?.trim()||null,sikhAppearance:target.profile.sikhAppearance??null,sikhPractice:target.profile.sikhPractice??null,diet:target.profile.diet??null,caste:target.profile.caste?.trim()||null,hobbies:Array.isArray(target.profile.hobbies)?target.profile.hobbies:[],relationshipIntent:target.profile.relationshipIntent,aboutMe:target.profile.aboutMe,authenticityScore:target.authenticity.score,authenticityLevel:target.authenticity.level,faceVerified:target.authenticity.faceVerified===true,compatibilityScore:result.score,compatibilityLevel:result.level,careerPreferenceFit:requester&&prefs?careerFit(requester,target,prefs):"neutral",strongestAlignments:result.strongestAlignments.map(x=>x.label),conversationPoints:result.conversationPoints.map(x=>x.label),recommendationReasons:reasons(result),isTestProfile:target.isTestProfile}}
+function introductionReasons(
+  target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,
+  result:ReturnType<typeof calculateCompatibility>,
+  prefs:DiscoveryPreferences
+){
+  const reasons:string[]=[];
+
+  if(result.score>=80){
+    reasons.push("Strong relationship compatibility");
+  }else if(result.score>=65){
+    reasons.push("Good relationship compatibility");
+  }
+
+  const fit=preferenceFit(target,prefs);
+
+  if(fit.signalsCompared>0&&fit.adjustment>=2){
+    reasons.push("Matches preferences important to you");
+  }else if(fit.signalsCompared>0&&fit.adjustment>0){
+    reasons.push("Matches some of the preferences you set");
+  }
+
+  const alignmentLabels=result.strongestAlignments
+    .map(item=>item.label.toLowerCase());
+
+  if(
+    alignmentLabels.some(label=>
+      label.includes("interest")||
+      label.includes("lifestyle")
+    )
+  ){
+    reasons.push("Shared interests or lifestyle signals");
+  }
+
+  if(result.strongestAlignments.length>=2){
+    reasons.push("Several relationship signals align");
+  }
+
+  return reasons.slice(0,3);
+}
+
+function projection(targetUid:string,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,result:ReturnType<typeof calculateCompatibility>,requester?:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs?:DiscoveryPreferences):SafeDiscoveryProfile{return{uid:targetUid,firstName:target.profile.preferredName?.trim()||target.profile.firstName,age:target.profile.showAge?target.profile.age:null,generalLocation:target.profile.showLocation?target.profile.generalLocation:null,heightCm:target.profile.heightCm??null,occupation:target.profile.showOccupation?target.profile.occupation:null,professionArea:target.profile.professionArea??null,employmentType:target.profile.employmentType??null,careerImportance:target.profile.careerImportance??null,educationLevel:target.profile.educationLevel??null,educationField:target.profile.educationField?.trim()||null,educationInstitution:target.profile.educationInstitution?.trim()||null,sikhAppearance:target.profile.sikhAppearance??null,sikhPractice:target.profile.sikhPractice??null,diet:target.profile.diet??null,caste:target.profile.caste?.trim()||null,hobbies:Array.isArray(target.profile.hobbies)?target.profile.hobbies:[],relationshipIntent:target.profile.relationshipIntent,aboutMe:target.profile.aboutMe,authenticityScore:target.authenticity.score,authenticityLevel:target.authenticity.level,faceVerified:target.authenticity.faceVerified===true,compatibilityScore:result.score,compatibilityLevel:result.level,careerPreferenceFit:requester&&prefs?careerFit(requester,target,prefs):"neutral",strongestAlignments:result.strongestAlignments.map(x=>x.label),conversationPoints:result.conversationPoints.map(x=>x.label),recommendationReasons:reasons(result),introductionReasons:requester&&prefs?introductionReasons(target,result,prefs):[],isTestProfile:target.isTestProfile}}
 export async function buildDiscoveryFor(requesterUid:string){
   if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
   const [requester,prefs,membership]=await Promise.all([
