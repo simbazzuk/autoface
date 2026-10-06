@@ -159,12 +159,79 @@ function introductionReasons(
 }
 
 function projection(targetUid:string,target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,result:ReturnType<typeof calculateCompatibility>,requester?:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,prefs?:DiscoveryPreferences):SafeDiscoveryProfile{return{uid:targetUid,firstName:target.profile.preferredName?.trim()||target.profile.firstName,age:target.profile.showAge?target.profile.age:null,generalLocation:target.profile.showLocation?target.profile.generalLocation:null,heightCm:target.profile.heightCm??null,occupation:target.profile.showOccupation?target.profile.occupation:null,professionArea:target.profile.professionArea??null,employmentType:target.profile.employmentType??null,careerImportance:target.profile.careerImportance??null,educationLevel:target.profile.educationLevel??null,educationField:target.profile.educationField?.trim()||null,educationInstitution:target.profile.educationInstitution?.trim()||null,sikhAppearance:target.profile.sikhAppearance??null,sikhPractice:target.profile.sikhPractice??null,diet:target.profile.diet??null,caste:target.profile.caste?.trim()||null,hobbies:Array.isArray(target.profile.hobbies)?target.profile.hobbies:[],relationshipIntent:target.profile.relationshipIntent,aboutMe:target.profile.aboutMe,authenticityScore:target.authenticity.score,authenticityLevel:target.authenticity.level,faceVerified:target.authenticity.faceVerified===true,compatibilityScore:result.score,compatibilityLevel:result.level,careerPreferenceFit:requester&&prefs?careerFit(requester,target,prefs):"neutral",strongestAlignments:result.strongestAlignments.map(x=>x.label),conversationPoints:result.conversationPoints.map(x=>x.label),recommendationReasons:reasons(result),introductionReasons:requester&&prefs?introductionReasons(target,result,prefs):[],isTestProfile:target.isTestProfile}}
+type DiscoveryFeedbackLearning={
+  sharedInterestsEvidence:number;
+};
+
+async function discoveryFeedbackLearning(
+  uid:string
+):Promise<DiscoveryFeedbackLearning>{
+  if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
+
+  const snap=await adminDb
+    .collection("discoveryFeedback")
+    .where("uid","==",uid)
+    .limit(100)
+    .get();
+
+  let sharedInterestsEvidence=0;
+
+  for(const doc of snap.docs){
+    const data=doc.data();
+
+    if(data.usedForPersonalisation!==true)continue;
+
+    const decision=String(data.decision??"");
+    const reasons=Array.isArray(data.reasons)
+      ?data.reasons.map(String)
+      :[];
+
+    const unique=new Set(reasons);
+
+    if(
+      ["interested","saved"].includes(decision) &&
+      unique.has("shared_interests")
+    ){
+      sharedInterestsEvidence+=1;
+    }
+
+    if(
+      decision==="pass" &&
+      unique.has("not_enough_shared_interests")
+    ){
+      sharedInterestsEvidence+=1;
+    }
+  }
+
+  return{sharedInterestsEvidence};
+}
+
+function feedbackRankingAdjustment(
+  requester:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,
+  target:NonNullable<Awaited<ReturnType<typeof getEligibleMember>>>,
+  learning:DiscoveryFeedbackLearning
+){
+  if(learning.sharedInterestsEvidence<2)return 0;
+
+  const shared=sharedItems(
+    requester.profile.hobbies,
+    target.profile.hobbies
+  );
+
+  if(shared.length===0)return 0;
+
+  // Explicit repeated feedback only refines ranking.
+  // It never changes the official compatibility percentage.
+  return learning.sharedInterestsEvidence>=4?2:1;
+}
+
 export async function buildDiscoveryFor(requesterUid:string){
   if(!adminDb)throw new Error("SERVER_NOT_CONFIGURED");
-  const [requester,prefs,membership]=await Promise.all([
+  const [requester,prefs,membership,feedbackLearning]=await Promise.all([
     getEligibleMember(requesterUid,{strictAuth:true}),
     preferencesFor(requesterUid),
-    membershipFor(requesterUid)
+    membershipFor(requesterUid),
+    discoveryFeedbackLearning(requesterUid)
   ]);
   if(!requester)return{eligible:false,candidates:[] as SafeDiscoveryProfile[],preferences:prefs};
 
@@ -194,6 +261,7 @@ export async function buildDiscoveryFor(requesterUid:string){
     candidate:SafeDiscoveryProfile;
     preferenceAdjustment:number;
     preferenceSignalsCompared:number;
+    feedbackAdjustment:number;
   }[]=[];
   let skippedStaleProfiles=0;
 
@@ -250,11 +318,17 @@ export async function buildDiscoveryFor(requesterUid:string){
 
     const result=calculateCompatibility(requester.relationship,target.relationship);
     const preferenceMatch=preferenceFit(target,prefs);
+    const feedbackAdjustment=feedbackRankingAdjustment(
+      requester,
+      target,
+      feedbackLearning
+    );
 
     rankedCandidates.push({
       candidate:projection(uid,target,result,requester,prefs),
       preferenceAdjustment:preferenceMatch.adjustment,
-      preferenceSignalsCompared:preferenceMatch.signalsCompared
+      preferenceSignalsCompared:preferenceMatch.signalsCompared,
+      feedbackAdjustment
     });
   }
 
@@ -263,9 +337,14 @@ export async function buildDiscoveryFor(requesterUid:string){
     const bIncoming=incomingInterested.has(b.candidate.uid)?1:0;
 
     const aRankingScore=
-      a.candidate.compatibilityScore+a.preferenceAdjustment;
+      a.candidate.compatibilityScore+
+      a.preferenceAdjustment+
+      a.feedbackAdjustment;
+
     const bRankingScore=
-      b.candidate.compatibilityScore+b.preferenceAdjustment;
+      b.candidate.compatibilityScore+
+      b.preferenceAdjustment+
+      b.feedbackAdjustment;
 
     return bIncoming-aIncoming
       || bRankingScore-aRankingScore
