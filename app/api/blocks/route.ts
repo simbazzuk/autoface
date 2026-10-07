@@ -120,18 +120,35 @@ export async function DELETE(request: Request) {
     for (const doc of matchingDocs) {
       if (doc.ref.path !== canonicalRef.path) batch.delete(doc.ref);
     }
+    // Reset previous Discovery decisions in both directions.
+    //
+    // A block ends the relationship. If the blocker later explicitly
+    // unblocks the member, both people must start again through the normal
+    // Discovery journey. Old interested/saved/pass decisions must not
+    // automatically recreate a mutual connection.
+    const myInterestRef = adminDb
+      .collection("interests")
+      .doc(`${user.uid}_${blockedUid}`);
+
+    const theirInterestRef = adminDb
+      .collection("interests")
+      .doc(`${blockedUid}_${user.uid}`);
+
+    batch.delete(myInterestRef);
+    batch.delete(theirInterestRef);
+
     await batch.commit();
 
     // Deliberately do NOT restore the old match/conversation.
-    // Unblock means "remove my safety block", not "reconnect us".
-    // This prevents an accidental reconnection and requires the normal
-    // discovery/mutual-interest journey before a new active connection.
+    // Unblock removes the safety block and resets Discovery state.
+    // Any future connection must be created through fresh mutual interest.
     await adminDb.collection("securityEvents").add({
       uid: user.uid,
       eventType: "member_unblocked",
       targetUid: blockedUid,
       matchId,
       conversationRestored: false,
+      discoveryReset: true,
       createdAt: FieldValue.serverTimestamp(),
     });
 
@@ -140,6 +157,7 @@ export async function DELETE(request: Request) {
       blockedUid,
       matchId,
       conversationRestored: false,
+      discoveryReset: true,
       rediscoveryEligible: true,
     });
   } catch (error) {

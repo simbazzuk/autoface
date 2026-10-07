@@ -1,0 +1,21 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "GDFZ555M9T.chat.mip.autoface"
+        ],
+        "components": [
+          {
+            "/": "/messages/*",
+            "comment": "Open AutoFace conversations from message notifications"
+          },
+          {
+            "/": "/connections/*",
+            "comment": "Open AutoFace connections from introduction notifications"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -20,11 +20,36 @@ function containsContactDetails(text: string) {
 
 async function messagingEntitlement(matchId: string, uid: string) {
   if (!adminDb) throw new Error("SERVER_NOT_CONFIGURED");
+
   const membership = await membershipFor(uid);
   const unlimited = membership.entitlements.unlimitedMessaging;
-  const sent = await adminDb.collection("conversations").doc(matchId)
-    .collection("messages").where("senderUid", "==", uid).get();
-  const sentCount = sent.size;
+
+  const conversationRef = adminDb.collection("conversations").doc(matchId);
+  const conversationSnap = await conversationRef.get();
+  const conversationStartedAt = conversationSnap.data()?.conversationStartedAt;
+
+  // Read the conversation's messages and count this member's messages
+  // within the current connection period in memory. This deliberately
+  // avoids requiring a Firestore composite index for senderUid + createdAt.
+  const sent = await conversationRef
+    .collection("messages")
+    .orderBy("createdAt", "asc")
+    .get();
+
+  const sentCount = sent.docs.filter((doc) => {
+    const data = doc.data();
+
+    if (String(data.senderUid ?? "") !== uid) return false;
+
+    if (!conversationStartedAt) return true;
+
+    const createdAt = data.createdAt;
+    if (!createdAt?.toMillis || !conversationStartedAt?.toMillis) {
+      return false;
+    }
+
+    return createdAt.toMillis() >= conversationStartedAt.toMillis();
+  }).length;
   return {
     plan: membership.plan,
     unlimited,
@@ -76,8 +101,20 @@ export async function GET(request: Request) {
       available: false,
     };
 
-    const snapshot = await adminDb.collection("conversations").doc(matchId)
-      .collection("messages").orderBy("createdAt", "asc").limit(100).get();
+    const conversationRef = adminDb.collection("conversations").doc(matchId);
+    const conversationSnap = await conversationRef.get();
+    const conversationStartedAt = conversationSnap.data()?.conversationStartedAt;
+
+    let messagesQuery = conversationRef
+      .collection("messages")
+      .orderBy("createdAt", "asc");
+
+    if (conversationStartedAt) {
+      messagesQuery = messagesQuery.startAt(conversationStartedAt);
+    }
+
+    const snapshot = await messagesQuery.limit(100).get();
+
     const messages = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {

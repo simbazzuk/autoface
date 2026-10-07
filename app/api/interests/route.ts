@@ -44,12 +44,34 @@ export async function POST(request: Request) {
       if (reverse.exists && reverse.data()?.status === "interested") {
         const participants = [user.uid, body.toUid].sort();
         const matchId = participants.join("__");
+        // A pair may previously have matched and later been blocked/unmatched.
+        // Fresh mutual interest creates a fresh active connection while keeping
+        // the deterministic match id used throughout AutoFace.
         await db.collection("matches").doc(matchId).set({
           participants,
           status: "mutual",
+          endedBy: FieldValue.delete(),
+          endedAt: FieldValue.delete(),
           createdAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true });
+
+        // Re-open the conversation only because BOTH members have now made
+        // fresh Discovery decisions after the previous relationship ended.
+        //
+        // conversationStartedAt creates a new visible conversation period.
+        // Older messages remain retained for safety/audit purposes but are
+        // not surfaced in the newly established connection.
+        const conversationStartedAt = FieldValue.serverTimestamp();
+
+        await db.collection("conversations").doc(matchId).set({
+          status: "active",
+          closedReason: FieldValue.delete(),
+          conversationStartedAt,
+          lastMessageAt: FieldValue.delete(),
+          updatedAt: conversationStartedAt,
+        }, { merge: true });
+
         await Promise.all([
           createNotification({ recipientUid: user.uid, type: "introduction", title: `New introduction with ${toMember.profile.firstName}`, body: "You both independently expressed interest. Your private Connection space is ready.", actionUrl: `/connections/${matchId}`, actorUid: body.toUid, matchId }),
           createNotification({ recipientUid: body.toUid, type: "introduction", title: `New introduction with ${fromMember.profile.firstName}`, body: "You both independently expressed interest. Your private Connection space is ready.", actionUrl: `/connections/${matchId}`, actorUid: user.uid, matchId }),
