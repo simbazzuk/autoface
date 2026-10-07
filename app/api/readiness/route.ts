@@ -25,6 +25,10 @@ export async function GET(request: Request) {
     const relationship = (relationshipSnap.data() ?? {}) as Partial<RelationshipProfile>;
     const identity = identitySnap.data() ?? {};
 
+    const faceVerified =
+      identity.livenessVerified === true &&
+      identity.photoVerified === true;
+
     const authenticity = calculateAuthenticity({
       emailVerified: Boolean(user.email_verified),
       phoneVerified: Boolean(user.phone_number),
@@ -43,7 +47,13 @@ export async function GET(request: Request) {
         title: "Build your profile",
         shortTitle: "Profile",
         description: "Tell people who you are, including lifestyle, profession, education and interests.",
-        complete: profileSnap.exists && Boolean(profile.firstName) && Boolean(profile.surname) && Boolean(profile.aboutMe),
+        complete:
+          profileSnap.exists &&
+          Boolean(profile.firstName) &&
+          typeof profile.age === "number" &&
+          profile.age >= 18 &&
+          Boolean(profile.generalLocation) &&
+          Boolean(profile.aboutMe),
         href: "/profile",
         optional: false,
       },
@@ -75,12 +85,12 @@ export async function GET(request: Request) {
         optional: false,
       },
       {
-        id: "authenticity",
-        title: "Build authenticity",
-        shortTitle: "Trust",
-        description: "Reach the minimum trust threshold required to enter Discovery.",
-        complete: authenticity.score >= 50,
-        href: "/dashboard",
+        id: "verification",
+        title: "Complete Face Verification",
+        shortTitle: "Verification",
+        description: "Confirm that a live person matches your current profile photo.",
+        complete: faceVerified,
+        href: "/verify-face",
         optional: false,
       },
       {
@@ -106,6 +116,9 @@ export async function GET(request: Request) {
           : user.name || user.email?.split("@")[0] || "there",
       authenticityScore: authenticity.score,
       authenticityLevel: authenticity.level,
+      faceVerified,
+      livenessVerified: identity.livenessVerified === true,
+      photoVerified: identity.photoVerified === true,
       profileCompleteness: profileCompleteness.score,
       atlasCompleteness: atlasCompleteness.score,
       photoAdded: photoSnap.exists,
