@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AutoFace | Email Verification",
+  description: "Return to the AutoFace app after verifying your email address.",
+};
+
 export default function EmailVerifiedPage() {
   return (
     <main style={{
@@ -22,7 +29,7 @@ export default function EmailVerifiedPage() {
         <div style={{ fontSize: 44, margin: "24px 0" }}>✓</div>
         <h2>Email verification</h2>
         <p style={{ color: "#c7d1e0", lineHeight: 1.7 }}>
-          If Firebase has confirmed your email address,
+          Once you've verified your email address,
           return to the AutoFace app and tap
           &quot;I've verified&quot; to continue.
         </p>
