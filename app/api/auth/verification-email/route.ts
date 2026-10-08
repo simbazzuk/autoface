@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       await adminAuth.generateEmailVerificationLink(
         user.email,
         {
-          url: "https://mip.chat/verify-email"
+          url: "https://mip.chat/mobile/email-verified"
         }
       );
 

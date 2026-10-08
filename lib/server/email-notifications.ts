@@ -221,7 +221,7 @@ export async function sendAccountVerificationEmail(
       `Verify your email: ${verificationUrl}\n\n` +
       `If you didn't create an AutoFace account, you can safely ignore this email.\n\n` +
       `AutoFace — Private introductions, considered carefully.\n` +
-      `mip.chat`;
+      `AutoFace`;
 
     const html = `<!doctype html>
 <html>
@@ -234,7 +234,7 @@ export async function sendAccountVerificationEmail(
             AutoFace
           </div>
           <div style="margin-top:5px;color:#bda8ff;font-size:12px;font-weight:700">
-            PRIVATE INTRODUCTIONS · mip.chat
+            PRIVATE INTRODUCTIONS
           </div>
         </div>
 
