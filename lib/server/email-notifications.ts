@@ -189,3 +189,177 @@ export async function sendEmailNotification(input: EmailInput) {
     return { sent: false, reason: "EMAIL_SEND_FAILED" };
   }
 }
+
+export async function sendAccountVerificationEmail(
+  recipientUid: string,
+  verificationUrl: string
+) {
+  if (!adminDb || !adminAuth) {
+    return { sent: false, reason: "SERVER_NOT_CONFIGURED" };
+  }
+
+  try {
+    const authUser = await adminAuth.getUser(recipientUid);
+    const to = authUser.email;
+
+    if (!to) {
+      return { sent: false, reason: "NO_EMAIL" };
+    }
+
+    if (authUser.emailVerified) {
+      return { sent: false, reason: "ALREADY_VERIFIED" };
+    }
+
+    const safeUrl = escapeHtml(verificationUrl);
+
+    const subject = "Verify your email for AutoFace";
+
+    const text =
+      `Verify your email for AutoFace\n\n` +
+      `Welcome to AutoFace.\n\n` +
+      `Confirm your email address to continue setting up your profile and start your private Discovery journey.\n\n` +
+      `Verify your email: ${verificationUrl}\n\n` +
+      `If you didn't create an AutoFace account, you can safely ignore this email.\n\n` +
+      `AutoFace — Private introductions, considered carefully.\n` +
+      `mip.chat`;
+
+    const html = `<!doctype html>
+<html>
+  <body style="margin:0;background:#07101f;font-family:Arial,Helvetica,sans-serif;color:#f7f9ff">
+    <div style="max-width:620px;margin:0 auto;padding:34px 18px">
+      <div style="border:1px solid #27385d;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,#111c39,#19143a)">
+
+        <div style="padding:26px 28px;border-bottom:1px solid #2b3656">
+          <div style="font-size:22px;font-weight:800">
+            AutoFace
+          </div>
+          <div style="margin-top:5px;color:#bda8ff;font-size:12px;font-weight:700">
+            PRIVATE INTRODUCTIONS · mip.chat
+          </div>
+        </div>
+
+        <div style="padding:32px 28px">
+          <div style="color:#8dd8ff;font-size:11px;font-weight:800;letter-spacing:.09em">
+            EMAIL VERIFICATION
+          </div>
+
+          <h1 style="font-size:27px;line-height:1.2;margin:10px 0 14px">
+            Verify your email
+          </h1>
+
+          <p style="font-size:16px;line-height:1.65;color:#c7d1e0;margin:0 0 12px">
+            Welcome to AutoFace.
+          </p>
+
+          <p style="font-size:16px;line-height:1.65;color:#c7d1e0;margin:0 0 26px">
+            Confirm your email address to continue setting up your profile
+            and start your private Discovery journey.
+          </p>
+
+          <a
+            href="${safeUrl}"
+            style="display:inline-block;padding:14px 22px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#4aa8ff);color:#ffffff;text-decoration:none;font-weight:800"
+          >
+            Verify my email
+          </a>
+
+          <p style="font-size:13px;line-height:1.6;color:#8e9db5;margin:26px 0 0">
+            This confirms that you control the email address used to create
+            your AutoFace account.
+          </p>
+        </div>
+
+        <div style="padding:18px 28px;border-top:1px solid #2b3656;color:#8e9db5;font-size:12px;line-height:1.6">
+          If you didn't create an AutoFace account, you can safely ignore this email.
+          <br><br>
+          AutoFace · Private introductions, considered carefully.
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>`;
+
+    const deliveryRef = adminDb.collection("emailDeliveries").doc();
+
+    const baseLog = {
+      uid: recipientUid,
+      category: "account_verification",
+      to,
+      subject,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    if (!RESEND_API_KEY) {
+      await deliveryRef.set({
+        ...baseLog,
+        status: "configuration_required",
+        provider: "resend",
+      });
+
+      return {
+        sent: false,
+        reason: "EMAIL_PROVIDER_NOT_CONFIGURED"
+      };
+    }
+
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: [to],
+        subject,
+        html,
+        text,
+      }),
+    });
+
+    const result = await response.json().catch(() => ({})) as {
+      id?: string;
+      message?: string;
+    };
+
+    if (!response.ok) {
+      await deliveryRef.set({
+        ...baseLog,
+        status: "failed",
+        provider: "resend",
+        providerError:
+          result.message ?? `HTTP_${response.status}`,
+      });
+
+      return {
+        sent: false,
+        reason: "PROVIDER_FAILED"
+      };
+    }
+
+    await deliveryRef.set({
+      ...baseLog,
+      status: "sent",
+      provider: "resend",
+      providerMessageId: result.id ?? null,
+      sentAt: FieldValue.serverTimestamp(),
+    });
+
+    return {
+      sent: true,
+      providerMessageId: result.id ?? null
+    };
+  } catch (error) {
+    console.error(
+      "AutoFace account verification email failed",
+      error
+    );
+
+    return {
+      sent: false,
+      reason: "EMAIL_SEND_FAILED"
+    };
+  }
+}
