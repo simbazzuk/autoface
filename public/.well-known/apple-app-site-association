@@ -13,6 +13,10 @@
           {
             "/": "/connections/*",
             "comment": "Open AutoFace connections from introduction notifications"
+          },
+          {
+            "/": "/profile",
+            "comment": "Open AutoFace profile from verification notifications"
           }
         ]
       }

@@ -84,13 +84,17 @@ async function markMessageEmailSent(input: EmailInput) {
 }
 
 function renderEmail(input: EmailInput) {
-  const action = absoluteActionUrl(input.actionUrl);
+  const action = absoluteActionUrl(
+    input.category === "verification" && input.actionUrl === "/verify-face"
+      ? "/profile"
+      : input.actionUrl
+  );
   const safeTitle = escapeHtml(input.title);
   const safeBody = escapeHtml(input.body);
 
   return {
     subject: input.title,
-    text: `${input.title}\n\n${input.body}\n\nOpen AutoFace: ${action}\n\nAutoFace — The Match Intelligence Platform\nmip.chat`,
+    text: `${input.title}\n\n${input.body}\n\nOpen AutoFace: ${action}\n\nAutoFace — The Match Intelligence Platform`,
     html: `<!doctype html>
 <html>
   <body style="margin:0;background:#07101f;font-family:Arial,Helvetica,sans-serif;color:#f7f9ff">
@@ -98,7 +102,7 @@ function renderEmail(input: EmailInput) {
       <div style="border:1px solid #27385d;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,#111c39,#19143a)">
         <div style="padding:26px 28px;border-bottom:1px solid #2b3656">
           <div style="font-size:22px;font-weight:800">AutoFace</div>
-          <div style="margin-top:5px;color:#bda8ff;font-size:12px;font-weight:700">THE MATCH INTELLIGENCE PLATFORM · mip.chat</div>
+          <div style="margin-top:5px;color:#bda8ff;font-size:12px;font-weight:700">THE MATCH INTELLIGENCE PLATFORM</div>
         </div>
         <div style="padding:30px 28px">
           <div style="color:#8dd8ff;font-size:11px;font-weight:800;letter-spacing:.09em">${escapeHtml(input.category.toUpperCase())}</div>
