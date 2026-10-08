@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import { SiteChrome } from "@/components/SiteChrome";
 import { AuthProvider } from "@/components/AuthProvider";
-import { SupportAssistant } from "@/components/SupportAssistant";
 
 export const metadata: Metadata = {
   title: "AutoFace — The Match Intelligence Platform | mip.chat",
@@ -11,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><AuthProvider><Header />{children}<Footer /><SupportAssistant /></AuthProvider></body></html>;
+  return <html lang="en"><body><AuthProvider><SiteChrome>{children}</SiteChrome></AuthProvider></body></html>;
 }
